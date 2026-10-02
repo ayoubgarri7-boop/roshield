@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Le nom du site est ajouté automatiquement au titre par commun.js -->
+  <title>Accueil</title>
+  <meta name="description" content="Apprends à repérer les arnaques et le vol de compte sur Roblox et Discord. Vérifie un lien avant de cliquer.">
+
+  <!-- Polices Google -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Le menu est construit ici par js/commun.js -->
+  <div id="entete"></div>
+
+  <main>
+    <!-- ===== Section d'accueil ===== -->
+    <section class="hero conteneur">
+
+      <a class="badge-nouveau" href="verificateur.html">
+        <span class="badge-nouveau__label">NOUVEAU</span>
+        <span>Vérificateur de liens disponible</span>
+        <span class="badge-nouveau__fleche" aria-hidden="true">→</span>
+      </a>
+
+      <p class="sur-titre">Protection Roblox &amp; Discord</p>
+
+      <h1 class="hero__titre">
+        Ne tombe plus dans le <span class="texte-degrade">piège</span><span class="point-couleur">.</span>
+      </h1>
+
+      <p class="hero__intro">
+        Faux Robux gratuits, faux modérateurs, liens piégés : <strong><span data-nom></span></strong>
+        t'apprend à repérer les arnaques et à protéger ton compte, en quelques minutes.
+      </p>
+
+      <div class="hero__boutons">
+        <a class="bouton bouton--principal" href="verificateur.html">
+          <!-- Icône bouclier (SVG écrit à la main) -->
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
+               stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 3l8 3v6c0 4.5-3.2 8.3-8 9-4.8-.7-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/>
+          </svg>
+          Vérifier un lien
+        </a>
+        <a class="bouton bouton--secondaire" href="guides.html">Voir les guides</a>
+      </div>
+    </section>
+
+    <!-- ===== Les 3 outils du site ===== -->
+    <section class="section conteneur">
+      <h2 class="section__titre">Tout pour rester en sécurité</h2>
+      <p class="section__intro">Trois outils simples, pensés pour être utilisés sur téléphone.</p>
+
+      <div class="grille">
+        <a class="carte" href="verificateur.html">
+          <div class="carte__icone" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div>
+          <h3>Vérificateur de lien</h3>
+          <p>Colle un lien suspect : on t'explique s'il vient d'un site officiel ou d'un faux site.</p>
+        </a>
+
+        <a class="carte" href="guides.html">
+          <div class="carte__icone" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/></svg></div>
+          <h3>Guide des arnaques</h3>
+          <p>Cookie logging, faux Robux, faux modérateurs… comment ça marche et comment s'en protéger.</p>
+        </a>
+
+        <a class="carte" href="securite.html">
+          <div class="carte__icone" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M8 12l3 3 5-6"/></svg></div>
+          <h3>Checklist de sécurité</h3>
+          <p>Les réglages à activer sur ton compte pour que les pirates aient la vie dure.</p>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Le pied de page est construit ici par js/commun.js -->
+  <div id="pied"></div>
+
+  <!-- Scripts à la fin de la page : config.js d'abord, puis commun.js -->
+  <script src="js/config.js"></script>
+  <script src="js/commun.js"></script>
+</body>
+</html>
