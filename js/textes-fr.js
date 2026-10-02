@@ -16,8 +16,12 @@ window.TEXTES_VERIF = {
   // ----- Les 3 niveaux -----
   titres: {
     vert: "Domaine officiel",
-    orange: "Suspect : vérifie avant de cliquer",
-    rouge: "Danger : faux lien probable, ne clique pas"
+    // Tout ce qui n'est ni officiel ni une imitation évidente : un seul titre
+    jaune: "Domaine inconnu de RoShield",
+    rouge: "Danger : faux lien probable, ne clique pas",
+    // Cas particulier : domaine officiel, mais avec un détail à vérifier (http://, @...)
+    // Le titre "inconnu" serait faux ici, puisque le domaine est bien connu.
+    officielAttention: "Domaine officiel, mais vérifie le lien"
   },
 
   // ----- Affichage du domaine -----
@@ -52,10 +56,11 @@ window.TEXTES_VERIF = {
   },
   adresseIP: "Ce lien utilise une adresse IP (des chiffres) à la place d'un nom de site. Roblox et Discord n'envoient jamais de liens comme ça.",
   punycode: "Ce nom de domaine est codé (il contient « xn-- »). C'est souvent utilisé pour cacher des lettres d'un autre alphabet qui ressemblent aux nôtres (par exemple un « о » russe à la place d'un « o »). C'est une technique classique de faux site.",
+  // Petites lignes d'explication (affichées sous le message principal, en jaune)
   raccourcisseur: function (domaine) {
-    return "« " + domaine + " » est un raccourcisseur de liens : on ne peut pas savoir où il mène juste en regardant le lien. Évite-le, surtout si on te le demande pour un jeu ou un cadeau.";
+    return "Ce lien est raccourci (« " + domaine + " ») : on ne voit pas où il mène.";
   },
-  http: "Le lien commence par « http:// » et non « https:// » : la connexion n'est pas chiffrée. Un vrai site de connexion utilise toujours https.",
+  http: "Ce lien commence par « http:// » et non « https:// » : la connexion n'est pas chiffrée.",
   imiteSousDomaine: function (officiel, vrai) {
     return "Ce lien imite « " + officiel + " » dans son adresse, mais le vrai domaine est « " + vrai + " ». " +
       "Ce qui compte, c'est la fin du nom, pas le début.";
@@ -72,7 +77,7 @@ window.TEXTES_VERIF = {
   partieProche: function (partie, mot, vrai) {
     return "Dans « " + vrai + " », le mot « " + partie + " » ressemble beaucoup à « " + mot + " » : c'est probablement une faute de frappe faite exprès pour te tromper.";
   },
-  inconnu: function (vrai) {
-    return "Le domaine « " + vrai + " » n'est ni Roblox ni Discord. Si on t'a dit que ce lien vient de Roblox ou de Discord, c'est faux. Vérifie qui te l'a envoyé avant de cliquer.";
-  }
+  inconnu:
+    "RoShield ne connaît que les domaines officiels de Roblox et de Discord. Ça ne veut pas dire que ce lien " +
+    "est dangereux, mais on ne peut pas le confirmer. Vérifie qui te l'a envoyé et tape l'adresse toi-même si tu as un doute."
 };

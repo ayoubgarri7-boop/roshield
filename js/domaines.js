@@ -25,7 +25,7 @@ window.DOMAINES_OFFICIELS = [
 // Ils sont probablement liés à Roblox/Discord (cités par des listes de la
 // communauté), mais je n'ai pas trouvé de page OFFICIELLE qui le confirme.
 // Tant que ce n'est pas confirmé, on ne les met pas en vert.
-// Ils sont donc affichés "suspect" (orange) ou "imitation" selon le cas.
+// Ils sont donc affichés "domaine inconnu" (jaune) ou "imitation" selon le cas.
 window.DOMAINES_A_CONFIRMER = [
   "rbxcdn.com",      // serveur d'images/fichiers de Roblox (très probable)
   "robloxlabs.com",  // domaine interne de Roblox (probable)

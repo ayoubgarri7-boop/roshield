@@ -37,7 +37,7 @@
      http://192.168.12.34/login                 (adresse IP)
      javascript:alert(1)                        (protocole dangereux)
 
-   ORANGE (suspect)
+   JAUNE (domaine inconnu de RoShield)
      https://bit.ly/abc123                      (raccourcisseur)
      http://www.roblox.com                      (http sur domaine officiel)
      https://mon-super-site.com                 (inconnu, sans rapport)
@@ -57,7 +57,7 @@
   const RACCOURCISSEURS = window.RACCOURCISSEURS;
 
   // Gravité des niveaux : permet de garder "le pire" à la fin
-  const GRAVITE = { vert: 0, orange: 1, rouge: 2 };
+  const GRAVITE = { vert: 0, jaune: 1, rouge: 2 };
 
   /* ------------------------------------------------------
      Distance de Levenshtein : combien de changements
@@ -134,9 +134,12 @@
       const p = sansSlashes[1].toLowerCase();
       const dangereux = ["javascript", "data", "vbscript", "file", "blob"].includes(p);
       return {
-        niveau: dangereux ? "rouge" : "orange",
+        niveau: dangereux ? "rouge" : "jaune",
+        titreCle: dangereux ? "rouge" : "jaune",
         hote: null,
-        raisons: [dangereux ? T.protocoleDangereux(p) : T.protocoleInhabituel(p)]
+        // Dangereux : explication en rouge. Sinon : explication jaune + petite ligne sur le protocole.
+        raisons: dangereux ? [T.protocoleDangereux(p)] : [T.inconnu],
+        notes: dangereux ? [] : [T.protocoleInhabituel(p)]
       };
     }
 
@@ -156,9 +159,12 @@
       const p = url.protocol.replace(":", "");
       const dangereux = ["javascript", "data", "vbscript", "file", "blob"].includes(p);
       return {
-        niveau: dangereux ? "rouge" : "orange",
+        niveau: dangereux ? "rouge" : "jaune",
+        titreCle: dangereux ? "rouge" : "jaune",
         hote: null,
-        raisons: [dangereux ? T.protocoleDangereux(p) : T.protocoleInhabituel(p)]
+        // Dangereux : explication en rouge. Sinon : explication jaune + petite ligne sur le protocole.
+        raisons: dangereux ? [T.protocoleDangereux(p)] : [T.inconnu],
+        notes: dangereux ? [] : [T.protocoleInhabituel(p)]
       };
     }
 
@@ -182,10 +188,11 @@
 
     // --- 5. On collecte les raisons, avec leur niveau ---
     const raisons = [];
+    const notes = [];   // petites lignes en plus (raccourcisseur, http://) : elles ne changent pas le titre
     function ajouter(niveau, message) { raisons.push({ niveau: niveau, message: message }); }
 
     if (url.username || url.password) {
-      ajouter(officiel ? "orange" : "rouge", T.arobase(hote, !!officiel));
+      ajouter(officiel ? "jaune" : "rouge", T.arobase(hote, !!officiel));
     }
     if (estIP) ajouter("rouge", T.adresseIP);
 
@@ -194,10 +201,10 @@
     if (estPunycode) ajouter("rouge", T.punycode);
 
     const raccourci = RACCOURCISSEURS.find(function (r) { return estOuSousDomaine(hote, r); });
-    if (raccourci) ajouter("orange", T.raccourcisseur(raccourci));
+    if (raccourci) notes.push(T.raccourcisseur(raccourci));
 
     // http:// n'est signalé que si l'utilisateur l'a écrit lui-même
-    if (avaitProtocole && url.protocol === "http:") ajouter("orange", T.http);
+    if (avaitProtocole && url.protocol === "http:") notes.push(T.http);
 
     // --- 6. Domaine NON officiel : cherche les imitations ---
     if (!officiel && !estIP && !estPunycode && !raccourci) {
@@ -256,9 +263,12 @@
           }
         }
       }
+    }
 
-      // f) rien de louche trouvé : domaine simplement inconnu
-      if (!trouve) ajouter("orange", T.inconnu(reel));
+    // --- 6b. Ni officiel, ni imitation évidente : "domaine inconnu de RoShield" (jaune) ---
+    // (raccourcisseurs et domaines sans rapport avec Roblox/Discord arrivent ici)
+    if (!officiel && !raisons.some(function (r) { return r.niveau === "rouge"; })) {
+      ajouter("jaune", T.inconnu);
     }
 
     // --- 7. Niveau final = le pire des niveaux trouvés ---
@@ -266,8 +276,10 @@
     raisons.forEach(function (r) {
       if (GRAVITE[r.niveau] > GRAVITE[niveau]) niveau = r.niveau;
     });
+    // Un domaine officiel avec une petite remarque (http://, raccourci...) passe en jaune
+    if (niveau === "vert" && notes.length > 0) niveau = "jaune";
     // Pas officiel et aucune raison (ne devrait pas arriver) : prudence
-    if (!officiel && niveau === "vert") niveau = "orange";
+    if (!officiel && niveau === "vert") niveau = "jaune";
 
     const messages = raisons.map(function (r) { return r.message; });
 
@@ -284,7 +296,11 @@
       messages.unshift(T.officielInfo(officiel.domaine));
     }
 
-    return { niveau: niveau, hote: hote, sous: sous, reel: reel, raisons: messages };
+    // Titre : un seul titre pour tout le jaune ("Domaine inconnu de RoShield").
+    // Exception : domaine officiel avec un détail (http://, @) -> "inconnu" serait faux.
+    const titreCle = officiel && niveau === "jaune" ? "officielAttention" : niveau;
+
+    return { niveau: niveau, titreCle: titreCle, hote: hote, sous: sous, reel: reel, raisons: messages, notes: notes };
   }
 
   // On expose la fonction pour pouvoir la tester (et la réutiliser)
@@ -333,7 +349,7 @@
     const rond = creer("span", "resultat__rond resultat__rond--" + res.niveau);
     rond.setAttribute("aria-hidden", "true");
     titre.appendChild(rond);
-    titre.appendChild(document.createTextNode(T.titres[res.niveau]));
+    titre.appendChild(document.createTextNode(T.titres[res.titreCle || res.niveau]));
     boite.appendChild(titre);
 
     // Domaine réel en gros (le morceau qui compte est mis en valeur)
@@ -352,6 +368,11 @@
     const liste = creer("ul", "resultat__raisons");
     res.raisons.forEach(function (r) { liste.appendChild(creer("li", "", r)); });
     boite.appendChild(liste);
+
+    // Petites lignes en plus (raccourcisseur, http://...) : sous le message principal
+    (res.notes || []).forEach(function (n) {
+      boite.appendChild(creer("p", "resultat__note", n));
+    });
 
     zoneResultat.appendChild(boite);
     blocApresClic.hidden = false;

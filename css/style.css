@@ -24,8 +24,8 @@
   --violet: #a46bff;
   --rose: #ff6bc1;
 
-  /* Danger / alerte (pour le vérificateur) */
-  --orange: #ffb547;
+  /* Niveaux du vérificateur : vert (officiel), jaune (inconnu), rouge (danger) */
+  --jaune: #ffd43b;                   /* domaine inconnu (contraste 13:1 sur fond sombre) */
   --rouge: #ff5d6c;
 
   /* Cartes en "verre" */
@@ -459,7 +459,7 @@ a.carte:hover {
           backdrop-filter: blur(12px);
 }
 .resultat--vert   { border-color: rgba(62, 224, 143, 0.55); box-shadow: 0 0 30px rgba(62, 224, 143, 0.12); }
-.resultat--orange { border-color: rgba(255, 181, 71, 0.55); box-shadow: 0 0 30px rgba(255, 181, 71, 0.12); }
+.resultat--jaune  { border-color: rgba(255, 212, 59, 0.55); box-shadow: 0 0 30px rgba(255, 212, 59, 0.12); }
 .resultat--rouge  { border-color: rgba(255, 93, 108, 0.6);  box-shadow: 0 0 30px rgba(255, 93, 108, 0.14); }
 .resultat--erreur { border-color: rgba(255, 93, 108, 0.45); }
 .resultat__erreur { margin: 0; }
@@ -477,10 +477,10 @@ a.carte:hover {
   vertical-align: -0.1em;
 }
 .resultat__rond--vert   { background: var(--vert);   box-shadow: 0 0 0.6em var(--vert); }
-.resultat__rond--orange { background: var(--orange); box-shadow: 0 0 0.6em var(--orange); }
+.resultat__rond--jaune  { background: var(--jaune);  box-shadow: 0 0 0.6em var(--jaune); }
 .resultat__rond--rouge  { background: var(--rouge);  box-shadow: 0 0 0.6em var(--rouge); }
 .resultat--vert   .resultat__titre { color: var(--vert); }
-.resultat--orange .resultat__titre { color: var(--orange); }
+.resultat--jaune  .resultat__titre { color: var(--jaune); }
 .resultat--rouge  .resultat__titre { color: var(--rouge); }
 
 .domaine {
@@ -498,6 +498,15 @@ a.carte:hover {
 
 .resultat__raisons { margin: 0; padding-left: 22px; }
 .resultat__raisons li { margin-bottom: 10px; }
+
+/* Petite ligne d'explication (raccourcisseur, http://...) */
+.resultat__note {
+  margin: 14px 0 0;
+  padding-left: 12px;
+  border-left: 3px solid var(--jaune);
+  color: var(--texte-doux);
+  font-size: 0.9rem;
+}
 
 .apres-clic, .conseil { margin-top: 20px; }
 .apres-clic h2, .conseil h2 { font-size: 1.3rem; }
@@ -589,8 +598,8 @@ code { font-family: ui-monospace, Consolas, monospace; font-size: 0.92em; overfl
 }
 .guide__bloc--comment .guide__etiquette { color: var(--bleu); }
 .guide__bloc--comment .guide__etiquette::before { background: var(--bleu); box-shadow: 0 0 8px var(--bleu); }
-.guide__bloc--reconnaitre .guide__etiquette { color: var(--orange); }
-.guide__bloc--reconnaitre .guide__etiquette::before { background: var(--orange); box-shadow: 0 0 8px var(--orange); }
+.guide__bloc--reconnaitre .guide__etiquette { color: var(--jaune); }
+.guide__bloc--reconnaitre .guide__etiquette::before { background: var(--jaune); box-shadow: 0 0 8px var(--jaune); }
 .guide__bloc--proteger .guide__etiquette { color: var(--vert); }
 .guide__bloc--proteger .guide__etiquette::before { background: var(--vert); box-shadow: 0 0 8px var(--vert); }
 
