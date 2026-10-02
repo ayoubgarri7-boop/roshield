@@ -19,7 +19,6 @@ window.TEXTES_VERIF = {
     orange: "Suspect : vérifie avant de cliquer",
     rouge: "Danger : faux lien probable, ne clique pas"
   },
-  emojis: { vert: "🟢", orange: "🟡", rouge: "🔴" },
 
   // ----- Affichage du domaine -----
   labelDomaine: "Domaine réel détecté",

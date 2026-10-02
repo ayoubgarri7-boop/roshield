@@ -325,10 +325,15 @@
 
     const boite = creer("div", "resultat resultat--" + res.niveau);
 
-    // Titre : emoji + niveau
+    // Titre : rond de couleur + niveau.
+    // Le rond est dessiné en CSS (et non un emoji) pour avoir exactement le même
+    // rendu sur tous les appareils. aria-hidden : les lecteurs d'écran l'ignorent,
+    // car il est purement décoratif (le niveau est déjà écrit en toutes lettres).
     const titre = creer("h2", "resultat__titre");
-    titre.appendChild(creer("span", "resultat__emoji", T.emojis[res.niveau]));
-    titre.appendChild(document.createTextNode(" " + T.titres[res.niveau]));
+    const rond = creer("span", "resultat__rond resultat__rond--" + res.niveau);
+    rond.setAttribute("aria-hidden", "true");
+    titre.appendChild(rond);
+    titre.appendChild(document.createTextNode(T.titres[res.niveau]));
     boite.appendChild(titre);
 
     // Domaine réel en gros (le morceau qui compte est mis en valeur)
