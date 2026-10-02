@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vérificateur de lien</title>
+  <meta name="description" content="Colle un lien suspect : on t'explique s'il mène vers un domaine officiel Roblox ou Discord, ou vers un faux site.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div id="entete"></div>
+
+  <main class="conteneur page">
+
+    <header class="page__tete">
+      <p class="sur-titre">Vérificateur de lien</p>
+      <h1 class="page__titre">Ce lien est-il <span class="texte-degrade">officiel</span><span class="point-couleur">?</span></h1>
+      <p class="page__intro">
+        Colle le lien qu'on t'a envoyé. Le site l'analyse <strong>sans jamais l'ouvrir</strong> :
+        tout se passe dans ton navigateur, rien n'est envoyé nulle part.
+      </p>
+    </header>
+
+    <!-- Formulaire : "novalidate" car on gère nous-mêmes les messages d'erreur -->
+    <form id="form-verif" class="carte verif" novalidate>
+      <label for="champ-lien" class="verif__label">Le lien à vérifier</label>
+      <div class="verif__ligne">
+        <!-- type="text" (pas "url") pour accepter aussi les liens sans https:// -->
+        <input id="champ-lien" class="verif__champ" type="text" inputmode="url"
+               placeholder="Colle le lien ici (ex : roblox.com/games/...)"
+               autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false"
+               maxlength="2048">
+        <button type="submit" class="bouton bouton--principal">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
+               stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 3l8 3v6c0 4.5-3.2 8.3-8 9-4.8-.7-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/>
+          </svg>
+          Vérifier
+        </button>
+      </div>
+    </form>
+
+    <!-- Le résultat est écrit ici par js/verificateur.js.
+         aria-live : les lecteurs d'écran annoncent le résultat. -->
+    <div id="resultat" aria-live="polite"></div>
+
+    <!-- Caché tant qu'il n'y a pas de résultat -->
+    <section id="apres-clic" class="carte apres-clic" hidden>
+      <h2>Que faire si j'ai déjà cliqué ?</h2>
+      <ol>
+        <li><strong>Ne tape rien</strong> sur la page : ni mot de passe, ni code reçu, et ne télécharge rien. Ferme-la.</li>
+        <li><strong>Change ton mot de passe</strong> depuis l'application officielle (pas depuis un lien), sur un appareil de confiance.</li>
+        <li><strong>Déconnecte-toi de toutes les sessions</strong> dans les paramètres de sécurité de ton compte.</li>
+        <li><strong>Active la validation en 2 étapes</strong> si ce n'est pas déjà fait.</li>
+        <li>Si tu as lancé un fichier, préviens un adulte : l'appareil doit être vérifié avec un antivirus.</li>
+      </ol>
+    </section>
+
+    <section class="carte conseil">
+      <h2>Comment lire un lien toi-même</h2>
+      <p>
+        Dans <code>https://<span class="mono-doux">www.</span><b>roblox.com</b>/games</code>, le vrai site est
+        <b>roblox.com</b> : les <b>deux derniers morceaux avant le premier « / »</b>.
+        Dans <code>https://roblox.com.<b>site-pirate.xyz</b>/login</code>, le vrai site est <b>site-pirate.xyz</b>,
+        même si « roblox.com » est écrit au début.
+      </p>
+    </section>
+
+  </main>
+
+  <div id="pied"></div>
+
+  <!-- Ordre important : les données et textes AVANT la logique -->
+  <script src="js/config.js"></script>
+  <script src="js/commun.js"></script>
+  <script src="js/domaines.js"></script>
+  <script src="js/textes-fr.js"></script>
+  <script src="js/verificateur.js"></script>
+</body>
+</html>
