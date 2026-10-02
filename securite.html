@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Checklist de sécurité</title>
+  <meta name="description" content="Huit réglages et réflexes pour protéger ton compte Roblox et Discord. Coche ceux que tu as déjà faits.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div id="entete"></div>
+
+  <main class="conteneur page">
+
+    <header class="page__tete">
+      <p class="sur-titre">Checklist de sécurité</p>
+      <h1 class="page__titre">Verrouille ton <span class="texte-degrade">compte</span><span class="point-couleur">.</span></h1>
+      <p class="page__intro">
+        Huit réglages et réflexes qui rendent la vie très difficile aux pirates. Coche ceux que tu as
+        déjà faits : la page ne garde rien en mémoire, tout est effacé quand tu la quittes.
+        Aucune protection n'est parfaite à 100 %, mais chaque case cochée réduit les risques.
+      </p>
+    </header>
+
+    <!-- Compteur de progression (rempli par js/securite.js) -->
+    <section class="carte progres" aria-label="Ta progression">
+      <div class="progres__ligne">
+        <p class="progres__texte" id="progres-texte" aria-live="polite">0 sur 8 faits</p>
+        <button type="button" class="bouton bouton--secondaire bouton--petit" id="bouton-reset">Tout décocher</button>
+      </div>
+      <div class="progres__piste" role="progressbar" aria-labelledby="progres-texte"
+           aria-valuemin="0" aria-valuemax="8" aria-valuenow="0" id="progres-barre">
+        <span class="progres__rempli" id="progres-rempli"></span>
+      </div>
+      <p class="progres__fin" id="progres-fin" hidden>
+        Bien joué, tu as fait tout le tour de la checklist ! Reste quand même attentif : aucune
+        protection n'est parfaite à 100 %.
+      </p>
+    </section>
+
+    <!-- ===== Groupe 1 : les réglages du compte ===== -->
+    <section class="check-groupe" aria-labelledby="titre-reglages">
+      <h2 class="check-groupe__titre" id="titre-reglages">Les réglages de ton compte</h2>
+
+      <label class="check carte">
+        <input class="check__entree" type="checkbox">
+        <span class="check__boite" aria-hidden="true"></span>
+        <span class="check__corps">
+          <span class="check__titre">Active la validation en 2 étapes avec une application d'authentification</span>
+          <span class="check__aide">
+            Même si un pirate découvre ton mot de passe, il ne peut pas entrer sans le code de ton application.
+            Sur Roblox, cherche la « validation en 2 étapes » dans les paramètres, onglet Sécurité. Sur Discord,
+            ouvre les paramètres utilisateur, dans la partie de ton compte. Si on te propose des codes de secours,
+            garde-les dans un endroit sûr.
+          </span>
+        </span>
+      </label>
+
+      <label class="check carte">
+        <input class="check__entree" type="checkbox">
+        <span class="check__boite" aria-hidden="true"></span>
+        <span class="check__corps">
+          <span class="check__titre">Ajoute un code PIN ou des restrictions sur ton compte, si c'est possible</span>
+          <span class="check__aide">
+            Roblox propose des options de ce genre dans ses paramètres de sécurité. Leur nom et leur emplacement
+            peuvent changer : cherche-les dans les paramètres ou dans le centre d'aide officiel. Si ton compte est
+            suivi par un parent, fais-le avec lui.
+          </span>
+        </span>
+      </label>
+
+      <label class="check carte">
+        <input class="check__entree" type="checkbox">
+        <span class="check__boite" aria-hidden="true"></span>
+        <span class="check__corps">
+          <span class="check__titre">Vérifie tes sessions actives et déconnecte les appareils inconnus</span>
+          <span class="check__aide">
+            Dans les paramètres de sécurité de Roblox, tu peux voir où ton compte est connecté et te déconnecter
+            des autres appareils. Si tu en vois un que tu ne reconnais pas, déconnecte-le, puis change ton mot de
+            passe. Sur Discord, changer ton mot de passe te déconnecte de tous tes appareils.
+          </span>
+        </span>
+      </label>
+
+      <label class="check carte">
+        <input class="check__entree" type="checkbox">
+        <span class="check__boite" aria-hidden="true"></span>
+        <span class="check__corps">
+          <span class="check__titre">Utilise un mot de passe unique, jamais réutilisé</span>
+          <span class="check__aide">
+            Un mot de passe différent pour chaque site. Si un site se fait pirater, tes autres comptes restent
+            protégés. Un gestionnaire de mots de passe peut t'aider : demande à un adulte de confiance.
+          </span>
+        </span>
+      </label>
+    </section>
+
+    <!-- ===== Groupe 2 : les bons réflexes ===== -->
+    <section class="check-groupe" aria-labelledby="titre-reflexes">
+      <h2 class="check-groupe__titre" id="titre-reflexes">Les bons réflexes</h2>
+
+      <label class="check carte">
+        <input class="check__entree" type="checkbox">
+        <span class="check__boite" aria-hidden="true"></span>
+        <span class="check__corps">
+          <span class="check__titre">Ne partage jamais ton écran pendant une connexion ou une récupération de compte</span>
+          <span class="check__aide">
+            Ton écran peut montrer tes codes, tes e-mails et ton compte. Un vrai support ne te demande jamais ça.
+          </span>
+        </span>
+      </label>
+
+      <label class="check carte">
+        <input class="check__entree" type="checkbox">
+        <span class="check__boite" aria-hidden="true"></span>
+        <span class="check__corps">
+          <span class="check__titre">Ne donne jamais un code reçu par SMS ou par e-mail</span>
+          <span class="check__aide">
+            Ces codes servent à prouver que c'est bien toi. Si quelqu'un te les demande, c'est une arnaque,
+            même s'il dit être du support ou un ami.
+          </span>
+        </span>
+      </label>
+
+      <label class="check carte">
+        <input class="check__entree" type="checkbox">
+        <span class="check__boite" aria-hidden="true"></span>
+        <span class="check__corps">
+          <span class="check__titre">Ne lance jamais un fichier envoyé par un inconnu</span>
+          <span class="check__aide">
+            Même s'il se présente comme un jeu, un test ou une mise à jour (.exe, .zip, .scr...). Un fichier
+            piégé peut voler tes mots de passe. Au moindre doute, montre-le à un adulte de confiance.
+          </span>
+        </span>
+      </label>
+
+      <label class="check carte">
+        <input class="check__entree" type="checkbox">
+        <span class="check__boite" aria-hidden="true"></span>
+        <span class="check__corps">
+          <span class="check__titre">Ne colle jamais de code dans la console du navigateur</span>
+          <span class="check__aide">
+            Si quelqu'un te dit « appuie sur F12 et colle ça », c'est une arnaque : ce code donne ton compte
+            à un inconnu.
+          </span>
+        </span>
+      </label>
+    </section>
+
+    <!-- Note sur les noms des options -->
+    <section class="carte conseil">
+      <h2>Tu ne trouves pas une option ?</h2>
+      <p>
+        Roblox et Discord changent parfois les noms et la place des menus, surtout selon l'appareil et la langue.
+        Si une option ne ressemble pas à ce qui est écrit ici, utilise le centre d'aide officiel :
+        <a href="https://www.roblox.com/support" target="_blank" rel="noopener noreferrer">aide de Roblox</a> ou
+        <a href="https://support.discord.com" target="_blank" rel="noopener noreferrer">aide de Discord</a>.
+        Pense aussi à lire le <a href="guides.html">guide des arnaques</a>.
+      </p>
+    </section>
+
+  </main>
+
+  <div id="pied"></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/commun.js"></script>
+  <script src="js/securite.js"></script>
+</body>
+</html>

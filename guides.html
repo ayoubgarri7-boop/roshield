@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Guide des arnaques</title>
+  <meta name="description" content="Cookie logging, faux Robux, faux modérateurs, faux Nitro : comment ces arnaques fonctionnent, comment les reconnaître et comment s'en protéger.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div id="entete"></div>
+
+  <main class="conteneur page">
+
+    <header class="page__tete">
+      <p class="sur-titre">Guide des arnaques</p>
+      <h1 class="page__titre">Reconnais le <span class="texte-degrade">piège</span><span class="point-couleur">.</span></h1>
+      <p class="page__intro">
+        Sept arnaques très courantes sur Roblox et Discord. Pour chacune : comment ça marche,
+        comment la reconnaître et comment t'en protéger. Aucune méthode n'est parfaite à 100 %,
+        mais ces réflexes réduisent beaucoup les risques.
+      </p>
+    </header>
+
+    <!-- Sommaire : des liens vers chaque carte de la page -->
+    <nav class="sommaire" aria-label="Sommaire des arnaques">
+      <a class="sommaire__lien" href="#cookie-logging"><span class="sommaire__num">01</span>Cookie logging</a>
+      <a class="sommaire__lien" href="#faux-robux"><span class="sommaire__num">02</span>Faux Robux</a>
+      <a class="sommaire__lien" href="#faux-moderateurs"><span class="sommaire__num">03</span>Faux modérateurs</a>
+      <a class="sommaire__lien" href="#faux-emplois"><span class="sommaire__num">04</span>Faux jobs</a>
+      <a class="sommaire__lien" href="#faux-echanges"><span class="sommaire__num">05</span>Faux échanges</a>
+      <a class="sommaire__lien" href="#faux-nitro"><span class="sommaire__num">06</span>Faux Nitro</a>
+      <a class="sommaire__lien" href="#console-navigateur"><span class="sommaire__num">07</span>Code dans la console</a>
+    </nav>
+
+    <div class="guides">
+
+    <!-- ===== Arnaque 1 : Le cookie logging ===== -->
+    <article class="carte guide" id="cookie-logging">
+      <header class="guide__tete">
+        <span class="guide__num" aria-hidden="true">01</span>
+        <div>
+          <h2 class="guide__titre">Le cookie logging</h2>
+          <p class="guide__resume">Un pirate vole la « clé » qui te garde connecté, et entre dans ton compte sans mot de passe.</p>
+        </div>
+      </header>
+
+      <section class="guide__bloc guide__bloc--comment">
+        <h3 class="guide__etiquette">Comment ça marche</h3>
+        <p>Quand tu es connecté, ton navigateur garde un petit fichier secret (un cookie) qui prouve que c'est bien toi. Si un pirate le copie, il peut prendre ta place sur Roblox, même sans connaître ton mot de passe. Il le vole avec un faux site, un fichier ou une extension piégée.</p>
+      </section>
+
+      <section class="guide__bloc guide__bloc--reconnaitre">
+        <h3 class="guide__etiquette">Comment le reconnaître</h3>
+        <ul>
+            <li>On te dit « regarde mon avatar », « regarde mon jeu » ou « rejoins mon serveur privé » et on te donne un lien.</li>
+            <li>Le lien mène vers une page qui te demande de te connecter, de télécharger quelque chose ou d'installer une extension.</li>
+            <li>L'adresse du site n'est pas celle du vrai Roblox (vérifie-la avec le vérificateur de ce site).</li>
+        </ul>
+      </section>
+
+      <section class="guide__bloc guide__bloc--proteger">
+        <h3 class="guide__etiquette">Comment se protéger</h3>
+        <ul>
+            <li>Ne te connecte jamais depuis un lien reçu : tape toi-même l'adresse officielle ou utilise l'application.</li>
+            <li>N'installe pas d'extension ni de fichier proposé par quelqu'un que tu ne connais pas.</li>
+            <li>Au moindre doute, déconnecte-toi de toutes les sessions et change ton mot de passe depuis l'application officielle.</li>
+        </ul>
+      </section>
+    </article>
+    <!-- ===== Arnaque 2 : Les faux « Robux gratuits » et les faux générateurs ===== -->
+    <article class="carte guide" id="faux-robux">
+      <header class="guide__tete">
+        <span class="guide__num" aria-hidden="true">02</span>
+        <div>
+          <h2 class="guide__titre">Les faux « Robux gratuits » et les faux générateurs</h2>
+          <p class="guide__resume">On te promet des Robux pour rien, mais le but est de te voler ton compte ou ton argent.</p>
+        </div>
+      </header>
+
+      <section class="guide__bloc guide__bloc--comment">
+        <h3 class="guide__etiquette">Comment ça marche</h3>
+        <p>Un site ou une vidéo affirme qu'il peut te donner des Robux gratuits. Pour les « recevoir », il te demande ton pseudo, ton mot de passe, un code, de télécharger un programme ou de remplir des sondages. En réalité, rien n'arrive : les arnaqueurs récupèrent tes informations.</p>
+      </section>
+
+      <section class="guide__bloc guide__bloc--reconnaitre">
+        <h3 class="guide__etiquette">Comment le reconnaître</h3>
+        <ul>
+            <li>Des promesses énormes : « 10 000 Robux gratuits », « générateur 100 % fonctionnel ».</li>
+            <li>Un compte à rebours ou un message du type « il ne reste que 3 places » pour te faire aller vite.</li>
+            <li>Le site te demande ton mot de passe, de « prouver que tu es humain » ou de télécharger un fichier.</li>
+        </ul>
+      </section>
+
+      <section class="guide__bloc guide__bloc--proteger">
+        <h3 class="guide__etiquette">Comment se protéger</h3>
+        <ul>
+            <li>Retiens une règle simple : un générateur de Robux n'existe pas. Les seules façons d'en avoir sont officielles.</li>
+            <li>Ferme la page et ne rentre jamais ton mot de passe sur un site qui promet des cadeaux.</li>
+            <li>Si c'est une vidéo ou un message, signale-le et préviens tes amis.</li>
+        </ul>
+      </section>
+    </article>
+    <!-- ===== Arnaque 3 : Les faux modérateurs et faux support ===== -->
+    <article class="carte guide" id="faux-moderateurs">
+      <header class="guide__tete">
+        <span class="guide__num" aria-hidden="true">03</span>
+        <div>
+          <h2 class="guide__titre">Les faux modérateurs et faux support</h2>
+          <p class="guide__resume">Quelqu'un se fait passer pour le personnel de Roblox ou de Discord pour te faire peur et te faire agir vite.</p>
+        </div>
+      </header>
+
+      <section class="guide__bloc guide__bloc--comment">
+        <h3 class="guide__etiquette">Comment ça marche</h3>
+        <p>Tu reçois un message qui dit « ton compte va être banni » ou « on a détecté un problème ». La personne te demande ensuite de partager ton écran, de lui donner un code ou de cliquer sur un lien pour « régler ça ». En partageant ton écran, tu lui montres tes codes et ton compte.</p>
+      </section>
+
+      <section class="guide__bloc guide__bloc--reconnaitre">
+        <h3 class="guide__etiquette">Comment le reconnaître</h3>
+        <ul>
+            <li>Un message privé avec un ton urgent ou menaçant (« tu as 10 minutes »).</li>
+            <li>On te demande ton mot de passe, un code reçu par SMS ou e-mail, ou de partager ton écran.</li>
+            <li>Le message arrive d'un simple utilisateur, ou d'un compte dont le nom imite celui d'une vraie équipe.</li>
+        </ul>
+      </section>
+
+      <section class="guide__bloc guide__bloc--proteger">
+        <h3 class="guide__etiquette">Comment se protéger</h3>
+        <ul>
+            <li>Ne partage jamais ton écran avec quelqu'un qui te contacte en premier, surtout pendant une connexion.</li>
+            <li>Ne donne jamais un mot de passe ni un code. Le vrai personnel ne te les demande pas.</li>
+            <li>En cas de doute, contacte le support depuis le site officiel, en tapant toi-même l'adresse.</li>
+        </ul>
+      </section>
+    </article>
+    <!-- ===== Arnaque 4 : Les fausses offres de travail et « teste mon jeu » ===== -->
+    <article class="carte guide" id="faux-emplois">
+      <header class="guide__tete">
+        <span class="guide__num" aria-hidden="true">04</span>
+        <div>
+          <h2 class="guide__titre">Les fausses offres de travail et « teste mon jeu »</h2>
+          <p class="guide__resume">On te propose un job ou un test de jeu, mais le fichier à lancer cache un virus.</p>
+        </div>
+      </header>
+
+      <section class="guide__bloc guide__bloc--comment">
+        <h3 class="guide__etiquette">Comment ça marche</h3>
+        <p>Quelqu'un te propose de devenir testeur, développeur ou modérateur, ou te demande de tester son jeu. Pour cela, il t'envoie un fichier à lancer sur ton ordinateur (un programme, un .exe, un .zip). Ce fichier est un logiciel malveillant qui peut voler tes mots de passe et tes sessions.</p>
+      </section>
+
+      <section class="guide__bloc guide__bloc--reconnaitre">
+        <h3 class="guide__etiquette">Comment le reconnaître</h3>
+        <ul>
+            <li>L'offre arrive en message privé, sans que tu l'aies cherchée, avec une récompense très généreuse.</li>
+            <li>On te demande de télécharger un fichier hors de Roblox, parfois en désactivant ton antivirus.</li>
+            <li>La personne te met la pression ou refuse de tester dans le jeu Roblox officiel.</li>
+        </ul>
+      </section>
+
+      <section class="guide__bloc guide__bloc--proteger">
+        <h3 class="guide__etiquette">Comment se protéger</h3>
+        <ul>
+            <li>Ne lance jamais un fichier envoyé par quelqu'un que tu ne connais pas, même s'il a l'air d'un jeu.</li>
+            <li>Ne désactive jamais ton antivirus parce qu'on te le demande.</li>
+            <li>Un vrai test de jeu se fait dans Roblox, avec un lien vers le site officiel. Montre l'offre à un adulte de confiance.</li>
+        </ul>
+      </section>
+    </article>
+    <!-- ===== Arnaque 5 : Les faux échanges et les faux intermédiaires ===== -->
+    <article class="carte guide" id="faux-echanges">
+      <header class="guide__tete">
+        <span class="guide__num" aria-hidden="true">05</span>
+        <div>
+          <h2 class="guide__titre">Les faux échanges et les faux intermédiaires</h2>
+          <p class="guide__resume">On te convainc de donner tes objets en premier, en passant par un « intermédiaire de confiance » qui est un complice.</p>
+        </div>
+      </header>
+
+      <section class="guide__bloc guide__bloc--comment">
+        <h3 class="guide__etiquette">Comment ça marche</h3>
+        <p>Pour un échange d'objets, quelqu'un te dit que c'est plus sûr d'utiliser un intermédiaire (« middleman ») qu'il connaît. En réalité, c'est un complice : tu donnes tes objets et tu ne reçois rien.</p>
+      </section>
+
+      <section class="guide__bloc guide__bloc--reconnaitre">
+        <h3 class="guide__etiquette">Comment le reconnaître</h3>
+        <ul>
+            <li>On te propose un échange très avantageux, mais on te demande de donner en premier.</li>
+            <li>On te presse d'utiliser « un intermédiaire de confiance » choisi par l'autre personne.</li>
+            <li>On te montre de fausses preuves (captures d'écran) pour te rassurer.</li>
+        </ul>
+      </section>
+
+      <section class="guide__bloc guide__bloc--proteger">
+        <h3 class="guide__etiquette">Comment se protéger</h3>
+        <ul>
+            <li>Fais tes échanges uniquement avec la fonction d'échange officielle du jeu, jamais en dehors.</li>
+            <li>Refuse tout intermédiaire proposé par l'autre personne, même s'il a beaucoup de messages positifs.</li>
+            <li>Si une offre semble trop belle pour être vraie, dis non : tu ne perds rien à refuser.</li>
+        </ul>
+      </section>
+    </article>
+    <!-- ===== Arnaque 6 : Le faux « Nitro gratuit » sur Discord ===== -->
+    <article class="carte guide" id="faux-nitro">
+      <header class="guide__tete">
+        <span class="guide__num" aria-hidden="true">06</span>
+        <div>
+          <h2 class="guide__titre">Le faux « Nitro gratuit » sur Discord</h2>
+          <p class="guide__resume">Un message te promet un abonnement offert, mais le lien vole ton compte.</p>
+        </div>
+      </header>
+
+      <section class="guide__bloc guide__bloc--comment">
+        <h3 class="guide__etiquette">Comment ça marche</h3>
+        <p>Tu reçois un message privé, parfois d'un ami dont le compte a été piraté, qui t'offre du Nitro ou un cadeau. Le lien mène vers une fausse page qui te demande de te connecter ou de scanner un QR code. En le scannant, tu donnes accès à ton compte.</p>
+      </section>
+
+      <section class="guide__bloc guide__bloc--reconnaitre">
+        <h3 class="guide__etiquette">Comment le reconnaître</h3>
+        <ul>
+            <li>Un message qui dit « tiens, un Nitro gratuit pour toi » ou « tu as reçu un cadeau ».</li>
+            <li>Le lien ne mène pas vers un site Discord officiel, ou tu dois scanner un QR code.</li>
+            <li>Un ami qui te parle différemment que d'habitude, avec une phrase courte et un lien.</li>
+        </ul>
+      </section>
+
+      <section class="guide__bloc guide__bloc--proteger">
+        <h3 class="guide__etiquette">Comment se protéger</h3>
+        <ul>
+            <li>Ne scanne jamais un QR code que quelqu'un d'autre te donne : il sert à connecter ton compte ailleurs.</li>
+            <li>Ne te connecte jamais depuis un lien reçu. Passe toujours par l'application officielle.</li>
+            <li>Si un ami t'envoie ça, préviens-le par un autre moyen : son compte est peut-être piraté.</li>
+        </ul>
+      </section>
+    </article>
+    <!-- ===== Arnaque 7 : Les gens qui demandent de coller du code dans la console ===== -->
+    <article class="carte guide" id="console-navigateur">
+      <header class="guide__tete">
+        <span class="guide__num" aria-hidden="true">07</span>
+        <div>
+          <h2 class="guide__titre">Les gens qui demandent de coller du code dans la console</h2>
+          <p class="guide__resume">On te donne un morceau de code à copier dans ton navigateur : il donne ton compte à un inconnu.</p>
+        </div>
+      </header>
+
+      <section class="guide__bloc guide__bloc--comment">
+        <h3 class="guide__etiquette">Comment ça marche</h3>
+        <p>Quelqu'un te dit « ouvre la console (F12), colle ce code et tu auras des Robux, un objet rare ou un déban ». La console permet de faire tourner des commandes dans ta session : en collant du code que tu ne comprends pas, tu laisses un inconnu agir à ta place.</p>
+      </section>
+
+      <section class="guide__bloc guide__bloc--reconnaitre">
+        <h3 class="guide__etiquette">Comment le reconnaître</h3>
+        <ul>
+            <li>Des instructions du genre « appuie sur F12, va dans Console, colle ça et appuie sur Entrée ».</li>
+            <li>Une promesse de gain, d'objet rare ou de déban en échange.</li>
+            <li>Le code est long, illisible, et la personne insiste pour que tu le fasses vite.</li>
+        </ul>
+      </section>
+
+      <section class="guide__bloc guide__bloc--proteger">
+        <h3 class="guide__etiquette">Comment se protéger</h3>
+        <ul>
+            <li>Ne colle jamais du code dans la console du navigateur à la demande de quelqu'un.</li>
+            <li>Ferme la page et ne reviens pas dessus, même si la personne insiste.</li>
+            <li>Si tu l'as déjà fait, déconnecte-toi de toutes les sessions et change ton mot de passe tout de suite.</li>
+        </ul>
+      </section>
+    </article>
+    </div>
+
+    <!-- Encadré final -->
+    <section class="carte conseil guide-fin">
+      <h2>Tu penses être tombé dans un piège ?</h2>
+      <p>
+        Ne tape rien, change ton mot de passe depuis l'application officielle et déconnecte-toi de toutes
+        les sessions. Parles-en à un adulte de confiance : il n'y a aucune honte, ça arrive même aux adultes.
+        Tu peux aussi <a href="verificateur.html">vérifier un lien</a> ou consulter la
+        <a href="securite.html">checklist de sécurité</a>.
+      </p>
+    </section>
+
+  </main>
+
+  <div id="pied"></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/commun.js"></script>
+</body>
+</html>
