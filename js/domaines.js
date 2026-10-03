@@ -42,6 +42,30 @@ window.DOMAINES_A_CONFIRMER = [
 // Si un domaine NON officiel contient un de ces mots, c'est très suspect.
 window.MOTS_CLES = ["roblox", "discord", "robux", "nitro"];
 
+// Hôtes EXACTS dispensés de la règle du mot-clé (c, d, e), et seulement d'elle.
+// Exemple : roblox.fandom.com est le wiki communautaire de Roblox, hébergé par Fandom : un joueur
+// le rencontre vraiment. Le mot « roblox » y est dans le NOM DE SOUS-DOMAINE, pas dans le domaine réel (fandom.com).
+// ATTENTION : la comparaison est EXACTE. N'importe quel autre sous-domaine de fandom.com
+// (roblox-gratuit.fandom.com, robux.fandom.com...) reste ROUGE : n'importe qui peut en créer un.
+// Ces hôtes restent JAUNES (domaine inconnu) avec « autre chose », et ROUGES avec « page Roblox / Discord ».
+// Les règles a) et b) (imitation d'un domaine officiel) s'appliquent toujours.
+window.HOTES_SANS_MOT_CLE = ["roblox.fandom.com"];
+
+// ---------- Exceptions de la règle « nom officiel complet dans le chemin ou la requête » ----------
+// Règle : un domaine NON officiel dont le chemin ou la requête contient « roblox.com », « discord.gg »...
+// (écrit en entier) est rouge : « Ce lien imite Roblox (ou Discord) ».
+// Ces sites-là sont des exceptions, car ils CITENT une adresse sans être l'adresse :
+// l'hôte doit être EXACTEMENT celui de la liste (jamais un sous-domaine) ET le chemin doit commencer par "chemin".
+// Ils ne deviennent pas « sûrs » pour autant : ils restent jaunes, avec la petite ligne « autre adresse cachée ».
+window.REDIRECTEURS_CONNUS = [
+  // Archive d'Internet : « web.archive.org/web/2023.../https://www.roblox.com/ » est une copie ancienne, pas un faux site.
+  { hote: "web.archive.org", chemin: "/web/" },
+  // Les redirecteurs : le lien passe par le site, puis part vers l'adresse écrite dans la requête.
+  { hote: "www.google.com", chemin: "/url" },       // lien de résultat de recherche Google
+  { hote: "www.youtube.com", chemin: "/redirect" }, // liens des descriptions et commentaires YouTube
+  { hote: "l.facebook.com", chemin: "/l.php" }      // liens partagés sur Facebook
+];
+
 // Noms "de base" des vrais sites, pour repérer les fautes de frappe
 // volontaires (rob1ox, dlscord...). "discordapp" est le nom de l'ancien domaine.
 window.NOMS_OFFICIELS = ["roblox", "discord", "discordapp", "robux", "nitro"];

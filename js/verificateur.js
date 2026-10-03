@@ -68,6 +68,8 @@
   const OFFICIELS = window.DOMAINES_OFFICIELS;
   const MOTS_CLES = window.MOTS_CLES;
   const NOMS_OFFICIELS = window.NOMS_OFFICIELS;
+  const HOTES_SANS_MOT_CLE = window.HOTES_SANS_MOT_CLE || [];
+  const REDIRECTEURS_CONNUS = window.REDIRECTEURS_CONNUS || [];
   const RACCOURCISSEURS = window.RACCOURCISSEURS;
 
   // Une AUTRE adresse complète cachée dans le chemin ou la requête d'un lien ?
@@ -77,6 +79,36 @@
   const ADRESSE_CACHEE = /https?(?::|%3a)(?:\/|%2f){2}|%3a%2f%2f|%253a%252f%252f/i;
 
   // Gravité des niveaux : permet de garder "le pire" à la fin
+  // Le chemin / la requête du lien contiennent-ils le NOM COMPLET d'un domaine officiel ?
+  // On remet le texte "à plat" avant de chercher : minuscules, %2E / %2F / double encodage (%252E) décodés,
+  // et tirets, tirets bas, barres et espaces comptés comme des points ("roblox-com" -> "roblox.com").
+  // Le nom doit être COMPLET et finir proprement : "roblox.com" ou "roblox-com/", mais pas "roblox-community"
+  // ni le mot "roblox" tout seul.
+  function nomOfficielDansChemin(url) {
+    let texte = url.pathname + url.search + url.hash;
+    for (let i = 0; i < 3; i++) {
+      let decode;
+      try { decode = decodeURIComponent(texte); } catch (e) { break; }
+      if (decode === texte) break;
+      texte = decode;
+    }
+    texte = texte.toLowerCase().replace(/[-_\/\s]+/g, ".");
+    return OFFICIELS.find(function (d) {
+      const debut = texte.indexOf(d.domaine);
+      if (debut === -1) return false;
+      // on regarde toutes les occurrences : la fin doit être propre (pas une lettre ou un chiffre juste après)
+      for (let i = debut; i !== -1; i = texte.indexOf(d.domaine, i + 1)) {
+        if (!/[a-z0-9]/.test(texte.charAt(i + d.domaine.length))) return true;
+      }
+      return false;
+    });
+  }
+
+  // Le lien passe-t-il par une archive ou un redirecteur connu (liste dans domaines.js) ? Hôte EXACT + début de chemin.
+  function estRedirecteurConnu(hote, chemin) {
+    return REDIRECTEURS_CONNUS.some(function (r) { return r.hote === hote && chemin.indexOf(r.chemin) === 0; });
+  }
+
   const GRAVITE = { vert: 0, jaune: 1, rouge: 2 };
 
   /* ------------------------------------------------------
@@ -231,9 +263,15 @@
     // http:// n'est signalé que si l'utilisateur l'a écrit lui-même
     if (avaitProtocole && url.protocol === "http:") notes.push(T.http);
 
+    // Titre imposé par une règle précise (sinon on prend celui du niveau)
+    let titreForce = null;
+
     // --- 6. Domaine NON officiel : cherche les imitations ---
     if (!officiel && !estIP && !estPunycode && !raccourci) {
       let trouve = false;
+      // Hôte exact exempté de la règle du mot-clé (voir domaines.js) : on saute c), d) et e).
+      // Comparaison EXACTE : jamais un autre sous-domaine du même site.
+      const sansMotCle = HOTES_SANS_MOT_CLE.includes(hote);
 
       // a) "roblox.com.example.com" : un domaine officiel écrit en début de nom
       const imite = OFFICIELS.find(function (d) { return hote.includes(d.domaine); });
@@ -254,8 +292,21 @@
         }
       }
 
+      // f) le NOM COMPLET d'un site officiel est écrit dans le chemin ou la requête
+      //    (evil.test/roblox.com/login, evil.test/?u=discord-com). Jamais le mot "roblox" seul.
+      //    Exceptions : archives et redirecteurs connus (domaines.js). On le teste avant c), d), e) pour que le message soit
+      //    le plus précis, et il ne s'applique pas aux hôtes déjà rouges par a) ou b).
+      if (!trouve && !estRedirecteurConnu(hote, url.pathname)) {
+        const cite = nomOfficielDansChemin(url);
+        if (cite) {
+          ajouter("rouge", T.imiteDansChemin);
+          titreForce = "imiteChemin";
+          trouve = true;
+        }
+      }
+
       // c) contient un mot-clé (roblox, discord, robux, nitro)
-      if (!trouve) {
+      if (!trouve && !sansMotCle) {
         const mot = MOTS_CLES.find(function (m) { return hote.includes(m); });
         if (mot) {
           ajouter("rouge", T.motCle(mot, reel));
@@ -264,7 +315,7 @@
       }
 
       // d) chiffres à la place de lettres (rob1ox -> roblox)
-      if (!trouve) {
+      if (!trouve && !sansMotCle) {
         const hoteNormalise = normaliser(hote);
         const mot = MOTS_CLES.find(function (m) { return hoteNormalise.includes(m); });
         if (mot) {
@@ -274,7 +325,7 @@
       }
 
       // e) un morceau du nom ressemble à un mot officiel (robiox-gratuit.com)
-      if (!trouve) {
+      if (!trouve && !sansMotCle) {
         const morceaux = hote.split(/[-_.]/);
         for (const partie of morceaux) {
           if (partie.length < 5) continue;
@@ -301,7 +352,6 @@
     // c'est rouge : quelqu'un se fait passer pour Roblox/Discord. Les autres raisons restent affichées.
     // Si le domaine est officiel (même celui de l'AUTRE plateforme), on ne change rien.
     // Si on ne sait pas, on ne change rien.
-    let titreForce = null;
     const plateforme = attendu === "roblox" ? "Roblox" : attendu === "discord" ? "Discord" : null;
     if (plateforme && !officiel) {
       // Était-ce DÉJÀ rouge sans la question (imitation, adresse IP, punycode...) ?

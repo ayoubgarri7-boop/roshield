@@ -24,7 +24,9 @@ window.TEXTES_VERIF = {
     officielAttention: "Domaine officiel, mais vérifie le lien",
     // Quand le message disait "c'est une page Roblox / Discord" mais que le domaine réel est un autre (nouveau rouge)
     nonOfficielRoblox: "Ce n'est pas le vrai site de Roblox",
-    nonOfficielDiscord: "Ce n'est pas le vrai site de Discord"
+    nonOfficielDiscord: "Ce n'est pas le vrai site de Discord",
+    // Un site non officiel écrit « roblox.com » ou « discord.gg » en entier dans son chemin
+    imiteChemin: "Le nom de Roblox (ou Discord) est copié dans ce lien"
   },
 
   // ----- Affichage du domaine -----
@@ -68,6 +70,7 @@ window.TEXTES_VERIF = {
     return "Ce lien imite « " + officiel + " » dans son adresse, mais le vrai domaine est « " + vrai + " ». " +
       "Ce qui compte, c'est la fin du nom, pas le début.";
   },
+  imiteDansChemin: "Son vrai domaine est un autre. Ne tape jamais ton mot de passe ou un code sur cette page, et ne partage jamais ton écran.",
   ressemble: function (vrai, officiel) {
     return "« " + vrai + " » ressemble beaucoup à « " + officiel + " » mais ce n'est pas le même : ça ressemble à une faute de frappe faite exprès pour te tromper.";
   },
