@@ -67,16 +67,21 @@ const OFFICIELS = lireLiens("liens-officiels.txt");
 const PIEGES = lireLiens("pieges-synthetiques.txt");
 const estDifficile = function (x) { return /GROUPE DIFFICILE/.test(x.groupe); };
 // Test de résistance : liens honnêtes qui contiennent un nom officiel dans leur chemin. Comptés À PART, jamais mélangés.
-const estResistance = function (x) { return /rouge par prudence/.test(x.groupe); };
+const estResistance = function (x) { return /contiennent un nom officiel dans leur chemin/.test(x.groupe); };
+// Liens honnêtes « à risque » (mot de marque + mot de piège) : servent à mesurer une règle possible. Comptés À PART aussi.
+const estRisque = function (x) { return /honnêtes à risque/.test(x.groupe); };
 
 // ---------- 3. Outils ----------
 const R_ROBLOX = "roblox", R_DISCORD = "discord", R_AUTRE = "inconnu";
 
-// Classe un résultat : vert / jaune (inconnu) / jaune (officiel mais vérifie) / rouge / erreur
+// Classe un résultat : vert / jaune simple (inconnu) / jaune alerte forte / jaune (officiel mais vérifie) / rouge / erreur
 function categorie(r) {
   if (r.erreur) return "erreur";
   if (r.niveau === "rouge") return "rouge";
-  if (r.niveau === "jaune") return r.titreCle === "officielAttention" ? "jaune officiel" : "jaune";
+  if (r.niveau === "jaune") {
+    if (r.titreCle === "officielAttention") return "jaune officiel";
+    return /^alerte/.test(r.titreCle) ? "jaune alerte" : "jaune";
+  }
   return "vert";
 }
 
@@ -108,7 +113,7 @@ function evaluer(liens, reponse) {
   });
 }
 function compter(resultats) {
-  const c = { vert: 0, "jaune officiel": 0, jaune: 0, rouge: 0, erreur: 0 };
+  const c = { vert: 0, "jaune officiel": 0, jaune: 0, "jaune alerte": 0, rouge: 0, erreur: 0 };
   resultats.forEach(function (x) { c[x.cat]++; });
   return c;
 }
@@ -157,26 +162,42 @@ const NOM_REP = { inconnu: "autre chose / je ne sais pas", roblox: "page Roblox"
 titre("1. LIENS HONNÊTES avec « autre chose / je ne sais pas » : combien sortent ROUGE (faux rouges) ?");
 const hAutre = honnetes[R_AUTRE];
 const rougesH = hAutre.filter(function (x) { return x.cat === "rouge"; });
-const fauxRouges = rougesH.filter(function (x) { return !estDifficile(x) && !estResistance(x); });
+const fauxRouges = rougesH.filter(function (x) { return !estDifficile(x) && !estResistance(x) && !estRisque(x); });
 const fauxRougesResistance = rougesH.filter(estResistance);
 const nResistance = hAutre.filter(estResistance).length;
+const fauxRougesRisque = rougesH.filter(estRisque);
+const nRisque = hAutre.filter(estRisque).length;
 const rougesDifficiles = rougesH.filter(estDifficile);
-const nHorsDifficile = hAutre.filter(function (x) { return !estDifficile(x) && !estResistance(x); }).length;
+const nHorsDifficile = hAutre.filter(function (x) { return !estDifficile(x) && !estResistance(x) && !estRisque(x); }).length;
+// Alertes fortes (jaune) sur des liens HONNÊTES : ce sont des alertes inutiles (pas des erreurs de niveau, mais du bruit)
+const alertesH = hAutre.filter(function (x) { return x.cat === "jaune alerte"; });
+const alertesOrigine = alertesH.filter(function (x) { return !estDifficile(x) && !estResistance(x) && !estRisque(x); });
+const alertesResistance = alertesH.filter(estResistance);
+const alertesRisque = alertesH.filter(estRisque);
+const alertesDifficile = alertesH.filter(estDifficile);
+const lignesAlerte = function (liste) { liste.forEach(function (x) { log("   - " + court(x.lien, 84).padEnd(86) + "-> " + x.r.titreCle); }); };
 log("  Liens testés : " + hAutre.length + " (dont " + nbDifficile + " dans le groupe difficile)");
-log("  FAUX ROUGES, liste d'origine (hors groupe difficile et hors test de résistance) : " + fauxRouges.length + " sur " + nHorsDifficile + "  (" + pct(fauxRouges.length, nHorsDifficile) + ")");
-log("  FAUX ROUGES, test de résistance « rouge par prudence » (compté À PART) : " + fauxRougesResistance.length + " sur " + nResistance + "  (" + pct(fauxRougesResistance.length, nResistance) + ")");
-log("  Groupe difficile : " + rougesDifficiles.length + " rouges sur " + nbDifficile + "  (décision : ils restent rouges tant qu'il n'y a pas de source officielle)");
+log("  FAUX ROUGES, liste d'origine (cible : 0, hors groupe difficile) : " + fauxRouges.length + " sur " + nHorsDifficile + "  (" + pct(fauxRouges.length, nHorsDifficile) + ")");
+log("  FAUX ROUGES, groupe « nom officiel dans le chemin » (compté À PART)        : " + fauxRougesResistance.length + " sur " + nResistance + "  (" + pct(fauxRougesResistance.length, nResistance) + ")");
+log("  ROUGES, groupe « honnêtes à risque (mot de marque + mot de piège) » (À PART) : " + fauxRougesRisque.length + " sur " + nRisque + "  (" + pct(fauxRougesRisque.length, nRisque) + ")");
+log("  Groupe difficile (domaines Roblox/Discord non confirmés, À PART) : " + rougesDifficiles.length + " rouges, " + alertesDifficile.length + " jaunes alerte forte, sur " + nbDifficile);
+log("  JAUNES ALERTE FORTE sur des liens honnêtes (alertes inutiles) : liste d'origine " + alertesOrigine.length + " / " + nHorsDifficile +
+    " ; groupe « nom officiel dans le chemin » " + alertesResistance.length + " / " + nResistance + " ; groupe « à risque » " + alertesRisque.length + " / " + nRisque);
 if (!RESUME) {
-  log("\n  Liste des faux rouges (lien -> règle qui l'a mis en rouge) :");
+  log("\n  Liste des faux rouges, liste d'origine (lien -> règle qui l'a mis en rouge) :");
   fauxRouges.forEach(function (x) { log("   - " + court(x.lien, 92).padEnd(94) + "-> " + regleDuRouge(x.r)); });
-  log("\n  Test de résistance (liens qui contiennent un nom officiel dans leur chemin, rouge par prudence) :");
-  fauxRougesResistance.forEach(function (x) { log("   - " + court(x.lien, 92).padEnd(94) + "-> " + regleDuRouge(x.r)); });
-  log("\n  Groupe difficile (rouges décidés) :");
+  log("\n  Rouges dans les groupes à part (« nom officiel dans le chemin » + « à risque ») :");
+  fauxRougesResistance.concat(fauxRougesRisque).forEach(function (x) { log("   - " + court(x.lien, 92).padEnd(94) + "-> " + regleDuRouge(x.r)); });
+  log("\n  Groupe difficile (rouges, comptés à part) :");
   rougesDifficiles.forEach(function (x) { log("   - " + court(x.lien, 92).padEnd(94) + "-> " + regleDuRouge(x.r)); });
-  const parRegle = {};
-  rougesH.forEach(function (x) { const g = regleDuRouge(x.r).replace(/« \w+ »/, "« … »"); parRegle[g] = (parRegle[g] || 0) + 1; });
-  log("\n  Tous les rouges honnêtes, par règle :");
-  Object.entries(parRegle).sort(function (a, b) { return b[1] - a[1]; }).forEach(function (e) { log("     " + String(e[1]).padStart(3) + "  " + e[0]); });
+  log("\n  Liens honnêtes en JAUNE ALERTE FORTE, liste d'origine (alertes inutiles) :");
+  lignesAlerte(alertesOrigine);
+  log("\n  Liens honnêtes en JAUNE ALERTE FORTE, groupe « nom officiel dans le chemin » :");
+  lignesAlerte(alertesResistance);
+  log("\n  Liens honnêtes en JAUNE ALERTE FORTE, groupe « à risque » :");
+  lignesAlerte(alertesRisque);
+  log("\n  Liens honnêtes en JAUNE ALERTE FORTE, groupe difficile :");
+  lignesAlerte(alertesDifficile);
 }
 // par groupe (seulement ceux qui ont au moins un rouge)
 const parGroupeH = {};
@@ -199,24 +220,25 @@ if (!RESUME) {
 }
 
 // ---- 3. Pièges avec « autre chose » ----
-titre("3. PIÈGES SYNTHÉTIQUES avec « autre chose / je ne sais pas » : détectés (ROUGE) ou ratés (JAUNE) ?");
+titre("3. PIÈGES SYNTHÉTIQUES avec « autre chose / je ne sais pas » : ROUGE, JAUNE ALERTE FORTE ou JAUNE SIMPLE (raté) ?");
 const pAutre = pieges[R_AUTRE], cP = compter(pAutre);
-const rates = pAutre.filter(function (x) { return x.cat !== "rouge"; });
+const rates = pAutre.filter(function (x) { return x.cat === "jaune"; });   // seulement le jaune SIMPLE
 log("  Pièges testés : " + pAutre.length);
 log("  ROUGES (détectés) : " + cP.rouge + " (" + pct(cP.rouge, pAutre.length) + ")");
-log("  JAUNES (pièges RATÉS) : " + cP.jaune + " (" + pct(cP.jaune, pAutre.length) + ")");
+log("  JAUNES ALERTE FORTE (signalés, pas ratés) : " + cP["jaune alerte"] + " (" + pct(cP["jaune alerte"], pAutre.length) + ")");
+log("  JAUNES SIMPLES (pièges RATÉS) : " + cP.jaune + " (" + pct(cP.jaune, pAutre.length) + ")");
 log("  VERTS (très grave) : " + cP.vert + "   jaunes « officiel » : " + cP["jaune officiel"] + "   erreurs de saisie : " + cP.erreur);
 log("\n  Par motif (groupe du fichier) :");
 const groupes = [];
 pAutre.forEach(function (x) { if (groupes.indexOf(x.groupe) === -1) groupes.push(x.groupe); });
-const L = [64, 6, 8, 8, 8];
-log("  " + ligneTableau(["motif", "liens", "rouge", "jaune", "autre"], L));
+const L = [60, 6, 7, 8, 8, 7];
+log("  " + ligneTableau(["motif", "liens", "rouge", "alerte", "simple", "autre"], L));
 groupes.forEach(function (g) {
   const sel = pAutre.filter(function (x) { return x.groupe === g; }), c = compter(sel);
-  log("  " + ligneTableau([g.slice(0, 62), sel.length, c.rouge, c.jaune, c.vert + c["jaune officiel"] + c.erreur], L));
+  log("  " + ligneTableau([g.slice(0, 58), sel.length, c.rouge, c["jaune alerte"], c.jaune, c.vert + c["jaune officiel"] + c.erreur], L));
 });
 if (!RESUME) {
-  log("\n  Liste des pièges RATÉS (restent jaunes) :");
+  log("\n  Liste des pièges RATÉS (jaune simple) :");
   rates.forEach(function (x) { log("   - " + court(x.lien, 110)); });
 }
 
@@ -230,18 +252,18 @@ if (!RESUME) pRDnonRouges.forEach(function (x) { log("   - PAS ROUGE : " + court
 
 // ---- 5. Répartition des niveaux ----
 titre("5. RÉPARTITION DES NIVEAUX pour chaque groupe et chaque réponse");
-const L5 = [34, 29, 6, 6, 8, 6, 6];
-log(ligneTableau(["groupe", "réponse", "vert", "jaune", "jaune off.", "rouge", "autre"], L5));
+const L5 = [34, 29, 6, 7, 7, 10, 6, 6];
+log(ligneTableau(["groupe", "réponse", "vert", "alerte", "simple", "jaune off.", "rouge", "autre"], L5));
 function ligne5(nomGroupe, tabs) {
   [R_AUTRE, R_ROBLOX, R_DISCORD].forEach(function (rep) {
     const c = compter(tabs[rep]);
-    log(ligneTableau([nomGroupe, NOM_REP[rep], c.vert, c.jaune, c["jaune officiel"], c.rouge, c.erreur], L5));
+    log(ligneTableau([nomGroupe, NOM_REP[rep], c.vert, c["jaune alerte"], c.jaune, c["jaune officiel"], c.rouge, c.erreur], L5));
   });
 }
 ligne5("liens honnêtes (" + HONNETES.length + ")", honnetes);
 ligne5("liens officiels (" + OFFICIELS.length + ")", officiels);
 ligne5("pièges synthétiques (" + PIEGES.length + ")", pieges);
-log("\n  (« jaune off. » = jaune « Domaine officiel, mais vérifie le lien » ; « autre » = erreurs de saisie)");
+log("\n  (« alerte » = jaune avec alerte forte ; « simple » = jaune « Domaine inconnu » ; « jaune off. » = jaune « Domaine officiel, mais vérifie le lien » ; « autre » = erreurs de saisie)");
 
 // ---- Précision sur la conception ----
 titre("À SAVOIR : le rouge « par conception » n'est PAS un faux rouge");
@@ -254,21 +276,24 @@ log("  Ces rouges ne sont donc pas comptés comme des faux rouges. À titre d'in
 // ---- Résumé ----
 const piegesVerts = cP.vert + pRD.filter(function (x) { return x.cat === "vert"; }).length;
 titre("RÉSUMÉ");
-log("  Faux rouges, liste d'origine (« autre chose »)                       : " + fauxRouges.length + " / " + nHorsDifficile + "  (" + pct(fauxRouges.length, nHorsDifficile) + ")");
-log("  Faux rouges, test de résistance « rouge par prudence » (à part)      : " + fauxRougesResistance.length + " / " + nResistance + "  (" + pct(fauxRougesResistance.length, nResistance) + ")");
-log("  Groupe difficile : rouges (décidés)                                  : " + rougesDifficiles.length + " / " + nbDifficile);
+log("  Faux rouges, liste d'origine (« autre chose », cible 0)              : " + fauxRouges.length + " / " + nHorsDifficile + "  (" + pct(fauxRouges.length, nHorsDifficile) + ")");
+log("  Rouges, groupe « nom officiel dans le chemin » (à part)              : " + fauxRougesResistance.length + " / " + nResistance);
+log("  Rouges, groupe « honnêtes à risque » (à part)                        : " + fauxRougesRisque.length + " / " + nRisque);
+log("  Groupe difficile (à part) : rouges / jaunes alerte forte             : " + rougesDifficiles.length + " / " + alertesDifficile.length + " sur " + nbDifficile);
+log("  Alertes fortes inutiles sur liens honnêtes (origine / chemin / risque) : " + alertesOrigine.length + " / " + alertesResistance.length + " / " + alertesRisque.length);
 log("  Liens officiels mal classés (« page Roblox/Discord »)               : " + ratesOff.length + " / " + oRD.length + "  (" + pct(ratesOff.length, oRD.length) + ")");
 log("  Pièges détectés en rouge (« autre chose »)                          : " + cP.rouge + " / " + pAutre.length + "  (" + pct(cP.rouge, pAutre.length) + ")");
-log("  Pièges ratés, restés jaunes (« autre chose »)                       : " + cP.jaune + " / " + pAutre.length + "  (" + pct(cP.jaune, pAutre.length) + ")");
+log("  Pièges en jaune ALERTE FORTE (« autre chose »)                      : " + cP["jaune alerte"] + " / " + pAutre.length + "  (" + pct(cP["jaune alerte"], pAutre.length) + ")");
+log("  Pièges RATÉS = jaune SIMPLE (« autre chose »)                       : " + cP.jaune + " / " + pAutre.length + "  (" + pct(cP.jaune, pAutre.length) + ")");
 log("  Pièges rouges avec « page Roblox/Discord »                          : " + (pRD.length - pRDnonRouges.length) + " / " + pRD.length + "  (" + pct(pRD.length - pRDnonRouges.length, pRD.length) + ")");
 log("  Pièges verts (très grave)                                            : " + piegesVerts);
 
 if (JSON_SORTIE) {
   console.log(JSON.stringify({
-    honnetes: { total: HONNETES.length, horsDifficile: nHorsDifficile, fauxRouges: fauxRouges.length, resistance: nResistance, fauxRougesResistance: fauxRougesResistance.length, difficile: nbDifficile, difficileRouges: rougesDifficiles.length,
+    honnetes: { total: HONNETES.length, horsDifficile: nHorsDifficile, fauxRouges: fauxRouges.length, resistance: nResistance, fauxRougesResistance: fauxRougesResistance.length, risque: nRisque, rougesRisque: fauxRougesRisque.length, difficile: nbDifficile, difficileRouges: rougesDifficiles.length, alertesOrigine: alertesOrigine.length, alertesResistance: alertesResistance.length, alertesRisque: alertesRisque.length, listeAlertesOrigine: alertesOrigine.map(function (x) { return x.lien; }),
       listeFauxRouges: fauxRouges.map(function (x) { return x.lien; }), groupesAvecRouges: Object.entries(parGroupeH).filter(function (e) { return e[1].rouges > 0; }).map(function (e) { return [e[0], e[1].rouges, e[1].n]; }) },
     officiels: { evaluations: oRD.length, malClasses: ratesOff.length },
-    pieges: { total: PIEGES.length, rouges: cP.rouge, jaunes: cP.jaune, verts: piegesVerts, rougesAvecReponse: pRD.length - pRDnonRouges.length, evaluationsAvecReponse: pRD.length,
+    pieges: { total: PIEGES.length, rouges: cP.rouge, alertes: cP["jaune alerte"], jaunes: cP.jaune, verts: piegesVerts, rougesAvecReponse: pRD.length - pRDnonRouges.length, evaluationsAvecReponse: pRD.length,
       listeRates: rates.map(function (x) { return x.lien; }) }
   }));
 }

@@ -224,7 +224,6 @@ https://sites.google.com/view/example-class-project
 # DÉCISION : on ne les ajoute PAS à la liste officielle tant qu'on n'a pas de source officielle pour chacun.
 # Ils sortent donc ROUGES (mot-clé ou imitation) ou JAUNES (dis.gd, rbxcdn.com). C'est voulu, et compté à part.
 https://roblox.link/dPGsxuUV
-https://ro.blox.com/Gwbr6h
 https://c0.rbxcdn.com/wpblnbbn8vqaewzczduha9azazswcexk
 https://tr.rbxcdn.com/7tbunelxdx2puu73nkgmp6jpfewkuyjf/150/150/Image/Png
 https://www.robloxlabs.com/
@@ -271,10 +270,10 @@ https://www.tiktok.com/@roblox?lang=en
 # --- GROUPE DIFFICILE (cas voulu) : site de fans inconnu avec « roblox » dans son nom ---
 # DÉCISION : rouge voulu. N'importe qui peut acheter un domaine « roblox... » : RoShield ne peut pas le distinguer d'un piège.
 https://www.robloxfans.example/
-# --- liens qui contiennent un nom officiel dans leur chemin (rouge par prudence) ---
+# --- liens qui contiennent un nom officiel dans leur chemin (jaune alerte forte) ---
 # (archives, redirecteurs, moteurs de recherche, outils de vérification, forums). Ils servent à mesurer les faux rouges
-# que la règle « nom officiel complet dans le chemin » crée. DÉCISION : seules 4 exceptions (web.archive.org, Google /url, YouTube /redirect,
-# Facebook l.php) ; les autres (moteurs de recherche, VirusTotal, GitHub...) restent ROUGES par prudence. Compté À PART, jamais mélangé aux faux rouges d'origine.
+# que la règle « nom officiel complet dans le chemin » crée. DÉCISION : plus d'exception ; avec « autre chose » ces liens sont JAUNES avec
+# alerte forte (jamais rouges). Comptés À PART, jamais mélangés à la liste d'origine : ce sont des alertes inutiles, pas des erreurs de niveau.
 https://web.archive.org/web/20230115000000/https://www.roblox.com/
 https://web.archive.org/web/2024*/discord.com
 https://archive.org/wayback/available?url=roblox.com
@@ -295,3 +294,79 @@ https://www.similarweb.com/website/roblox.com/
 https://downdetector.com/status/roblox-com/
 https://github.com/Roblox/creator-docs/issues/1818?q=discord.com
 https://www.trustpilot.com/review/roblox.com
+# --- liens honnêtes à risque (mot de marque + mot de piège) ---
+# Pages HONNÊTES qui parlent d'arnaques ou de comptes : le mot de marque (roblox, discord, robux, nitro) et un mot de piège
+# (login, verify, claim, free, gift...) sont dans le chemin ou la requête. Domaines .example ou grands sites (format seulement).
+# Comptés À PART : ils mesurent le risque d'une règle « mot de marque + mot de piège », ils ne sont pas des erreurs actuelles.
+https://www.reddit.com/r/roblox/comments/1k2m3n/free_robux_scam_warning_do_not_click/
+https://www.reddit.com/r/robloxhelp/comments/1p4q5r/someone_asked_for_my_account_login_is_this_a_scam/
+https://www.reddit.com/r/discordapp/comments/2a3b4c/fake_nitro_gift_links_how_to_spot_them/
+https://www.reddit.com/r/Scams/comments/3d4e5f/roblox_unban_scam_dm_on_discord/
+https://www.reddit.com/r/roblox/comments/4g5h6i/friends_asking_me_to_verify_my_account_on_a_weird_site/
+https://www.reddit.com/r/discordapp/comments/5j6k7l/nitro_giveaway_claim_link_is_this_legit/
+https://www.example-news.example/tech/how-to-avoid-free-robux-scams
+https://www.example-journal.example/2025/03/discord-nitro-scam-what-parents-should-know
+https://www.example-gazette.example/gaming/roblox-account-verify-phishing-emails-explained
+https://www.example-parents.example/safety/roblox-free-robux-generators-dont-work
+https://www.example-tech.example/security/fake-discord-gift-links-spread-on-servers
+https://www.example-news.example/2025/roblox-scammers-claim-free-items-in-games
+https://www.example-radio.example/articles/nitro-gift-scam-warning-signs
+https://en.wikipedia.org/wiki/Discord_(software)#Free_Nitro_scams
+https://en.wikipedia.org/wiki/Roblox#Account_security
+https://en.wikipedia.org/wiki/Phishing#Discord_and_Roblox_login_scams
+https://en.wikipedia.org/wiki/Special:Search?search=free+robux+scam
+https://medium.com/@parentblog/my-kid-clicked-a-free-robux-link-what-i-learned-3f2a1b
+https://www.example-blog.example/2024/11/roblox-friends-list-privacy-and-account-safety
+https://parentingblog.example/discord-nitro-gift-scams-explained
+https://securityblog.example/posts/robux-reward-scams-in-2025
+https://schoolblog.example/digital-safety/roblox-login-security-checklist
+https://docs.example/roblox/account-verify-api
+https://developers.example/docs/discord-bot/verify-member-role
+https://developers.example/docs/roblox-open-cloud/claim-api-key
+https://readthedocs.example/en/latest/roblox-py/login.html
+https://github.com/example-user/roblox-account-verify-bot/blob/main/README.md
+https://github.com/example-org/discord-nitro-gift-detector/issues/12
+https://forum.example.org/t/roblox-free-items-scam-megathread/9876
+https://devforum.example.org/t/discord-login-oauth-redirect-problem/1234
+https://stackoverflow.com/questions/12345678/discord-bot-how-to-verify-new-members
+https://forum.example.org/t/nitro-gift-link-says-already-claimed/5521
+https://community.example/t/roblox-friends-not-showing-after-update/7788
+https://forum.example.org/viewtopic.php?t=4455&title=roblox-unban-appeal-tips
+https://scams.wiki.example/wiki/Roblox_free_robux_generator
+https://safety.wiki.example/wiki/Discord_nitro_gift_scam
+https://gamehelp.wiki.example/wiki/Roblox_support_contact_options
+https://www.youtube.com/watch?v=aB3dE5fG7hI&list=roblox-scam-warning-free-robux
+https://www.youtube.com/results?search_query=discord+nitro+free+scam
+https://schoolhelp.example/help?topic=roblox+account+safety
+# --- sites de fans connus ---
+# Sites de fans et d'outils connus des joueurs, non officiels. Un mot de marque dans le nom (todoroblox) donne une alerte JAUNE, jamais du rouge.
+https://www.rolimons.com/
+https://www.rovalk.com/
+https://www.todoroblox.com/
+https://roblox.fandom.com/wiki/Gear
+# --- mots courants (un mot d'arnaque ou de marque COLLÉ dans un mot ordinaire : jamais rouge) ---
+# Ces mots contiennent « free », « hack », « nitro », « gift », « support », « account » ou « login » sans en être.
+# Attendu avec « autre chose » : jamais rouge (jaune simple, ou jaune alerte forte si « roblox » / « discord » y figure).
+https://freelance-roblox-dev.example/
+https://hackathon-roblox.example/
+https://nitrogen.example/
+https://discordance.example/
+https://hackertrain.example/
+https://giftshop.example/
+https://supportgroup.example/
+https://accountingtools.example/
+https://loginsoft.example/
+# --- noms honnêtes avec des chiffres (un chiffre dans un nom ordinaire : jamais rouge) ---
+# Un chiffre à la place d'une lettre est rouge SEULEMENT dans un nom de marque (r0blox, d1sc0rd). Ici, aucun nom de marque n'est écrit avec des chiffres.
+https://web3-roblox-fans.example/
+https://2fa-help.example/
+https://4chan-archive.example/
+https://3d-printing-club.example/
+# --- mots d'arnaque au pluriel sans mot de marque (sites ordinaires : jamais rouge) ---
+# Un mot comme « gifts », « rewards » ou « cheats » seul dans un nom d'hôte, sans roblox / discord / nitro / robux, ne signale rien.
+https://gifts-shop.example/
+https://rewards-program.example/
+https://cheats-crosswords.example/
+https://hacks-diy.example/
+https://generators-solar.example/
+https://livres-gratuits.example/
