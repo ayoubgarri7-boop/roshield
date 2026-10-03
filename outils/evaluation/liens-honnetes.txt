@@ -370,3 +370,10 @@ https://cheats-crosswords.example/
 https://hacks-diy.example/
 https://generators-solar.example/
 https://livres-gratuits.example/
+# --- mots courants proches de « discord » (jamais rouges) ---
+# Des mots ordinaires à une lettre de « discord » (discard = jeter, discorde = désaccord). Attendu avec « autre chose » : jamais rouge.
+https://discard.example/
+https://discarded-ideas.example/
+https://discorde.example/
+https://pomme-de-discorde.example/
+https://discordance-musicale.example/

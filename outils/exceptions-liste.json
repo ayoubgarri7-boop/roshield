@@ -1,0 +1,5 @@
+{
+  "_aide": "Pour RETIRER une erreur de js/blocklist.json : ajoute le nom d'hote complet dans \"hotes\" (ex. \"exemple.test\") ou l'adresse complete dans \"liens\" (ex. \"https://exemple.test/page\"), puis relance : node outils/maj-liste.js --local donnees-externes. Les entrees de ce fichier sont retirees de la liste a chaque mise a jour.",
+  "hotes": [],
+  "liens": []
+}

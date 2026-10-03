@@ -36,7 +36,20 @@ const CAS = [
   ["https://www.roblox.com/users/123/profile", "inconnu", "vert", "vert"],
   // --- Un faux domaine qui copie /attachments/ n'est PAS officiel : il reste jaune (ou rouge avec la réponse) ---
   ["https://evil.test/attachments/123/456/fichier.png", "inconnu", "jaune", "jaune"],
-  ["https://evil.test/attachments/123/456/fichier.png", "discord", "rouge", "nonOfficielDiscord"]
+  ["https://evil.test/attachments/123/456/fichier.png", "discord", "rouge", "nonOfficielDiscord"],
+  // --- Faute de frappe d'un caractère dans un long morceau du nom d'hôte (roblox / discord) : ROUGE ---
+  ["https://discrod-egift.example/", "inconnu", "rouge", "rouge"],
+  ["https://dlscordapps.example/", "inconnu", "rouge", "rouge"],
+  ["https://dicsord-summer.example/", "inconnu", "rouge", "rouge"],
+  // --- Mots honnêtes proches de "discord" : JAMAIS rouges avec « autre chose » (jaune simple, ou alerte si "discord" y figure) ---
+  ["https://discard.example/", "inconnu", "jaune", "jaune"],
+  ["https://discarded-ideas.example/", "inconnu", "jaune", "jaune"],
+  ["https://discorde.example/", "inconnu", "jaune", "alerteMarque_discord"],
+  ["https://pomme-de-discorde.example/", "inconnu", "jaune", "alerteMarque_discord"],
+  ["https://discordance-musicale.example/", "inconnu", "jaune", "alerteMarque_discord"],
+  ["https://discordant.example/", "inconnu", "jaune", "alerteMarque_discord"],
+  // --- "nitro" n'est pas concerné par la faute de frappe dans un morceau ("intro" est un vrai mot) ---
+  ["https://intro-guides.example/", "inconnu", "jaune", "jaune"]
 ];
 
 let echecs = 0;
