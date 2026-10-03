@@ -98,6 +98,8 @@ window.TEXTES_VERIF = {
       "Ne tape jamais ton mot de passe ou un code dessus, et ne partage jamais ton écran.";
   },
   // Petite ligne (sur le vert et le jaune) : le lien cache une autre adresse
+  // Fichier envoyé par un utilisateur sur le CDN de Discord (/attachments/) : domaine officiel, mais pas vérifié par Discord
+  fichierEnvoye: "Ce fichier a été envoyé par un utilisateur, pas par Discord. Ne l'ouvre pas si tu ne connais pas la personne, et ne lance jamais un fichier envoyé par un inconnu.",
   adresseCachee: "Ce lien contient une autre adresse cachée : il peut t'envoyer ailleurs.",
   inconnu:
     "RoShield ne connaît que les domaines officiels de Roblox et de Discord. Ça ne veut pas dire que ce lien " +

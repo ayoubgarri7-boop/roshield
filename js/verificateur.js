@@ -261,6 +261,23 @@
     // http:// n'est signalé que si l'utilisateur l'a écrit lui-même
     if (avaitProtocole && url.protocol === "http:") notes.push(T.http);
 
+    // Fichier ENVOYÉ PAR UN UTILISATEUR sur un domaine Discord officiel (cdn.discordapp.com/attachments/...,
+    // media.discordapp.net/attachments/...) : le domaine est bien celui de Discord, mais Discord n'a pas vérifié le fichier.
+    // Ce n'est donc pas "vert" : jaune "Domaine officiel, mais vérifie le lien", avec une explication forte.
+    // Les autres liens Discord officiels (discord.com/channels/..., discord.gg/abc) restent verts.
+    if (officiel && /discord/.test(officiel.domaine)) {
+      let chemin = url.pathname;
+      for (let i = 0; i < 3; i++) {
+        let decode;
+        try { decode = decodeURIComponent(chemin); } catch (e) { break; }
+        if (decode === chemin) break;
+        chemin = decode;
+      }
+      if (/\/attachments(\/|$)/i.test(chemin)) {
+        ajouter("jaune", T.fichierEnvoye);
+      }
+    }
+
     // Titre imposé par une règle précise (sinon on prend celui du niveau)
     let titreForce = null;
     // Alerte forte JAUNE (nom officiel copié dans le chemin, ou mot de marque seul dans le nom d'hôte) : clé du titre
