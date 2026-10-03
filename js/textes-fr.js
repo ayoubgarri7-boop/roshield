@@ -22,10 +22,10 @@ window.TEXTES_VERIF = {
     // Cas particulier : domaine officiel, mais avec un détail à vérifier (http://, @...)
     // Le titre "inconnu" serait faux ici, puisque le domaine est bien connu.
     officielAttention: "Domaine officiel, mais vérifie le lien",
-    // Quand le message parlait de Roblox / Discord mais que le domaine réel est un autre (nouveau rouge)
+    // Quand le message disait "c'est une page Roblox / Discord" mais que le domaine réel est un autre (nouveau rouge)
     nonOfficielRoblox: "Ce n'est pas le vrai site de Roblox",
     nonOfficielDiscord: "Ce n'est pas le vrai site de Discord",
-    // Quand le message parlait de Roblox / Discord mais que le lien mène vers un autre grand site connu (gris-bleu)
+    // Quand le message disait "c'est une page Roblox / Discord" mais que le lien mène vers un autre grand site connu (gris-bleu)
     autreSiteConnuRoblox: "Ce n'est pas Roblox : c'est un autre site connu",
     autreSiteConnuDiscord: "Ce n'est pas Discord : c'est un autre site connu"
   },
@@ -83,14 +83,14 @@ window.TEXTES_VERIF = {
   partieProche: function (partie, mot, vrai) {
     return "Dans « " + vrai + " », le mot « " + partie + " » ressemble beaucoup à « " + mot + " » : c'est probablement une faute de frappe faite exprès pour te tromper.";
   },
-  // Question "Que disait le message qui accompagnait ce lien ?" (plateforme = "Roblox" ou "Discord")
+  // Question "Que disait le message à propos de ce lien ?" (plateforme = "Roblox" ou "Discord")
   attenduFaux: function (plateforme) {
-    return "Le message parlait de " + plateforme + ", mais le vrai domaine de ce lien est un autre. " +
+    return "Le message disait que ce lien était une page " + plateforme + ", mais son vrai domaine est un autre. " +
       "Ne tape jamais ton mot de passe ou un code dessus, et ne partage jamais ton écran.";
   },
   // Niveau gris-bleu : un autre grand site connu (jamais "sûr", jamais vert)
   autreSiteConnu: function (plateforme) {
-    return "Le message parlait de " + plateforme + ", mais ce lien mène vers un autre site connu. " +
+    return "Le message disait que c'était " + plateforme + ", mais ce lien mène vers un autre site connu. " +
       "Ce n'est pas forcément dangereux, mais vérifie que la page ne te demande pas de te connecter.";
   },
   // Petite ligne (niveau gris-bleu) : le lien cache une autre adresse

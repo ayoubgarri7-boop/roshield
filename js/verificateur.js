@@ -43,7 +43,7 @@
      https://mon-super-site.com                 (inconnu, sans rapport)
      https://discord.com@roblox.com             (@ mais mène vers un officiel)
 
-   AVEC LA QUESTION "Que disait le message qui accompagnait ce lien ?"  (Roblox / Discord / rien de précis)
+   AVEC LA QUESTION "Que disait le message à propos de ce lien ?"  (page Roblox / page Discord / autre chose ou je ne sais pas)
      https://dash.cloudflare.com/sign-up        + Roblox  ou  + Discord  -> ROUGE "Ce n'est pas le vrai site de ..."
      https://www.roblox.com/games/123           + Roblox  -> VERT (comme d'habitude)
      https://mon-super-site.com                 + "Je ne sais pas" -> JAUNE (comme d'habitude)
@@ -152,7 +152,7 @@
      Renvoie soit  { erreur: "..." }
      soit { niveau, hote, sous, reel, raisons: [...] }
 
-     "attendu" (facultatif) = de quoi parlait le message qui accompagnait le lien :
+     "attendu" (facultatif) = ce que le message PRÉTENDAIT : "c'est une page Roblox / Discord" :
        "roblox" ou "discord"  -> si le domaine réel n'est pas officiel : rouge
        "inconnu" ou rien      -> comportement habituel, rien ne change
      Cette réponse ne sert qu'à comparer : le lien n'est jamais visité.
@@ -307,7 +307,7 @@
       ajouter("jaune", T.inconnu);
     }
 
-    // --- 6c. Le message parlait de Roblox ou de Discord ---
+    // --- 6c. Le message disait que c'était une page Roblox ou Discord ---
     // Si le domaine réel n'est PAS officiel (les sous-domaines officiels comptent comme officiels),
     // c'est rouge : quelqu'un se fait passer pour Roblox/Discord. Les autres raisons restent affichées.
     // SAUF si c'est un grand site tiers connu (YouTube, Reddit...) ET que ce n'était pas déjà rouge :
@@ -396,7 +396,7 @@
 
   let resultatAffiche = false;   // vrai quand un résultat (pas une erreur) est à l'écran
 
-  // La réponse choisie à la question "Que disait le message qui accompagnait ce lien ?"
+  // La réponse choisie à la question "Que disait le message à propos de ce lien ?"
   function reponseChoisie() {
     const choix = formulaire.querySelector('input[name="attendu"]:checked');
     return choix ? choix.value : "inconnu";

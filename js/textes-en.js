@@ -31,10 +31,10 @@ window.TEXTES_VERIF = {
     rouge: "Danger: probably a fake link. Don’t click it.",
     // Cas particulier : domaine officiel, mais avec un détail à vérifier (http://, @...)
     officielAttention: "Official domain, but check the link",
-    // Quand le message parlait de Roblox / Discord mais que le domaine réel est un autre (nouveau rouge)
+    // Quand le message disait "c'est une page Roblox / Discord" mais que le domaine réel est un autre (nouveau rouge)
     nonOfficielRoblox: "This isn’t the real Roblox site",
     nonOfficielDiscord: "This isn’t the real Discord site",
-    // Quand le message parlait de Roblox / Discord mais que le lien mène vers un autre grand site connu (gris-bleu)
+    // Quand le message disait "c'est une page Roblox / Discord" mais que le lien mène vers un autre grand site connu (gris-bleu)
     autreSiteConnuRoblox: "This isn’t Roblox: it’s another well-known site",
     autreSiteConnuDiscord: "This isn’t Discord: it’s another well-known site"
   },
@@ -92,14 +92,14 @@ window.TEXTES_VERIF = {
   partieProche: function (partie, mot, vrai) {
     return "In “" + vrai + "”, the word “" + partie + "” looks a lot like “" + mot + "”. It’s probably a typo made on purpose to trick you.";
   },
-  // Question "What did the message that came with this link say?" (plateforme = "Roblox" ou "Discord")
+  // Question "What did the message say about this link?" (plateforme = "Roblox" ou "Discord")
   attenduFaux: function (plateforme) {
-    return "The message was about " + plateforme + ", but this link’s real domain is a different one. " +
+    return "The message said this link was a " + plateforme + " page, but its real domain is a different one. " +
       "Never type your password or a code on it, and never share your screen.";
   },
   // Niveau gris-bleu : un autre grand site connu (jamais "safe", jamais vert)
   autreSiteConnu: function (plateforme) {
-    return "The message was about " + plateforme + ", but this link goes to another well-known site. " +
+    return "The message said it was " + plateforme + ", but this link goes to another well-known site. " +
       "That doesn’t mean it’s dangerous, but make sure the page doesn’t ask you to log in.";
   },
   // Petite ligne (niveau gris-bleu) : le lien cache une autre adresse

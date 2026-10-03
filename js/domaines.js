@@ -55,7 +55,7 @@ window.RACCOURCISSEURS = [
 ];
 
 // ---------- 5. Grands sites tiers connus (utilisés SEULEMENT avec la question du vérificateur) ----------
-// Quand le message parlait de Roblox ou de Discord, que le lien n'est PAS officiel, mais que son vrai
+// Quand le message disait "c'est une page Roblox ou Discord", que le lien n'est PAS officiel, mais que son vrai
 // domaine est un de ces grands sites, le résultat est gris-bleu ("c'est un autre site connu") au lieu de rouge.
 // Ce n'est PAS un verdict de confiance : on dit seulement "ce n'est pas Roblox / Discord, c'est un autre site connu".
 //
