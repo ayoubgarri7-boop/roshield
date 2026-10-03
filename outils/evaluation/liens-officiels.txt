@@ -1,0 +1,57 @@
+# Liens vers des domaines OFFICIELS Roblox et Discord (sous-domaines compris).
+# Un lien par ligne. Les lignes qui commencent par # et les lignes vides sont ignorées.
+# Attendu : VERT (ou JAUNE « Domaine officiel, mais vérifie le lien » pour un détail comme http://), quelle que soit la réponse.
+# Ces liens sont inventés pour le test : les numéros et les codes ne mènent nulle part de précis.
+# --- Roblox : site principal ---
+https://www.roblox.com/home
+https://www.roblox.com/
+https://roblox.com/login
+https://web.roblox.com/home
+https://www.roblox.com/discover#/
+https://www.roblox.com/my/avatar
+https://www.roblox.com/transactions
+https://www.roblox.com/upgrades/robux?ctx=nav
+https://www.roblox.com/premium/membership
+https://www.roblox.com/giftcards
+https://www.roblox.com/redeem
+https://www.roblox.com/download
+# --- Roblox : pages avec chemin long ou paramètres ---
+https://www.roblox.com/games/0905274819/Adopt-Me?privateServerLinkCode=68400761298038723455042805750315
+https://www.roblox.com/catalog/94473285/Classic-Red-Cap?AssetFilter=3&Category=1&Subcategory=9&SortType=2&Keyword=cap
+https://www.roblox.com/users/624834321/profile?friendshipSourceType=1
+https://www.roblox.com/groups/8808182/Group-Name-Example#!/about
+https://www.roblox.com/login/return?returnUrl=%2Fhome%3Fref%3Dmenu
+https://www.roblox.com/search/users?keyword=builderman&utm_source=mail&utm_medium=email&utm_campaign=welcome
+# --- Roblox : sous-domaines officiels ---
+https://create.roblox.com/dashboard/creations
+https://create.roblox.com/docs/reference/engine/classes/Part
+https://create.roblox.com/store/asset/6040338170/Free-Model-Name
+https://devforum.roblox.com/t/how-to-use-datastores-safely/6788385
+https://devforum.roblox.com/c/updates/announcements/36
+https://en.help.roblox.com/hc/en-us/articles/964120503736-How-do-I-Add-or-Remove-a-PIN
+https://corp.roblox.com/news
+https://blog.roblox.com/2025/05/safety-features-update/
+https://education.roblox.com/en-us/resources
+https://developer.roblox.com/en-us/api-reference/class/Part
+# --- Discord : site principal ---
+https://discord.com/
+https://discord.com/download
+https://discord.com/nitro
+https://discord.com/safety
+https://discord.com/channels/@me
+https://discord.com/login
+# --- Discord : invitations, cadeaux, support, pièces jointes ---
+https://discord.gg/rmZE9Hg
+https://discord.gg/sbCJLeiW?event=218673035533254252
+https://discord.com/invite/fY2Hbxp
+https://discord.gift/aPwbp4YFqdfTvqKX
+https://support.discord.com/hc/en-us/articles/210867367738-Your-Account-Security
+https://support.discord.com/hc/en-us/requests/new?ticket_form_id=50916577526540
+https://discord.com/developers/docs/intro
+https://discord.com/channels/876462699476010698/351913831128718854/3124605043949227247
+https://discordapp.com/channels/@me/092743940925252203
+https://cdn.discordapp.com/attachments/030559445418095500/1691297383612100031/screenshot.png?ex=vimpmzm8&is=7gn4pglq&hm=775759352935846719894614951140&
+https://cdn.discordapp.com/avatars/290468655227456692/52638316016547515761445273151380.png?size=256
+https://media.discordapp.net/attachments/626547539645547711/7836085316569244261/clip.webp?format=webp&width=400&height=300
+https://images-ext-1.discordapp.net/external/fsRwvZ7ePrT45AekajqT/https/i.imgur.com/UhzvmDJ.png
+http://discord.com/

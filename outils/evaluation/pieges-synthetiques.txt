@@ -1,0 +1,161 @@
+# Liens-pièges INVENTÉS pour mesurer RoShield. Ils ne mènent nulle part.
+# Uniquement des domaines RÉSERVÉS aux tests et aux exemples (.test, .invalid, .example, example.com/.net/.org)
+# et des adresses IP de documentation (192.0.2.x, 198.51.100.x, 203.0.113.x, 2001:db8::). AUCUN vrai domaine malveillant.
+# Un lien par ligne. Les lignes qui commencent par # et les lignes vides sont ignorées.
+# Ces motifs sont inspirés de vraies arnaques : nom officiel copié dans le chemin, chiffres à la place des lettres,
+# tirets, mots de piège (login, verify, free, claim, gift, unban, friends, join), faux hébergeurs, IP, @, punycode, http://.
+# Les VRAIS raccourcisseurs (bit.ly...) ne sont pas dans ce fichier : seuls des raccourcisseurs inventés y figurent.
+# --- Nom au hasard + le nom officiel copié dans le CHEMIN (le motif le plus difficile à détecter) ---
+https://bc6puvp.test/roblox-com-users-2719359-profile
+https://5ty61meg.test/roblox-com-users-1858897-profile
+https://lf158g.example/www.roblox.com/games/14208295
+https://w4iuvk.test/roblox/login
+https://lcrw0v.invalid/discord-com/invite/AQR886J
+https://0maervmx.example/discord.com/channels/@me
+https://oa9yv99k.test/users/25964370/profile-roblox.com
+https://39lnc5.invalid/roblox.com/catalog/39229783/free-item
+https://wkfzgp8b.example/groups/2335884/roblox-official
+https://06p10cy.example/support-roblox-com/ticket/078309
+https://sssci3.test/nitro/discord-gift/mczzqejXXJrMJGCm
+https://1gtbji.invalid/robux/roblox.com/redeem
+# --- Le nom officiel copié dans la requête (paramètres) ---
+https://5sl84mi5.invalid/login?site=roblox.com
+https://a0k9gb8.invalid/auth?redirect=https://www.roblox.com/home
+https://fni5vr3.test/verify?service=discord&user=59268141
+https://vov9ar.example/go?u=https%3A%2F%2Fwww.roblox.com%2Flogin
+https://oc9y7478.test/?ref=roblox.com&uid=6482080
+https://nfeb0g.example/session?from=discord.com
+# --- Chiffres à la place des lettres (r0blox, rob1ox, d1scord...) ---
+https://r0blox.test/login
+https://rob1ox.test/games/2385418
+https://r0bl0x-login.test/
+https://rob1ox.invalid/home
+https://d1scord.test/invite/W7kpW5G
+https://disc0rd-nitro.test/gift
+https://dlscord.test/login
+https://r0blox.example.com/robux
+https://rob1ox-support.test/ticket
+https://d1sc0rd.invalid/verify
+https://www.r0blox.test/users/76620689/profile
+https://rob10x.test/
+https://r0b1ox.test/free-robux
+https://disc0rd.test/nitro
+# --- Fautes de frappe proches (rovlox, robIox, discorb...) ---
+https://rovlox.test/
+https://robIox.test/login
+https://roblx.example.com/
+https://discorb.test/invite/a9QrEST
+https://dlscord-gift.test/
+https://robIlox.invalid/
+https://rooblox.test/games
+https://roblocks.test/
+https://dicsord.test/login
+https://discrod.invalid/nitro
+https://robolox.test/free
+# --- Tirets et variantes (roblox-com-login, ro-blox, www-roblox-com...) ---
+https://roblox-com-login.test/
+https://www-roblox-com.invalid/
+https://roblox--support.test/
+https://ro-blox.test/home
+https://dis-cord.test/
+https://roblox-com.example.com/login
+https://discord-com-invite.test/TkwB3mT
+https://roblox-support-team.test/ticket/674863
+https://roblox-official-site.invalid/
+https://discord-app-download.test/
+https://my-roblox-account.test/
+https://roblox-games-online.example/
+# --- Mots de piège dans le domaine ou le chemin (login, verify, free, claim, gift, unban, friends, join) ---
+https://login-i8sge.test/roblox
+https://verify-56ncg.test/account
+https://free-robux-48xl.test/
+https://claim-he18y.invalid/robux
+https://gift-tr311.test/nitro
+https://unban-ynzbg.test/appeal
+https://friends-7hv8t.test/join
+https://join-r0ztb.test/khuRXay
+https://6i76s5ce.example/verify-your-account
+https://ecb1p4qo.test/claim-free-robux
+https://5w55x8wm.test/free-nitro-gift-smbNaMX6
+https://44sruk.invalid/unban-my-account/089146
+https://8t2e8a.test/login-to-continue
+https://t7ashzhm.example/join-friends-pmRVNr
+https://uqadel.example/claim-your-gift
+https://freerobux.test/
+https://robuxfree.invalid/generator
+https://nitrofree.test/claim
+https://giftnitro.example/
+https://robux-giveaway.test/winner/112247
+# --- Sous-domaines d'hébergeurs gratuits INVENTÉS (le nom officiel est un sous-domaine d'un faux hébergeur) ---
+https://roblox-login.fakehost.test/
+https://roblox.pages-hosting.test/login
+https://d1vr97e.free-sites.invalid/roblox
+https://discord-nitro.sites-gratuits.test/
+https://robux-gratuit.hebergeur-libre.example/
+https://y4w596.faux-netlify.test/roblox-login
+https://roblox-verify.faux-github-pages.invalid/
+https://t0yhl8.fakeblog.test/free-robux
+https://login-roblox.myfreesite.test/
+https://nitro-gift.pagesgratuites.example/
+https://scmekv.sites-demo.test/discord-login
+https://roblox-support.faux-vercel.test/
+# --- Sous-domaines trompeurs (roblox.com.xxx.test : le vrai domaine est la fin) ---
+https://roblox.com.eqv1es.invalid/login
+https://www.roblox.com.liwuz50.test/home
+https://discord.com.1o0o4b5.test/invite/QKchAky
+https://login.roblox.com.aybs6v.test/
+https://roblox.com.example.com/verify
+https://discord.com.example.net/gift
+https://www.roblox.com.login.fiy3tju.test/
+https://support.discord.com.ctycow.test/ticket
+https://roblox.com-xlx6oi.example/login
+https://discord.gg.xxj8qhu.test/rfDT9Ps
+# --- Faux raccourcisseurs INVENTÉS (les vrais raccourcisseurs, comme bit.ly, ne sont pas dans ce fichier) ---
+https://sho.rt.test/jZ55Fc
+https://lnk.test/r/L5d932b
+https://go.link-court.example/d5mCU
+https://u.invalid/fqYRrJ
+https://tiny.raccourci.test/E3FLizW2
+http://sho.rt.test/ZtPXNm
+# --- Adresses IP (plages réservées à la documentation) ---
+http://203.0.113.67/roblox/login
+https://198.51.100.116:8443/discord/verify
+http://192.0.2.93/
+http://203.0.113.185/free-robux
+https://198.51.100.160/nitro/claim
+http://192.0.2.249:8080/login
+http://3405803777/roblox
+http://[2001:db8::68]/login
+# --- Le trompe-l'œil avec « @ » (ce qui est avant le @ est ignoré) ---
+https://www.roblox.com@uwf9s8nv.test/login
+https://discord.com@55ne1ky.test/gift/3RDzSaLHW854SbYP
+https://roblox.com:443@4h3v27mg.example/
+https://login@6ibste.invalid/roblox
+https://www.roblox.com@7bziyk8.example/home
+https://support.roblox.com@vexplf.invalid/ticket
+https://discord.gg@2311byy.invalid/32giWaj
+http://roblox.com@jmhzscq.example/free-robux
+# --- Punycode (lettres d'un autre alphabet cachées) ---
+https://xn--rblox-xxa.test/
+https://xn--dscord-6va.test/login
+https://xn--soicixml.test/
+https://xn--rblox-jye.invalid/home
+https://www.xn--rblox-7va.test/login
+https://xn--6mu14-roblox.test/
+# --- http:// (connexion non chiffrée) sur des domaines inventés ---
+http://m3w3b80v.test/roblox-login
+http://free-robux.test/
+http://4v90kj.example/discord-nitro
+http://roblox-support.example/
+http://tsfd14d.example/verify
+http://giftnitro.test/claim
+# --- Mélanges réalistes (plusieurs motifs à la fois) ---
+https://b38a973.invalid/login/roblox-com/verify?user=01504105&gift=1
+https://free-5c8yd.test/discord-nitro-claim/N3VYbBS
+https://kxqqou.example/join/roblox-friends-70347
+https://lohphl.hosting-libre.test/discord/gift-dppcRT3G
+https://www.bxipbmap.example/unban/roblox.com/114893
+https://tyk058da.example/verify-roblox-account/step-2?token=YJEfmyMk6isJ2bJhgCmP6DaE
+https://0yf7ygk6.test/nitro/discord-com-gift?code=Gt5cNnAiYfFXE8Mv
+https://qqbztab.example/steam-gift-card-roblox-1710
+https://3gg51k6.example/robux-for-free/claim/7290961

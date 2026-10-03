@@ -1,0 +1,297 @@
+# Liens HONNÊTES que des joueurs rencontrent vraiment (Roblox, Discord, YouTube, Reddit, Wikipédia, GitHub, wikis, forums...).
+# Un lien par ligne. Les lignes qui commencent par # et les lignes vides sont ignorées.
+# Les numéros et les codes sont inventés pour le test. Aucun lien n'est visité : le script ne lit que le TEXTE.
+# Attendu avec « autre chose / je ne sais pas » : jamais ROUGE (le rouge est réservé aux pièges). Un site inconnu est JAUNE.
+# Le « GROUPE DIFFICILE » (domaines de Roblox/Discord absents de la liste officielle) est compté à part : ses liens
+# restent ROUGES tant qu'il n'y a pas de source officielle (décision), ce ne sont pas des erreurs à corriger.
+# --- Roblox : profils ---
+https://www.roblox.com/users/259348999/profile
+https://www.roblox.com/users/4268096820/profile
+https://www.roblox.com/users/2730367796/profile
+https://www.roblox.com/users/0939889/profile
+https://www.roblox.com/users/387833647/profile
+https://www.roblox.com/users/8637582839/profile
+https://www.roblox.com/users/952987185/profile
+https://www.roblox.com/users/9179564/profile
+# --- Roblox : jeux ---
+https://www.roblox.com/games/675551/Adopt-Me
+https://www.roblox.com/games/429446/Blox-Fruits
+https://www.roblox.com/games/5854761338/Brookhaven-RP
+https://www.roblox.com/games/435399/Tower-of-Hell
+https://www.roblox.com/games/69254651/Piggy
+https://www.roblox.com/games/024783/Arsenal
+https://www.roblox.com/games/2240233350/Jailbreak
+https://www.roblox.com/games/3136292142/MeepCity
+https://www.roblox.com/games/782864/Murder-Mystery-2
+https://www.roblox.com/games/3940315307/Bee-Swarm-Simulator
+https://www.roblox.com/games/660502/Doors
+https://www.roblox.com/games/3519456943/Natural-Disaster-Survival
+https://www.roblox.com/games/4332392804/Bloxburg
+https://www.roblox.com/games/763796/Pet-Simulator-99
+# --- Roblox : groupes ---
+https://www.roblox.com/groups/63334009/Roblox-Fan-Club
+https://www.roblox.com/groups/7574798/Builders-Club-Crew
+https://www.roblox.com/groups/7845363/Obby-Creators
+https://www.roblox.com/groups/1648164/RP-Town-Residents
+https://www.roblox.com/groups/2595373/Trading-Hub
+https://www.roblox.com/groups/32005245/Dev-Team-Example
+# --- Roblox : boutique (catalogue, bundles, game passes, Premium) ---
+https://www.roblox.com/catalog/68634630/Classic-Fedora
+https://www.roblox.com/catalog/637850948/Dominus-Frigidus
+https://www.roblox.com/catalog/19994529/Cool-Sunglasses
+https://www.roblox.com/catalog?Category=1&salesTypeFilter=1&SortType=3
+https://www.roblox.com/bundles/49997/Rthro-Package
+https://www.roblox.com/bundles/180/Korblox-Deathspeaker
+https://www.roblox.com/game-pass/56603164/VIP-Pass
+https://www.roblox.com/game-pass/544502598/2x-Cash
+https://www.roblox.com/premium/membership
+https://www.roblox.com/upgrades/robux
+https://www.roblox.com/giftcards
+https://www.roblox.com/redeem
+# --- Roblox : aide, forum des développeurs, documentation, actualités ---
+https://en.help.roblox.com/hc/en-us/articles/808248701558-Keep-Your-Account-Safe
+https://en.help.roblox.com/hc/en-us/articles/352818312085-Account-Restrictions
+https://en.help.roblox.com/hc/en-us/articles/652200402719-Parental-Controls-Overview
+https://en.help.roblox.com/hc/en-us/articles/081113468-Add-2-Step-Verification-to-Your-Account
+https://en.help.roblox.com/hc/en-us/articles/300671374440-Roblox-Terms-of-Use
+https://en.help.roblox.com/hc/en-us/sections/3437035992-Safety
+https://www.roblox.com/support
+https://www.roblox.com/info/privacy
+https://devforum.roblox.com/t/datastore-best-practices/6221869
+https://devforum.roblox.com/t/how-do-i-use-remoteevents/3331173/3
+https://devforum.roblox.com/t/studio-beta-new-script-editor/4702104
+https://devforum.roblox.com/c/updates/announcements/36
+https://devforum.roblox.com/latest?order=views
+https://devforum.roblox.com/u/builderman/summary
+https://create.roblox.com/docs/
+https://create.roblox.com/docs/scripting/luau
+https://create.roblox.com/docs/reference/engine/classes/Players
+https://create.roblox.com/docs/production/monetization
+https://create.roblox.com/dashboard/creations
+https://create.roblox.com/store/asset/4407070159/Tree-Model
+https://developer.roblox.com/en-us/api-reference/function/Players/GetPlayerByUserId
+https://blog.roblox.com/2025/03/new-safety-tools/
+https://corp.roblox.com/
+https://corp.roblox.com/safety
+# --- Discord : invitations, serveurs, support, pièces jointes ---
+https://discord.gg/UK6vbzH
+https://discord.gg/jLBs4PMk
+https://discord.gg/pWFkq9
+https://discord.gg/AEJsh3V47X
+https://discord.gg/vxNUDjq
+https://discord.com/invite/Z4eSyLC
+https://discord.com/invite/vyv4dppx
+https://discord.com/invite/C7hGXZJ?event=582097395177772392
+https://discord.com/channels/909877508265458755/590620963510796986
+https://discord.com/channels/@me
+https://discord.com/channels/605333100318869108/633265646139626276/7723238231208613680
+https://support.discord.com/hc/en-us
+https://support.discord.com/hc/en-us/articles/213600799072-Safety-Center
+https://support.discord.com/hc/en-us/articles/888643841672-Setting-up-Multi-Factor-Authentication
+https://support.discord.com/hc/en-us/articles/989419637942-How-to-Report-Content
+https://support.discord.com/hc/en-us/articles/23137367776798-Using-an-Authenticator-App-on-Discord
+https://cdn.discordapp.com/attachments/576368226853470366/7715401498317126973/image.png
+https://cdn.discordapp.com/attachments/949043647960023319/0585490140132004047/clip.mp4
+https://cdn.discordapp.com/attachments/919524531824352081/3085507926057258503/skin-pack.zip
+https://media.discordapp.net/attachments/381608000432762639/5481506455093624320/meme.png?width=500&height=400
+https://cdn.discordapp.com/avatars/240895720383430805/66824993657746129004351465819828.png
+https://cdn.discordapp.com/emojis/961598936999557625.webp?size=96&quality=lossless
+https://discord.com/download
+https://discord.com/nitro
+https://discord.com/safety
+https://discord.com/developers/docs/intro
+https://discord.com/terms
+https://discord.gift/AhQGn4UBqJRtLj4R
+https://discord.gift/PhAX3rTZJpg9RA4w
+# --- YouTube ---
+https://www.youtube.com/watch?v=DPJxSTu8EWD
+https://www.youtube.com/watch?v=XzemQ5BNt3U&t=42s
+https://www.youtube.com/watch?v=AAkqDCkWe5q&list=PL3jZnjFMC4hcjRYn3UiP9Rrp67Zgwns8e&index=3
+https://youtu.be/rscLnRZLK2x
+https://youtu.be/TbxBYZ9RvAs?t=128
+https://www.youtube.com/playlist?list=PLwYMyB7zivBDRXDqTiCz26sPz2y9ahPVm
+https://www.youtube.com/@Roblox
+https://www.youtube.com/@RobloxDevelopers/videos
+https://www.youtube.com/channel/UCFveryDt3zXsw4yixzZub56
+https://www.youtube.com/shorts/bY8BvMTMZZM
+https://m.youtube.com/watch?v=RDUNKHLjisB
+https://music.youtube.com/watch?v=W9QbPySmCbm
+https://www.youtube.com/results?search_query=roblox+obby+guide
+https://www.youtube.com/live/KMG36iVD535
+https://youtube.com/watch?v=n8dPkeJ3VVR
+# --- Reddit ---
+https://www.reddit.com/r/roblox/
+https://www.reddit.com/r/roblox/comments/8acdxc/my_new_avatar/
+https://www.reddit.com/r/robloxgamedev/comments/ahqcjt/how_do_i_script_a_door/
+https://old.reddit.com/r/RobloxHelp/comments/cjf37w/
+https://reddit.com/r/discordapp/comments/khwcdi/new_feature/
+https://www.reddit.com/user/example_user/
+https://redd.it/rjkzce
+https://www.reddit.com/r/roblox/top/?t=week
+# --- Wikipédia ---
+https://en.wikipedia.org/wiki/Roblox
+https://fr.wikipedia.org/wiki/Roblox
+https://en.wikipedia.org/wiki/Discord
+https://fr.wikipedia.org/wiki/Discord_(logiciel)
+https://en.wikipedia.org/wiki/Lua_(programming_language)#History
+https://en.wikipedia.org/wiki/Special:Search?search=roblox&go=Go
+# --- GitHub et dépôts de code ---
+https://github.com/Roblox/creator-docs
+https://github.com/Roblox/rbx-dom
+https://github.com/rojo-rbx/rojo
+https://github.com/rojo-rbx/rojo/releases/latest
+https://github.com/Roblox/roblox-ts/issues/1234
+https://gist.github.com/example-user/pjwuatajnxtmvzeteus7xtm4kzydexys
+https://raw.githubusercontent.com/Roblox/creator-docs/main/README.md
+https://example-user.github.io/my-roblox-notes/
+https://github.com/Kampfkarren/selene/blob/main/README.md
+https://gitlab.com/example-group/example-project
+# --- Twitch, TikTok, X / Twitter, Instagram ---
+https://www.twitch.tv/roblox
+https://www.twitch.tv/videos/7075671329
+https://clips.twitch.tv/SX68eGwqb6bakDw7KJ2giNVC
+https://www.twitch.tv/directory/category/roblox
+https://www.tiktok.com/@roblox
+https://www.tiktok.com/@example.user/video/9704649193884951784
+https://vm.tiktok.com/xjnmVxfg7/
+https://www.tiktok.com/tag/roblox
+https://x.com/Roblox
+https://x.com/Roblox/status/3452935900551722219
+https://twitter.com/Roblox
+https://twitter.com/discord/status/5641615119918101892?s=20
+https://x.com/search?q=roblox%20update&src=typed_query
+https://nitter.example.net/Roblox
+https://www.instagram.com/roblox/
+https://www.instagram.com/p/UxmUVht2SQN/
+# --- Wikis de fans (Fandom) et sites communautaires ---
+https://roblox.fandom.com/wiki/Robux
+https://roblox.fandom.com/wiki/Roblox_Wiki
+https://bloxburg.fandom.com/wiki/Bloxburg_Wiki
+https://blox-fruits.fandom.com/wiki/Blox_Fruits_Wiki
+https://adoptme.fandom.com/wiki/Pets
+https://minecraft.fandom.com/wiki/Redstone
+https://roblox.fandom.com/wiki/Special:Search?query=obby
+https://www.rolimons.com/item/66981396
+https://www.rolimons.com/player/38314037
+https://www.rolimons.com/deals
+https://rblx.trade/
+https://www.bloxfruitsvalues.example.com/
+# --- Jeux, magasins, forums, médias ---
+https://store.steampowered.com/app/62452/Garrys_Mod/
+https://steamcommunity.com/id/example_user/
+https://steamcommunity.com/sharedfiles/filedetails/?id=849586508
+https://store.epicgames.com/en-US/p/fortnite
+https://www.minecraft.net/en-us/download
+https://example-user.itch.io/my-game
+https://itch.io/games/free
+https://gamejolt.com/games/example/198018
+https://www.curseforge.com/minecraft/mc-mods/jei
+https://modrinth.com/mod/sodium
+https://www.nexusmods.com/skyrimspecialedition/mods/7641
+https://www.ign.com/articles/roblox-news-example
+https://www.gamespot.com/articles/roblox-update-example/9757781686/
+https://www.polygon.com/roblox
+https://www.pcgamer.com/roblox/
+https://stackoverflow.com/questions/00286513/how-do-i-use-tweenservice
+https://stackoverflow.com/questions/37364873/lua-table-length
+https://developer.mozilla.org/en-US/docs/Web/JavaScript
+https://developer.mozilla.org/fr/docs/Web/CSS/grid
+https://www.w3schools.com/css/css_grid.asp
+https://medium.com/@example/how-to-learn-luau-jryksxquestb
+https://i.imgur.com/pYKtSzp.png
+https://imgur.com/a/n7dBzWZ
+https://pastebin.com/raw/yWkJKvqp
+https://www.facebook.com/roblox/
+https://www.pinterest.com/pin/553697063142497/
+https://open.spotify.com/track/wMZTbB8DvmWEGXHVLrViTG
+https://open.spotify.com/playlist/7StidS46gw9BXPPXzcyYQt?si=geeEiRWFR3AAScMD
+https://www.amazon.com/dp/NTWAGD8MHT
+https://apps.apple.com/us/app/roblox/id431946152
+https://play.google.com/store/apps/details?id=com.roblox.client
+https://www.microsoft.com/en-us/p/roblox/9nblox1jxs8m
+https://support.microsoft.com/en-us/account-billing
+# --- Google ---
+https://www.google.com/search?q=roblox+promo+codes+2026
+https://www.google.com/search?q=how+to+script+in+roblox&hl=en&gl=us
+https://google.com/
+https://docs.google.com/document/d/fVNA4SjV2DKgaeS6aQWZyFd2bnqUeNw2tjVxX8jKPJrE/edit?usp=sharing
+https://docs.google.com/spreadsheets/d/aK8CXpmQqpnAGFG3KcQ5BcirEtrXzL3uLW7chVbzuQxM/edit#gid=0
+https://drive.google.com/file/d/b4wzCYV2mBhnCLMcDpAwCsWUGH9bXQp8T/view?usp=drive_link
+https://forms.gle/jcaeX2dbYr5XfbVW
+https://translate.google.com/?sl=en&tl=fr&text=hello&op=translate
+https://sites.google.com/view/example-class-project
+# --- GROUPE DIFFICILE : domaines de Roblox/Discord que RoShield ne connaît pas encore (honnêtes mais non listés) ---
+# DÉCISION : on ne les ajoute PAS à la liste officielle tant qu'on n'a pas de source officielle pour chacun.
+# Ils sortent donc ROUGES (mot-clé ou imitation) ou JAUNES (dis.gd, rbxcdn.com). C'est voulu, et compté à part.
+https://roblox.link/dPGsxuUV
+https://ro.blox.com/Gwbr6h
+https://c0.rbxcdn.com/wpblnbbn8vqaewzczduha9azazswcexk
+https://tr.rbxcdn.com/7tbunelxdx2puu73nkgmp6jpfewkuyjf/150/150/Image/Png
+https://www.robloxlabs.com/
+https://discordstatus.com/
+https://discord.new/qh5VFKsyPGpc
+https://dis.gd/dzm9CT
+https://discord.media/
+# --- Redirections et liens de sites connus (adresse complète dans le lien) ---
+https://www.youtube.com/redirect?event=video_description&redir_token=gBK4c96LfxJ58SRLQuFheJ5hU6UvYb&q=https%3A%2F%2Fgithub.com%2FRoblox%2Fcreator-docs
+https://www.youtube.com/redirect?q=https%3A%2F%2Fcreate.roblox.com%2Fdocs&event=comments&redir_token=Bmqm3FV9iLjjftfQ3fR7egvJPsLnty
+https://www.google.com/url?q=https://create.roblox.com/docs&sa=D&source=docs
+https://www.google.com/url?sa=t&url=https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FRoblox&usg=GdEsr85uS4ARCg4AL9Wt
+https://l.facebook.com/l.php?u=https%3A%2F%2Fwww.roblox.com%2Fgames%2F55026785&h=Mq5jq3Va7SvLH2CN
+https://out.reddit.com/t3_gaj6ui?url=https%3A%2F%2Fdevforum.roblox.com%2F&token=dgWYYeTUm4pyb49QUs97
+https://www.reddit.com/r/roblox/comments/2fzyya/check_this_out_httpsdevforumrobloxcom/
+https://discord.com/login?redirect_to=%2Fchannels%2F693875205443720429%2F223305790342802836
+https://accounts.google.com/ServiceLogin?continue=https%3A%2F%2Fdocs.google.com%2F
+https://www.roblox.com/login?returnUrl=https%3A%2F%2Fwww.roblox.com%2Fhome
+# --- Liens courts légitimes ---
+https://t.co/NumMpu4Wdz
+https://bit.ly/Mrk9DKd
+https://tinyurl.com/xbus6ben
+https://goo.gl/maps/NYiA8t6RsPPdMm
+https://is.gd/GSQDYu
+# --- Liens http:// légitimes (anciens sites) ---
+http://info.cern.ch/
+http://neverssl.com/
+http://example.com/
+http://example.org/index.html
+http://www.gutenberg.org/
+http://www.columbia.edu/~fdc/sample.html
+http://httpforever.com/
+http://www.bbc.co.uk/
+http://textfiles.com/
+# --- Liens avec paramètres de suivi et ancres ---
+https://www.roblox.com/games/576478445/Obby-Example?utm_source=newsletter&utm_medium=email
+https://www.youtube.com/watch?v=FHEqYaqK9jU&feature=youtu.be&si=NrBfNY6CqMqULEk6
+https://www.reddit.com/r/roblox/?utm_source=share&utm_medium=web&utm_name=web2x
+https://github.com/Roblox/creator-docs/blob/main/content/en-us/scripting/luau/index.md#L10-L20
+https://en.wikipedia.org/wiki/Roblox#Development
+https://discord.com/invite/G5Fdjkb?utm_source=website
+https://x.com/Roblox?ref_src=twsrc%5Egoogle
+https://www.tiktok.com/@roblox?lang=en
+# --- GROUPE DIFFICILE (cas voulu) : site de fans inconnu avec « roblox » dans son nom ---
+# DÉCISION : rouge voulu. N'importe qui peut acheter un domaine « roblox... » : RoShield ne peut pas le distinguer d'un piège.
+https://www.robloxfans.example/
+# --- liens qui contiennent un nom officiel dans leur chemin (rouge par prudence) ---
+# (archives, redirecteurs, moteurs de recherche, outils de vérification, forums). Ils servent à mesurer les faux rouges
+# que la règle « nom officiel complet dans le chemin » crée. DÉCISION : seules 4 exceptions (web.archive.org, Google /url, YouTube /redirect,
+# Facebook l.php) ; les autres (moteurs de recherche, VirusTotal, GitHub...) restent ROUGES par prudence. Compté À PART, jamais mélangé aux faux rouges d'origine.
+https://web.archive.org/web/20230115000000/https://www.roblox.com/
+https://web.archive.org/web/2024*/discord.com
+https://archive.org/wayback/available?url=roblox.com
+https://archive.ph/https://www.roblox.com/
+https://www.google.com/url?q=https://www.roblox.com/games/1818/Crossroads&sa=D&source=docs
+https://www.youtube.com/redirect?q=https%3A%2F%2Fwww.roblox.com%2Fgames%2F1818&event=video_description&redir_token=Qx7aB2
+https://l.facebook.com/l.php?u=https%3A%2F%2Fdiscord.com%2Fapp&h=AT2xYz
+https://www.google.com/search?q=roblox.com+login+problem
+https://www.bing.com/search?q=discord.com+download
+https://duckduckgo.com/?q=roblox.com+support&ia=web
+https://www.reddit.com/r/robloxhelp/comments/1a2b3c/is_robloxcom_down_for_everyone/
+https://www.reddit.com/r/discordapp/comments/4d5e6f/discordgg_invite_links_explained/
+https://www.wikidata.org/wiki/Special:Search?search=roblox.com
+https://www.virustotal.com/gui/domain/roblox.com
+https://urlscan.io/search/#domain%3Aroblox.com
+https://who.is/whois/roblox.com
+https://www.similarweb.com/website/roblox.com/
+https://downdetector.com/status/roblox-com/
+https://github.com/Roblox/creator-docs/issues/1818?q=discord.com
+https://www.trustpilot.com/review/roblox.com
