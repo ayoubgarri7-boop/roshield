@@ -25,8 +25,13 @@ window.TEXTES_VERIF = {
     // Quand le message disait "c'est une page Roblox / Discord" mais que le domaine réel est un autre (nouveau rouge)
     nonOfficielRoblox: "Ce n'est pas le vrai site de Roblox",
     nonOfficielDiscord: "Ce n'est pas le vrai site de Discord",
-    // Un site non officiel écrit « roblox.com » ou « discord.gg » en entier dans son chemin
-    imiteChemin: "Le nom de Roblox (ou Discord) est copié dans ce lien"
+    // Alertes fortes (JAUNE) : le niveau reste jaune, mais le titre est plus clair que « Domaine inconnu »
+    alerteChemin: "Attention : le nom de Roblox (ou Discord) est copié dans ce lien",
+    alerteMarque_roblox: "Ce site ne fait pas partie des sites officiels de Roblox que RoShield connaît : son nom contient « Roblox »",
+    alerteMarque_rbx: "Ce site ne fait pas partie des sites officiels de Roblox que RoShield connaît : son nom contient « rbx »",
+    alerteMarque_robux: "Ce site ne fait pas partie des sites officiels de Roblox que RoShield connaît : son nom contient « Robux »",
+    alerteMarque_discord: "Ce site ne fait pas partie des sites officiels de Discord que RoShield connaît : son nom contient « Discord »",
+    alerteMarque_nitro: "Ce site ne fait pas partie des sites officiels de Discord que RoShield connaît : son nom contient « Nitro »"
   },
 
   // ----- Affichage du domaine -----
@@ -71,6 +76,10 @@ window.TEXTES_VERIF = {
       "Ce qui compte, c'est la fin du nom, pas le début.";
   },
   imiteDansChemin: "Son vrai domaine est un autre. Ne tape jamais ton mot de passe ou un code sur cette page, et ne partage jamais ton écran.",
+  alerteMarque: function (plateforme) {
+    return "Les vrais sites officiels de " + plateforme + " sont peu nombreux, et les imitations utilisent souvent ce nom. " +
+      "Ne tape jamais ton mot de passe ou un code sur cette page.";
+  },
   ressemble: function (vrai, officiel) {
     return "« " + vrai + " » ressemble beaucoup à « " + officiel + " » mais ce n'est pas le même : ça ressemble à une faute de frappe faite exprès pour te tromper.";
   },

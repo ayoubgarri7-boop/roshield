@@ -34,8 +34,13 @@ window.TEXTES_VERIF = {
     // Quand le message disait "c'est une page Roblox / Discord" mais que le domaine réel est un autre (nouveau rouge)
     nonOfficielRoblox: "This isn’t the real Roblox site",
     nonOfficielDiscord: "This isn’t the real Discord site",
-    // A non-official site writes “roblox.com” or “discord.gg” in full in its path
-    imiteChemin: "Roblox’s (or Discord’s) name is copied into this link"
+    // Strong warnings (YELLOW): the level stays yellow, but the title is clearer than “Unknown domain”
+    alerteChemin: "Warning: Roblox’s (or Discord’s) name is copied into this link",
+    alerteMarque_roblox: "This isn’t one of the official Roblox sites that RoShield knows: its name contains “Roblox”",
+    alerteMarque_rbx: "This isn’t one of the official Roblox sites that RoShield knows: its name contains “rbx”",
+    alerteMarque_robux: "This isn’t one of the official Roblox sites that RoShield knows: its name contains “Robux”",
+    alerteMarque_discord: "This isn’t one of the official Discord sites that RoShield knows: its name contains “Discord”",
+    alerteMarque_nitro: "This isn’t one of the official Discord sites that RoShield knows: its name contains “Nitro”"
   },
 
   // ----- Affichage du domaine -----
@@ -80,6 +85,10 @@ window.TEXTES_VERIF = {
       "What counts is the end of the name, not the beginning.";
   },
   imiteDansChemin: "Its real domain is a different one. Never type your password or a code on this page, and never share your screen.",
+  alerteMarque: function (plateforme) {
+    return "There are only a few real official " + plateforme + " sites, and imitations often use this name. " +
+      "Never type your password or a code on this page.";
+  },
   ressemble: function (vrai, officiel) {
     return "“" + vrai + "” looks a lot like “" + officiel + "”, but it’s not the same. It looks like a typo made on purpose to trick you.";
   },

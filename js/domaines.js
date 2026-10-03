@@ -12,6 +12,11 @@
 window.DOMAINES_OFFICIELS = [
   // --- Roblox ---
   { domaine: "roblox.com",      note: "Site officiel de Roblox (et tous ses sous-domaines : www, web, create, devforum...)" },
+  // ro.blox.com : confirmé par une page OFFICIELLE de Roblox, le 3 octobre 2026.
+  // Page : https://create.roblox.com/docs/production/promotion/deeplinks (« Deep links »). Elle donne ce préfixe pour les
+  // liens d'ouverture de l'app Roblox : « https://ro.blox.com/Ebh5? ». Seul « ro.blox.com » (et ses sous-domaines) est officiel,
+  // PAS « blox.com » : evil.blox.com et blox.com restent rouges.
+  { domaine: "ro.blox.com",     note: "Liens d'ouverture de l'app Roblox (deep links), cités par create.roblox.com" },
 
   // --- Discord ---
   { domaine: "discord.com",     note: "Site et application web officiels de Discord" },
@@ -31,40 +36,60 @@ window.DOMAINES_A_CONFIRMER = [
   "robloxlabs.com",  // domaine interne de Roblox (probable)
   "roblox.link",     // liens de partage Roblox (à confirmer)
   "rblx.co",         // raccourci Roblox (à confirmer)
-  "blox.com",        // ro.blox.com : liens de mails Roblox (à confirmer)
+  // (ro.blox.com est maintenant confirmé et listé plus haut ; « blox.com » lui-même ne l'est PAS)
   "discord.media",   // serveurs vocaux Discord (jamais dans un lien cliqué)
   "dis.gd",          // raccourci Discord (à confirmer)
   "discordstatus.com", // page d'état de Discord (à confirmer)
   "discord.new"      // modèles de serveurs Discord (à confirmer)
 ];
 
-// ---------- 3. Mots-clés qui attirent les arnaqueurs ----------
-// Si un domaine NON officiel contient un de ces mots, c'est très suspect.
+// ---------- 3. Mots de MARQUE et mots d'ARNAQUE dans le nom d'hôte ----------
+// Règle sur le NOM D'HÔTE d'un domaine NON officiel (pas sur le chemin) :
+//   - un mot de marque + un mot d'arnaque  -> ROUGE        (roblox-free.example, discord-gift.example)
+//   - un mot de marque tout seul           -> JAUNE avec alerte forte (todoroblox.example : on ne peut pas savoir)
+// « robux » est dans les deux listes : seul il donne l'alerte jaune, avec un AUTRE mot d'arnaque (free-robux) il est rouge.
+//
+// MOTS ENTIERS : les séparateurs d'un nom d'hôte sont le point et le tiret. Un mot court ou courant n'est compté que
+// s'il est un morceau ENTIER du nom : "hackathon-roblox.example" ne contient pas le mot "hack", "nitrogen.example"
+// ne contient pas le mot "nitro". Cela évite de rendre rouges des sites honnêtes à cause d'un mot courant.
+
+// Mots de marque cherchés comme MORCEAUX (même collés à autre chose : todoroblox, robloxfans, discordance)
+window.MOTS_MARQUE_MORCEAUX = ["roblox", "discord", "robux"];
+// Mots de marque courts, cherchés comme MOTS ENTIERS seulement ("nitrogen" et "rbxcdn" ne comptent pas)
+window.MOTS_MARQUE_ENTIERS = ["rbx", "nitro"];
+// Mots d'arnaque, cherchés comme MOTS ENTIERS
+window.MOTS_ARNAQUE = [
+  "free", "gratuit", "gratuite", "robux", "gift", "cadeau", "claim", "generator", "generateur", "hack", "cheat",
+  "verify", "verification", "login", "signin", "unban", "giveaway", "reward", "support", "account", "official",
+  // Pluriels : "free-robux-gifts.test", "robux-generators.test", "daily-rewards-roblox.test" (un mot entier "gift" ne suffit pas)
+  "gratuits", "gifts", "rewards", "cheats", "hacks", "generators", "giveaways"
+];
+// Formes COLLÉES connues : des noms d'arnaque très répandus, écrits sans séparateur. Chacune est cherchée comme
+// morceau du nom d'hôte, et suffit à rendre le lien rouge (elle contient déjà une marque ET un mot d'arnaque).
+window.FORMES_COLLEES = [
+  "freerobux",       // "free robux" collé : le piège le plus répandu
+  "robuxfree",       // la même chose à l'envers
+  "robuxgenerator",  // faux "générateur de Robux"
+  "robuxgen",        // version courte du faux générateur
+  "freenitro",       // "free nitro" collé : faux cadeau Discord
+  "nitrofree",       // la même chose à l'envers
+  "robloxhack",      // faux "hack" Roblox
+  "robloxgift",      // faux cadeau Roblox
+  "robloxlogin",     // fausse page de connexion Roblox
+  "discordnitro",    // "Discord Nitro" collé : faux Nitro
+  "giftnitro"        // "gift nitro" collé : faux cadeau Nitro
+];
+// Mots-clés pour repérer les chiffres à la place des lettres (rob1ox -> roblox), voir normaliser().
 window.MOTS_CLES = ["roblox", "discord", "robux", "nitro"];
 
-// Hôtes EXACTS dispensés de la règle du mot-clé (c, d, e), et seulement d'elle.
+// Hôtes EXACTS dispensés des règles sur le mot de marque dans le nom d'hôte (c, d, e), et seulement d'elles.
 // Exemple : roblox.fandom.com est le wiki communautaire de Roblox, hébergé par Fandom : un joueur
 // le rencontre vraiment. Le mot « roblox » y est dans le NOM DE SOUS-DOMAINE, pas dans le domaine réel (fandom.com).
 // ATTENTION : la comparaison est EXACTE. N'importe quel autre sous-domaine de fandom.com
-// (roblox-gratuit.fandom.com, robux.fandom.com...) reste ROUGE : n'importe qui peut en créer un.
+// (roblox-gratuit.fandom.com : mot d'arnaque -> rouge ; robux.fandom.com : alerte jaune) n'est PAS exempté : n'importe qui peut en créer un.
 // Ces hôtes restent JAUNES (domaine inconnu) avec « autre chose », et ROUGES avec « page Roblox / Discord ».
 // Les règles a) et b) (imitation d'un domaine officiel) s'appliquent toujours.
 window.HOTES_SANS_MOT_CLE = ["roblox.fandom.com"];
-
-// ---------- Exceptions de la règle « nom officiel complet dans le chemin ou la requête » ----------
-// Règle : un domaine NON officiel dont le chemin ou la requête contient « roblox.com », « discord.gg »...
-// (écrit en entier) est rouge : « Ce lien imite Roblox (ou Discord) ».
-// Ces sites-là sont des exceptions, car ils CITENT une adresse sans être l'adresse :
-// l'hôte doit être EXACTEMENT celui de la liste (jamais un sous-domaine) ET le chemin doit commencer par "chemin".
-// Ils ne deviennent pas « sûrs » pour autant : ils restent jaunes, avec la petite ligne « autre adresse cachée ».
-window.REDIRECTEURS_CONNUS = [
-  // Archive d'Internet : « web.archive.org/web/2023.../https://www.roblox.com/ » est une copie ancienne, pas un faux site.
-  { hote: "web.archive.org", chemin: "/web/" },
-  // Les redirecteurs : le lien passe par le site, puis part vers l'adresse écrite dans la requête.
-  { hote: "www.google.com", chemin: "/url" },       // lien de résultat de recherche Google
-  { hote: "www.youtube.com", chemin: "/redirect" }, // liens des descriptions et commentaires YouTube
-  { hote: "l.facebook.com", chemin: "/l.php" }      // liens partagés sur Facebook
-];
 
 // Noms "de base" des vrais sites, pour repérer les fautes de frappe
 // volontaires (rob1ox, dlscord...). "discordapp" est le nom de l'ancien domaine.

@@ -69,7 +69,10 @@
   const MOTS_CLES = window.MOTS_CLES;
   const NOMS_OFFICIELS = window.NOMS_OFFICIELS;
   const HOTES_SANS_MOT_CLE = window.HOTES_SANS_MOT_CLE || [];
-  const REDIRECTEURS_CONNUS = window.REDIRECTEURS_CONNUS || [];
+  const MOTS_MARQUE_MORCEAUX = window.MOTS_MARQUE_MORCEAUX;
+  const MOTS_MARQUE_ENTIERS = window.MOTS_MARQUE_ENTIERS;
+  const FORMES_COLLEES = window.FORMES_COLLEES;
+  const MOTS_ARNAQUE = window.MOTS_ARNAQUE;
   const RACCOURCISSEURS = window.RACCOURCISSEURS;
 
   // Une AUTRE adresse complète cachée dans le chemin ou la requête d'un lien ?
@@ -78,12 +81,11 @@
   // Le mot "http" tout seul (youtube.com/watch?v=httpabc, wikipedia.org/wiki/HTTP) ne compte pas.
   const ADRESSE_CACHEE = /https?(?::|%3a)(?:\/|%2f){2}|%3a%2f%2f|%253a%252f%252f/i;
 
-  // Gravité des niveaux : permet de garder "le pire" à la fin
   // Le chemin / la requête du lien contiennent-ils le NOM COMPLET d'un domaine officiel ?
   // On remet le texte "à plat" avant de chercher : minuscules, %2E / %2F / double encodage (%252E) décodés,
   // et tirets, tirets bas, barres et espaces comptés comme des points ("roblox-com" -> "roblox.com").
   // Le nom doit être COMPLET et finir proprement : "roblox.com" ou "roblox-com/", mais pas "roblox-community"
-  // ni le mot "roblox" tout seul.
+  // ni le mot "roblox" tout seul. Un tel lien est JAUNE avec alerte forte (rouge si le message disait "page Roblox").
   function nomOfficielDansChemin(url) {
     let texte = url.pathname + url.search + url.hash;
     for (let i = 0; i < 3; i++) {
@@ -104,11 +106,7 @@
     });
   }
 
-  // Le lien passe-t-il par une archive ou un redirecteur connu (liste dans domaines.js) ? Hôte EXACT + début de chemin.
-  function estRedirecteurConnu(hote, chemin) {
-    return REDIRECTEURS_CONNUS.some(function (r) { return r.hote === hote && chemin.indexOf(r.chemin) === 0; });
-  }
-
+  // Gravité des niveaux : permet de garder "le pire" à la fin
   const GRAVITE = { vert: 0, jaune: 1, rouge: 2 };
 
   /* ------------------------------------------------------
@@ -265,6 +263,8 @@
 
     // Titre imposé par une règle précise (sinon on prend celui du niveau)
     let titreForce = null;
+    // Alerte forte JAUNE (nom officiel copié dans le chemin, ou mot de marque seul dans le nom d'hôte) : clé du titre
+    let alerte = null;
 
     // --- 6. Domaine NON officiel : cherche les imitations ---
     if (!officiel && !estIP && !estPunycode && !raccourci) {
@@ -273,8 +273,13 @@
       // Comparaison EXACTE : jamais un autre sous-domaine du même site.
       const sansMotCle = HOTES_SANS_MOT_CLE.includes(hote);
 
-      // a) "roblox.com.example.com" : un domaine officiel écrit en début de nom
-      const imite = OFFICIELS.find(function (d) { return hote.includes(d.domaine); });
+      // a) "roblox.com.example.com" : un domaine officiel écrit en début de nom, SUIVI d'autre chose.
+      //    Un nom qui se termine simplement par "roblox.com" ("todoroblox.com") est un autre domaine : il n'imite pas
+      //    un sous-domaine, il contient seulement le mot de marque (voir c ci-dessous : jaune avec alerte forte).
+      const imite = OFFICIELS.find(function (d) {
+        const place = hote.indexOf(d.domaine);
+        return place !== -1 && place + d.domaine.length < hote.length;
+      });
       if (imite) {
         ajouter("rouge", T.imiteSousDomaine(imite.domaine, reel));
         trouve = true;
@@ -292,32 +297,36 @@
         }
       }
 
-      // f) le NOM COMPLET d'un site officiel est écrit dans le chemin ou la requête
-      //    (evil.test/roblox.com/login, evil.test/?u=discord-com). Jamais le mot "roblox" seul.
-      //    Exceptions : archives et redirecteurs connus (domaines.js). On le teste avant c), d), e) pour que le message soit
-      //    le plus précis, et il ne s'applique pas aux hôtes déjà rouges par a) ou b).
-      if (!trouve && !estRedirecteurConnu(hote, url.pathname)) {
-        const cite = nomOfficielDansChemin(url);
-        if (cite) {
-          ajouter("rouge", T.imiteDansChemin);
-          titreForce = "imiteChemin";
+      // c) un mot de MARQUE dans le nom d'hôte (roblox, discord, robux, rbx, nitro)
+      //    - avec un mot d'arnaque dans le nom d'hôte (free, gift, login...) : ROUGE
+      //    - tout seul : on le garde de côté (marqueSeule) ; ce sera une alerte JAUNE si rien de plus grave n'est trouvé
+      //    "roblox", "discord", "robux" sont cherchés comme morceaux (todoroblox) ; "rbx", "nitro" et tous les mots
+      //    d'arnaque comme MOTS ENTIERS (séparés par des points ou des tirets), sauf quelques formes collées connues.
+      let marqueSeule = null;
+      if (!trouve && !sansMotCle) {
+        const mots = hote.split(/[.\-]/);
+        const entier = function (m) { return mots.includes(m); };
+        const collee = FORMES_COLLEES.find(function (f) { return hote.includes(f); });
+        const marque = MOTS_MARQUE_MORCEAUX.find(function (m) { return hote.includes(m); }) ||
+                       MOTS_MARQUE_ENTIERS.find(entier);
+        const arnaque = collee || (marque && MOTS_ARNAQUE.find(function (m) { return m !== marque && entier(m); }));
+        if (arnaque) {
+          ajouter("rouge", T.motCle(collee || marque, reel));
           trouve = true;
+        } else if (marque) {
+          marqueSeule = marque;
         }
       }
 
-      // c) contient un mot-clé (roblox, discord, robux, nitro)
+      // d) chiffres à la place de lettres dans un NOM DE MARQUE (rob1ox, r0blox, d1sc0rd, di5cord, n1tro) : ROUGE.
+      //    Le "1" peut remplacer un "l" (rob1ox) ou un "i" (d1scord) : on essaie les deux.
+      //    On exige que le mot n'y soit PAS déjà écrit tel quel, et on ne cherche que les noms de marque :
+      //    "web3-roblox-fans" ou "2fa-help" ne sont pas rouges.
       if (!trouve && !sansMotCle) {
-        const mot = MOTS_CLES.find(function (m) { return hote.includes(m); });
-        if (mot) {
-          ajouter("rouge", T.motCle(mot, reel));
-          trouve = true;
-        }
-      }
-
-      // d) chiffres à la place de lettres (rob1ox -> roblox)
-      if (!trouve && !sansMotCle) {
-        const hoteNormalise = normaliser(hote);
-        const mot = MOTS_CLES.find(function (m) { return hoteNormalise.includes(m); });
+        const variantes = [normaliser(hote), normaliser(hote.replace(/1/g, "i"))];
+        const mot = MOTS_CLES.find(function (m) {
+          return !hote.includes(m) && variantes.some(function (v) { return v.includes(m); });
+        });
         if (mot) {
           ajouter("rouge", T.chiffresLettres(mot, reel));
           trouve = true;
@@ -339,11 +348,42 @@
           }
         }
       }
+
+      // e2) le nom officiel COMPLET écrit avec des tirets dans le nom d'hôte : www-roblox-com.invalid,
+      //     roblox-com.example.com, discord-com-invite.test, discord-gg-abc.test. ROUGE.
+      //     Le nom doit être ENTIER et délimité (début du nom, point ou tiret de chaque côté) :
+      //     "notroblox-community" ou "notroblox-com" ne comptent pas (ce sont des mots de marque, voir c).
+      if (!trouve) {
+        const imiteTirets = OFFICIELS.find(function (d) {
+          const motif = new RegExp("(^|[._-])" + d.domaine.replace(/\./g, "[-_]") + "($|[._-])");
+          return motif.test(hote);
+        });
+        if (imiteTirets) {
+          ajouter("rouge", T.imiteSousDomaine(imiteTirets.domaine, reel));
+          trouve = true;
+        }
+      }
+
+      // f) Rien de rouge : deux signaux JAUNES avec alerte forte (jamais rouges tout seuls, car des sites honnêtes
+      //    les déclenchent : archives, moteurs de recherche, wikis, sites de fans...). Avec la réponse « page Roblox /
+      //    Discord », le 6c ci-dessous les passe en rouge.
+      if (!trouve) {
+        if (nomOfficielDansChemin(url)) {
+          // le NOM COMPLET d'un site officiel est écrit dans le chemin ou la requête (evil.test/roblox.com/login)
+          ajouter("jaune", T.imiteDansChemin);
+          alerte = "alerteChemin";
+        } else if (marqueSeule) {
+          // un mot de marque tout seul dans le nom d'hôte (todoroblox.example)
+          const plateformeMarque = (marqueSeule === "discord" || marqueSeule === "nitro") ? "Discord" : "Roblox";
+          ajouter("jaune", T.alerteMarque(plateformeMarque));
+          alerte = "alerteMarque_" + marqueSeule;
+        }
+      }
     }
 
     // --- 6b. Ni officiel, ni imitation évidente : "domaine inconnu de RoShield" (jaune) ---
     // (raccourcisseurs et domaines sans rapport avec Roblox/Discord arrivent ici)
-    if (!officiel && !raisons.some(function (r) { return r.niveau === "rouge"; })) {
+    if (!officiel && !alerte && !raisons.some(function (r) { return r.niveau === "rouge"; })) {
       ajouter("jaune", T.inconnu);
     }
 
@@ -402,7 +442,7 @@
 
     // Titre : un seul titre pour tout le jaune ("Domaine inconnu de RoShield").
     // Exception : domaine officiel avec un détail (http://, @) -> "inconnu" serait faux.
-    const titreCle = titreForce || (officiel && niveau === "jaune" ? "officielAttention" : niveau);
+    const titreCle = titreForce || (alerte && niveau === "jaune" ? alerte : (officiel && niveau === "jaune" ? "officielAttention" : niveau));
 
     return { niveau: niveau, titreCle: titreCle, hote: hote, sous: sous, reel: reel, raisons: messages, notes: notes };
   }
