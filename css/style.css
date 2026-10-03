@@ -518,6 +518,9 @@ a.carte:hover {
 .apres-clic li { margin-bottom: 8px; }
 .apres-clic strong { color: var(--texte); }
 .conseil p { margin: 0; color: var(--texte-doux); }
+/* Petite mention de la source de la liste de liens signalés (bas du vérificateur) */
+.note-source { margin: 20px 0 0; font-size: 0.85rem; color: var(--texte-doux); }
+.note-source a { text-decoration: underline; }
 .conseil p + p { margin-top: 12px; }
 .conseil ul { margin: 0; padding-left: 20px; color: var(--texte-doux); }
 .conseil li { margin-bottom: 10px; }

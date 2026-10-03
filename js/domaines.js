@@ -91,6 +91,18 @@ window.MOTS_CLES = ["roblox", "discord", "robux", "nitro"];
 // Les règles a) et b) (imitation d'un domaine officiel) s'appliquent toujours.
 window.HOTES_SANS_MOT_CLE = ["roblox.fandom.com"];
 
+// Mots HONNÊTES à une faute de "discord" ou "roblox" : la règle « faute de frappe dans un long morceau du nom d'hôte »
+// ne les compte pas. Un morceau du nom d'hôte (entre deux points ou tirets) doit être EXACTEMENT l'un de ces mots.
+window.MOTS_HONNETES_PROCHES = [
+  "discard",       // anglais : jeter, défausser (à une lettre de "discord")
+  "discarded",     // anglais : jeté, défaussé
+  "discards",      // anglais : pluriel / il jette
+  "discorde",      // français : « pomme de discorde » (contient déjà "discord" : écrit ici pour que la liste soit complète)
+  "discords",      // pluriel de "discord"
+  "discordance",   // français / anglais : désaccord, « discordance musicale »
+  "discordant"     // français / anglais : qui sonne faux
+];
+
 // Noms "de base" des vrais sites, pour repérer les fautes de frappe
 // volontaires (rob1ox, dlscord...). "discordapp" est le nom de l'ancien domaine.
 window.NOMS_OFFICIELS = ["roblox", "discord", "discordapp", "robux", "nitro"];

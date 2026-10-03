@@ -29,7 +29,8 @@
       <h1 class="page__titre">Ce lien est-il <span class="texte-degrade">officiel</span><span class="point-couleur">?</span></h1>
       <p class="page__intro">
         Colle le lien qu'on t'a envoyé. Le site l'analyse <strong>sans jamais l'ouvrir</strong> :
-        tout se passe dans ton navigateur, rien n'est envoyé nulle part.
+        tout est comparé sur ton appareil et ton lien n'est envoyé nulle part.
+        Ton navigateur télécharge seulement, comme n'importe quel fichier du site, une liste de liens déjà signalés, la même pour tout le monde.
       </p>
     </header>
 
@@ -53,7 +54,7 @@
           <label class="choix"><input type="radio" name="attendu" value="discord"><span>Il disait que c'était une page Discord (invitation, Nitro…)</span></label>
           <label class="choix"><input type="radio" name="attendu" value="inconnu" checked><span>Il parlait d'autre chose (vidéo, article, wiki…) ou je ne sais pas</span></label>
         </div>
-        <p class="verif__aide" id="aide-question">Tu n'as pas besoin d'ouvrir le lien : on se base seulement sur ce que disait le message. Rien n'est envoyé, tout reste dans ton navigateur.</p>
+        <p class="verif__aide" id="aide-question">Tu n'as pas besoin d'ouvrir le lien : on se base seulement sur ce que disait le message. Ton lien n'est envoyé nulle part et reste sur ton appareil.</p>
       </fieldset>
 
       <button type="submit" class="bouton bouton--principal verif__bouton">
@@ -90,6 +91,12 @@
         même si « roblox.com » est écrit au début.
       </p>
     </section>
+
+    <p class="note-source">
+      Certains liens déjà signalés sont reconnus grâce à la liste publique
+      <a href="https://github.com/Phishing-Database/Phishing.Database" target="_blank" rel="noopener noreferrer">Phishing.Database</a>
+      (licence MIT, <a href="LICENSE-PHISHING-DATABASE">texte de la licence</a>). Une liste peut se tromper.
+    </p>
 
   </main>
 

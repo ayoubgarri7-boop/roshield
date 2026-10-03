@@ -35,6 +35,9 @@ window.TEXTES_VERIF = {
     nonOfficielRoblox: "This isn’t the real Roblox site",
     nonOfficielDiscord: "This isn’t the real Discord site",
     // Strong warnings (YELLOW): the level stays yellow, but the title is clearer than “Unknown domain”
+    // List of reported links (Phishing.Database): red. “Reported” never means “proven”.
+    signale: "Reported as dangerous",
+    signaleFichier: "This specific file was reported as dangerous",
     alerteChemin: "Warning: Roblox’s (or Discord’s) name is copied into this link",
     alerteMarque_roblox: "This isn’t one of the official Roblox sites that RoShield knows: its name contains “Roblox”",
     alerteMarque_rbx: "This isn’t one of the official Roblox sites that RoShield knows: its name contains “rbx”",
@@ -109,6 +112,10 @@ window.TEXTES_VERIF = {
   // Petite ligne (sur le vert et le jaune) : le lien cache une autre adresse
   // File sent by a user on Discord's CDN (/attachments/): official domain, but not checked by Discord
   fichierEnvoye: "This file was sent by a user, not by Discord. Don’t open it if you don’t know the person, and never run a file sent by a stranger.",
+  // List of reported links (Phishing.Database): a list can be wrong, and a link may have been cleaned up since
+  listeHote: "This domain name appears in a public list of phishing links (Phishing.Database). A list can be wrong, but it’s better not to go there. Never type your password or a code, and never share your screen.",
+  listeLien: "This specific link appears in a public list of phishing links (Phishing.Database). A list can be wrong, but it’s better not to open it. Never type your password or a code, and never share your screen.",
+  listeFichier: "The domain really belongs to an official site, but this specific file appears in a public list of phishing links (Phishing.Database). It was sent by a user. Don’t open it, and never run a file sent by a stranger.",
   adresseCachee: "This link contains another address inside it: it may send you somewhere else.",
   inconnu:
     "RoShield only knows the official domains of Roblox and Discord. That doesn’t mean this link is dangerous, " +

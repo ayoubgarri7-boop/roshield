@@ -29,7 +29,8 @@
       <h1 class="page__titre">Is this link <span class="texte-degrade">official</span><span class="point-couleur">?</span></h1>
       <p class="page__intro">
         Paste the link someone sent you. This site checks it <strong>without ever opening it</strong>:
-        everything happens in your browser, and nothing is sent anywhere.
+        everything is checked on your device and your link is not sent anywhere.
+        Your browser only downloads, like any other file on the site, a list of links that have already been reported, the same for everyone.
       </p>
     </header>
 
@@ -53,7 +54,7 @@
           <label class="choix"><input type="radio" name="attendu" value="discord"><span>It said this was a Discord page (invite, Nitro…)</span></label>
           <label class="choix"><input type="radio" name="attendu" value="inconnu" checked><span>It was about something else (video, article, wiki…) or I don’t know</span></label>
         </div>
-        <p class="verif__aide" id="aide-question">You don’t need to open the link: we only go by what the message said. Nothing is sent anywhere, and everything stays in your browser.</p>
+        <p class="verif__aide" id="aide-question">You don’t need to open the link: we only go by what the message said. Your link is not sent anywhere and stays on your device.</p>
       </fieldset>
 
       <button type="submit" class="bouton bouton--principal verif__bouton">
@@ -90,6 +91,12 @@
         even though “roblox.com” is written at the start.
       </p>
     </section>
+
+    <p class="note-source">
+      Some links that have already been reported are recognized thanks to the public list
+      <a href="https://github.com/Phishing-Database/Phishing.Database" target="_blank" rel="noopener noreferrer">Phishing.Database</a>
+      (MIT license, <a href="../LICENSE-PHISHING-DATABASE">license text</a>). A list can be wrong.
+    </p>
 
   </main>
 

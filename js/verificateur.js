@@ -106,6 +106,79 @@
     });
   }
 
+  // Distance d'édition avec transposition : "discrod" est à UNE faute de "discord" (deux lettres échangées).
+  function distanceDamerau(a, b) {
+    const d = [];
+    for (let i = 0; i <= a.length; i++) { d[i] = [i]; }
+    for (let j = 0; j <= b.length; j++) { d[0][j] = j; }
+    for (let i = 1; i <= a.length; i++) {
+      for (let j = 1; j <= b.length; j++) {
+        const cout = a[i - 1] === b[j - 1] ? 0 : 1;
+        d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + cout);
+        if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1);
+      }
+    }
+    return d[a.length][b.length];
+  }
+
+  // Faute de frappe d'UN caractère sur "roblox" ou "discord" à l'INTÉRIEUR d'un long morceau du nom d'hôte
+  // (discrod-egift, dlscordapps, dicsord-summer). Seulement les morceaux de PLUS de 6 lettres, seulement roblox et discord
+  // (pas nitro : "intro" est un vrai mot), et seulement si le mot exact n'y est pas déjà écrit.
+  const MOTS_FAUTE_DANS_MORCEAU = ["roblox", "discord"];
+  const MOTS_HONNETES_PROCHES = window.MOTS_HONNETES_PROCHES || [];
+  function fauteDansMorceau(hote) {
+    const morceaux = hote.split(/[.\-]/);
+    for (const morceau of morceaux) {
+      if (morceau.length < 7) continue;
+      if (MOTS_FAUTE_DANS_MORCEAU.some(function (m) { return morceau.includes(m); })) continue;
+      if (MOTS_HONNETES_PROCHES.indexOf(morceau) !== -1) continue;   // mot honnête proche de "discord" (discard...) : voir domaines.js
+      for (const mot of MOTS_FAUTE_DANS_MORCEAU) {
+        for (let longueur = mot.length - 1; longueur <= mot.length + 1; longueur++) {
+          for (let debut = 0; debut + longueur <= morceau.length; debut++) {
+            if (distanceDamerau(morceau.slice(debut, debut + longueur), mot) === 1) return { morceau: morceau, mot: mot };
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  // ----- Liste de liens signalés (js/blocklist.json, fabriquée par outils/maj-liste.js, source Phishing.Database, licence MIT) -----
+  // Deux ensembles : des noms d'hôte DÉDIÉS (comparés au nom d'hôte complet) et des liens EXACTS (hôte + chemin normalisés,
+  // en empreinte) pour les hôtes partagés ou officiels. Tant que la liste n'est pas chargée, cette règle est simplement ignorée.
+  let LISTE = null;
+
+  // Empreinte de 64 bits (deux calculs de 32 bits), identique dans outils/maj-liste.js : on compare des empreintes, pas des adresses.
+  function empreinte(texte) {
+    const octets = unescape(encodeURIComponent(texte));
+    let a = 0x811c9dc5, b = 0x9e3779b9;
+    for (let i = 0; i < octets.length; i++) {
+      const c = octets.charCodeAt(i);
+      a = Math.imul(a ^ c, 16777619) >>> 0;
+      b = Math.imul(b ^ c, 0x85ebca6b) >>> 0;
+      b = (b ^ (b >>> 13)) >>> 0;
+    }
+    return ("00000000" + a.toString(16)).slice(-8) + ("00000000" + b.toString(16)).slice(-8);
+  }
+
+  // Clé d'un lien : nom d'hôte (minuscules) + chemin (décodé, minuscules, sans "/" final). Pas de requête ni d'ancre.
+  function cleLien(url) {
+    let chemin = url.pathname;
+    for (let i = 0; i < 3; i++) {
+      let decode;
+      try { decode = decodeURIComponent(chemin); } catch (e) { break; }
+      if (decode === chemin) break;
+      chemin = decode;
+    }
+    chemin = chemin.toLowerCase().replace(/\/+$/, "");
+    return url.hostname.toLowerCase().replace(/\.$/, "") + chemin;
+  }
+
+  function chargerListe(donnees) {
+    if (!donnees || !Array.isArray(donnees.hotes) || !Array.isArray(donnees.liens)) return;
+    LISTE = { hotes: new Set(donnees.hotes), liens: new Set(donnees.liens), hotesEmpreintes: !!donnees.hotesEmpreintes };
+  }
+
   // Gravité des niveaux : permet de garder "le pire" à la fin
   const GRAVITE = { vert: 0, jaune: 1, rouge: 2 };
 
@@ -283,6 +356,25 @@
     // Alerte forte JAUNE (nom officiel copié dans le chemin, ou mot de marque seul dans le nom d'hôte) : clé du titre
     let alerte = null;
 
+    // --- 5b. Liste de liens signalés (Phishing.Database) ---
+    // Un hôte DÉDIÉ de la liste est rouge. Un lien EXACT de la liste est rouge, même sur un hôte partagé (github.io...).
+    // Un domaine OFFICIEL n'est JAMAIS rouge au niveau de l'hôte : seul un fichier précis peut l'être, et le titre le dit.
+    if (LISTE) {
+      const cle = empreinte(cleLien(url));
+      if (officiel) {
+        if (LISTE.liens.has(cle)) {
+          ajouter("rouge", T.listeFichier);
+          titreForce = "signaleFichier";
+        }
+      } else {
+        const hoteListe = LISTE.hotes.has(LISTE.hotesEmpreintes ? empreinte(hote) : hote);
+        if (hoteListe || LISTE.liens.has(cle)) {
+          ajouter("rouge", hoteListe ? T.listeHote : T.listeLien);
+          titreForce = "signale";
+        }
+      }
+    }
+
     // --- 6. Domaine NON officiel : cherche les imitations ---
     if (!officiel && !estIP && !estPunycode && !raccourci) {
       let trouve = false;
@@ -355,6 +447,7 @@
         const morceaux = hote.split(/[-_.]/);
         for (const partie of morceaux) {
           if (partie.length < 5) continue;
+          if (MOTS_HONNETES_PROCHES.indexOf(partie) !== -1) continue;   // mot honnête (discard, discorde...) : voir domaines.js
           const mot = NOMS_OFFICIELS.find(function (n) {
             return levenshtein(partie, n) === 1;
           });
@@ -363,6 +456,15 @@
             trouve = true;
             break;
           }
+        }
+      }
+
+      // e3) faute de frappe d'un caractère à l'INTÉRIEUR d'un long morceau du nom d'hôte (discrod-egift, dlscordapps)
+      if (!trouve && !sansMotCle) {
+        const faute = fauteDansMorceau(hote);
+        if (faute) {
+          ajouter("rouge", T.partieProche(faute.morceau, faute.mot, reel));
+          trouve = true;
         }
       }
 
@@ -465,7 +567,7 @@
   }
 
   // On expose la fonction pour pouvoir la tester (et la réutiliser)
-  window.RoShieldVerif = { analyser: analyser, levenshtein: levenshtein };
+  window.RoShieldVerif = { analyser: analyser, levenshtein: levenshtein, empreinte: empreinte, cleLien: cleLien, chargerListe: chargerListe, fauteDansMorceau: fauteDansMorceau };
 
   /* ======================================================
      PARTIE AFFICHAGE (seulement dans une vraie page web)
@@ -474,6 +576,17 @@
 
   const formulaire = document.getElementById("form-verif");
   if (!formulaire) return;
+
+  // Chargement (facultatif) de la liste de liens signalés. Si elle manque ou si le chargement échoue, le vérificateur
+  // fonctionne exactement comme avant. On ne charge que NOTRE fichier js/blocklist.json : jamais une adresse de la liste.
+  (function () {
+    const script = document.querySelector('script[src$="verificateur.js"]');
+    if (!script || typeof fetch !== "function") return;
+    fetch(script.src.replace(/verificateur\.js(\?.*)?$/, "blocklist.json"))
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (donnees) { chargerListe(donnees); })
+      .catch(function () { /* pas de liste : tant pis */ });
+  })();
 
   const champ = document.getElementById("champ-lien");
   const zoneResultat = document.getElementById("resultat");

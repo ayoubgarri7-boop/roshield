@@ -26,6 +26,9 @@ window.TEXTES_VERIF = {
     nonOfficielRoblox: "Ce n'est pas le vrai site de Roblox",
     nonOfficielDiscord: "Ce n'est pas le vrai site de Discord",
     // Alertes fortes (JAUNE) : le niveau reste jaune, mais le titre est plus clair que « Domaine inconnu »
+    // Liste de liens signalés (Phishing.Database) : rouge. « Signalé » ne veut jamais dire « prouvé ».
+    signale: "Signalé comme dangereux",
+    signaleFichier: "Ce fichier précis a été signalé comme dangereux",
     alerteChemin: "Attention : le nom de Roblox (ou Discord) est copié dans ce lien",
     alerteMarque_roblox: "Ce site ne fait pas partie des sites officiels de Roblox que RoShield connaît : son nom contient « Roblox »",
     alerteMarque_rbx: "Ce site ne fait pas partie des sites officiels de Roblox que RoShield connaît : son nom contient « rbx »",
@@ -100,6 +103,10 @@ window.TEXTES_VERIF = {
   // Petite ligne (sur le vert et le jaune) : le lien cache une autre adresse
   // Fichier envoyé par un utilisateur sur le CDN de Discord (/attachments/) : domaine officiel, mais pas vérifié par Discord
   fichierEnvoye: "Ce fichier a été envoyé par un utilisateur, pas par Discord. Ne l'ouvre pas si tu ne connais pas la personne, et ne lance jamais un fichier envoyé par un inconnu.",
+  // Liste de liens signalés (Phishing.Database) : une liste peut se tromper, et un lien peut avoir été nettoyé depuis
+  listeHote: "Ce nom de domaine figure dans une liste publique de liens de phishing (Phishing.Database). Une liste peut se tromper, mais mieux vaut ne pas y aller. Ne tape jamais ton mot de passe ou un code, et ne partage jamais ton écran.",
+  listeLien: "Ce lien précis figure dans une liste publique de liens de phishing (Phishing.Database). Une liste peut se tromper, mais mieux vaut ne pas l'ouvrir. Ne tape jamais ton mot de passe ou un code, et ne partage jamais ton écran.",
+  listeFichier: "Le domaine est bien celui d'un site officiel, mais ce fichier précis figure dans une liste publique de liens de phishing (Phishing.Database). Il a été envoyé par un utilisateur. Ne l'ouvre pas, et ne lance jamais un fichier envoyé par un inconnu.",
   adresseCachee: "Ce lien contient une autre adresse cachée : il peut t'envoyer ailleurs.",
   inconnu:
     "RoShield ne connaît que les domaines officiels de Roblox et de Discord. Ça ne veut pas dire que ce lien " +
