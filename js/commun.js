@@ -34,11 +34,59 @@
   // Le nom de la page en cours, ex: "guides.html" ("index.html" si on est à la racine)
   const pageActuelle = location.pathname.split("/").pop() || "index.html";
 
+  // La langue de la page est lue dans <html lang="..."> : "fr" par défaut, "en" pour le dossier en/.
+  // Aucun changement automatique de langue, et rien n'est mémorisé.
+  const langue = document.documentElement.lang === "en" ? "en" : "fr";
+
   // --- 1. Titre de l'onglet : "Titre de la page – NomDuSite" ---
   // On lit le <title> écrit dans la page et on y ajoute le nom du site.
   document.title = document.title
     ? document.title + " – " + cfg.nom
     : cfg.nom;
+
+  // --- Le sélecteur de langue : "FR | EN" ---
+  // Il renvoie vers la MÊME page dans l'autre langue (pas vers l'accueil).
+  // Les adresses sont relatives : ça marche aussi dans le sous-dossier de GitHub Pages.
+  //   page française  guides.html     -> en/guides.html
+  //   page anglaise   en/guides.html  -> ../guides.html
+  // location.hash garde l'ancre (#...) pour rester au même endroit de la page.
+  function construireSelecteurLangue() {
+    const groupe = creer("div", "langue");
+    groupe.setAttribute("role", "group");
+    groupe.setAttribute("aria-label", t.langueGroupe);
+
+    // L'autre version de CETTE page existe-t-elle ? La réponse est dans le <head> :
+    // outils/hreflang.js n'écrit <link rel="alternate" hreflang="..."> que si les deux versions existent.
+    // Si la page jumelle n'existe pas encore, on envoie vers l'ACCUEIL de l'autre langue
+    // (jamais vers une page introuvable).
+    const autreLangue = langue === "fr" ? "en" : "fr";
+    const jumelle = document.querySelector('link[rel="alternate"][hreflang="' + autreLangue + '"]');
+    const autreAdresse = (langue === "fr" ? "en/" : "../") + (jumelle ? pageActuelle + location.hash : "index.html");
+
+    [
+      { code: "fr", texte: "FR", aria: t.langueFrAria },
+      { code: "en", texte: "EN", aria: t.langueEnAria }
+    ].forEach(function (l) {
+      let item;
+      if (l.code === langue) {
+        // Langue actuelle : pas un lien. Le texte caché est lu par les lecteurs d'écran.
+        item = creer("span", "langue__item langue__item--actif");
+        item.setAttribute("aria-current", "true");
+        const visible = creer("span", "", l.texte);
+        visible.setAttribute("aria-hidden", "true");
+        item.appendChild(visible);
+        item.appendChild(creer("span", "visually-hidden", l.aria));
+      } else {
+        item = creer("a", "langue__item", l.texte);
+        item.href = autreAdresse;
+        item.hreflang = l.code;
+        item.setAttribute("aria-label", l.aria);
+      }
+      item.lang = l.code;
+      groupe.appendChild(item);
+    });
+    return groupe;
+  }
 
   // --- 2. Le menu du haut ---
   function construireEntete() {
@@ -51,7 +99,7 @@
     // Logo : carré vert + nom + badge
     const logo = creer("a", "logo");
     logo.href = "index.html";
-    logo.setAttribute("aria-label", cfg.nom + " - accueil");
+    logo.setAttribute("aria-label", cfg.nom + " - " + t.accueilAria);
     logo.appendChild(creer("span", "logo__carre", cfg.lettreLogo));
     logo.appendChild(creer("span", "logo__nom", cfg.nom));
     if (cfg.badge) logo.appendChild(creer("span", "badge-mini", cfg.badge));
@@ -70,6 +118,9 @@
       nav.appendChild(a);
     });
     barre.appendChild(nav);
+
+    // Choix de la langue : FR | EN
+    barre.appendChild(construireSelecteurLangue());
 
     // Bouton vert à droite
     const bouton = creer("a", "bouton bouton--principal bouton--petit entete__cta");

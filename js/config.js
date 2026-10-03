@@ -18,6 +18,11 @@ window.CONFIG_SITE = {
   // le bouton s'affichera alors grisé, avec "bientôt".
   lienDon: "",
 
+  // Adresse du site en ligne (avec le "/" final). Elle sert aux liens "hreflang" entre la
+  // version française et la version anglaise. Pour changer de domaine : modifie cette ligne,
+  // puis lance  node outils/hreflang.js  (il met à jour toutes les pages d'un coup).
+  urlSite: "https://ayoubgarri7-boop.github.io/roshield/",
+
   // Le menu du haut. "fichier" doit être le nom exact de la page.
   menu: [
     { texte: "Accueil",      fichier: "index.html" },
@@ -34,6 +39,12 @@ window.CONFIG_SITE = {
     pasAffilie: "Ce site n'est pas affilié à Roblox Corporation ni à Discord Inc.",
     don: "Soutenir le projet",
     donBientot: "Soutenir le projet (bientôt)",
-    pied: "Protège ton compte, protège tes amis."
+    pied: "Protège ton compte, protège tes amis.",
+
+    // Libellés pour les lecteurs d'écran
+    accueilAria: "accueil",
+    langueGroupe: "Langue",
+    langueFrAria: "Français (langue actuelle)",
+    langueEnAria: "Passer le site en anglais"
   }
 };

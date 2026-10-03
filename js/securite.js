@@ -20,13 +20,21 @@
 
   if (!cases.length) return;
 
+  // Les textes viennent de la config de la langue (config-en.js pour l'anglais).
+  // Sans config (page française), on garde exactement les textes français d'origine.
+  const textesConfig = (window.CONFIG_SITE && window.CONFIG_SITE.textes) || {};
+  const formaterProgression = textesConfig.progression || function (faits, total) {
+    return faits + " sur " + total + " faits";
+  };
+  if (textesConfig.progressionFin) fin.textContent = textesConfig.progressionFin;
+
   // Recompte les cases cochées et met à jour l'affichage
   function majProgression() {
     const total = cases.length;
     let faits = 0;
     cases.forEach(function (c) { if (c.checked) faits++; });
 
-    texte.textContent = faits + " sur " + total + " faits";
+    texte.textContent = formaterProgression(faits, total);
     barre.setAttribute("aria-valuenow", String(faits));
     rempli.style.width = (faits / total) * 100 + "%";
     fin.hidden = faits !== total;

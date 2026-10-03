@@ -24,7 +24,7 @@
      https://cdn.discordapp.com/attachments/1/2/fichier.png  (+ rappel fichiers)
 
    ROUGE (danger)
-     https://roblox.com.site-pirate.xyz/login   (vrai domaine : site-pirate.xyz)
+     https://roblox.com.example.com/login       (vrai domaine : example.com)
      https://roblox-free-robux.com              (mot-clé, pas officiel)
      https://discord-nitro-gift.xyz             (mot-clé, pas officiel)
      https://rob1ox.com                         (chiffre à la place d'une lettre)
@@ -33,7 +33,7 @@
      https://dlscord.com                        (faute de frappe)
      https://xn--rblox-xxa.com                  (punycode)
      https://rоblox.com                         (le 2e "о" est russe ! → punycode)
-     https://roblox.com@site-pirate.xyz         (astuce du @)
+     https://roblox.com@example.com             (astuce du @)
      http://192.168.12.34/login                 (adresse IP)
      javascript:alert(1)                        (protocole dangereux)
 
@@ -210,7 +210,7 @@
     if (!officiel && !estIP && !estPunycode && !raccourci) {
       let trouve = false;
 
-      // a) "roblox.com.site-pirate.xyz" : un domaine officiel écrit en début de nom
+      // a) "roblox.com.example.com" : un domaine officiel écrit en début de nom
       const imite = OFFICIELS.find(function (d) { return hote.includes(d.domaine); });
       if (imite) {
         ajouter("rouge", T.imiteSousDomaine(imite.domaine, reel));
