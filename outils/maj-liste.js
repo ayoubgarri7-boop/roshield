@@ -273,4 +273,4 @@ async function main() {
 if (require.main === module) {
   main().catch(function (e) { console.error("Erreur : " + e.message); process.exit(1); });
 }
-module.exports = { libelleProcheDeMarque: libelleProcheDeMarque, signalDansHote: signalDansHote, construireListe: construireListe, chargerLogique: chargerLogique, domaineEnregistre: domaineEnregistre };
+module.exports = { SUFFIXES_PARTAGES: SUFFIXES_PARTAGES, MOTIFS_PARTAGES: MOTIFS_PARTAGES, libelleProcheDeMarque: libelleProcheDeMarque, signalDansHote: signalDansHote, construireListe: construireListe, chargerLogique: chargerLogique, domaineEnregistre: domaineEnregistre };

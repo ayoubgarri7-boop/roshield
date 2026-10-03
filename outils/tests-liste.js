@@ -108,6 +108,27 @@ if (fs.existsSync(fichierListe)) {
     });
   });
   verif(signales === 0, "des liens honnêtes ou officiels sortent « signalé » avec la vraie liste (" + signales + ")");
+  // sanité : aucun hôte dans « hotes » ne dépend d'un hébergeur ouvert (github.io, pages.dev, blogspot.*...)
+  if (!donnees.hotesEmpreintes) {
+    const ouverts = donnees.hotes.filter(function (h) {
+      return maj.SUFFIXES_PARTAGES.some(function (x) { return h === x || h.endsWith("." + x); }) || maj.MOTIFS_PARTAGES.some(function (m) { return m.test(h); });
+    });
+    verif(ouverts.length === 0, "des hébergeurs ouverts sont dans « hotes » (" + ouverts.length + ")");
+  }
+  // facultatif : tes vrais liens honnêtes (donnees-externes/, ignoré par git). On affiche seulement un NOMBRE, jamais un lien.
+  const fReels = path.join(__dirname, "..", "donnees-externes", "liens-honnetes-reels.txt");
+  if (fs.existsSync(fReels)) {
+    const reels = fs.readFileSync(fReels, "utf8").split(/\r?\n/).map(function (l) { return l.trim(); }).filter(function (l) { return l && l[0] !== "#"; });
+    let signalesReels = 0;
+    reels.forEach(function (l) {
+      ["inconnu", "roblox", "discord"].forEach(function (rep) {
+        const r = W2.RoShieldVerif.analyser(l, rep);
+        if (r.titreCle === "signale" || r.titreCle === "signaleFichier") signalesReels++;
+      });
+    });
+    verif(signalesReels === 0, "des liens honnêtes réels sortent « signalé » (" + signalesReels + ")");
+    console.log("Liens honnêtes réels (donnees-externes) vérifiés : " + reels.length);
+  }
   // sanité : aucun hôte officiel dans « hotes »
   if (!donnees.hotesEmpreintes) {
     const officiels = W2.DOMAINES_OFFICIELS.map(function (d) { return d.domaine; });
