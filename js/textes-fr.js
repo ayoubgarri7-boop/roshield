@@ -21,7 +21,10 @@ window.TEXTES_VERIF = {
     rouge: "Danger : faux lien probable, ne clique pas",
     // Cas particulier : domaine officiel, mais avec un détail à vérifier (http://, @...)
     // Le titre "inconnu" serait faux ici, puisque le domaine est bien connu.
-    officielAttention: "Domaine officiel, mais vérifie le lien"
+    officielAttention: "Domaine officiel, mais vérifie le lien",
+    // Quand le message parlait de Roblox / Discord mais que le domaine réel est un autre (nouveau rouge)
+    nonOfficielRoblox: "Ce n'est pas le vrai site de Roblox",
+    nonOfficielDiscord: "Ce n'est pas le vrai site de Discord"
   },
 
   // ----- Affichage du domaine -----
@@ -76,6 +79,11 @@ window.TEXTES_VERIF = {
   },
   partieProche: function (partie, mot, vrai) {
     return "Dans « " + vrai + " », le mot « " + partie + " » ressemble beaucoup à « " + mot + " » : c'est probablement une faute de frappe faite exprès pour te tromper.";
+  },
+  // Question "Que disait le message qui accompagnait ce lien ?" (plateforme = "Roblox" ou "Discord")
+  attenduFaux: function (plateforme) {
+    return "Le message parlait de " + plateforme + ", mais le vrai domaine de ce lien est un autre. " +
+      "Ne tape jamais ton mot de passe ou un code dessus, et ne partage jamais ton écran.";
   },
   inconnu:
     "RoShield ne connaît que les domaines officiels de Roblox et de Discord. Ça ne veut pas dire que ce lien " +

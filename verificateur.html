@@ -42,14 +42,27 @@
                placeholder="Colle le lien ici (ex : roblox.com/games/...)"
                autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false"
                maxlength="2048">
-        <button type="submit" class="bouton bouton--principal">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
-               stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M12 3l8 3v6c0 4.5-3.2 8.3-8 9-4.8-.7-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/>
-          </svg>
-          Vérifier
-        </button>
       </div>
+
+      <!-- Question : ce que disait le message qui accompagnait le lien.
+           Elle sert seulement à comparer avec le vrai domaine : on n'ouvre jamais le lien, rien n'est envoyé. -->
+      <fieldset class="verif__question" aria-describedby="aide-question">
+        <legend class="verif__legende">Que disait le message qui accompagnait ce lien ?</legend>
+        <div class="verif__choix">
+          <label class="choix"><input type="radio" name="attendu" value="roblox"><span>Il parlait de Roblox (profil, jeu, Robux…)</span></label>
+          <label class="choix"><input type="radio" name="attendu" value="discord"><span>Il parlait de Discord (serveur, Nitro…)</span></label>
+          <label class="choix"><input type="radio" name="attendu" value="inconnu" checked><span>Il ne disait rien de précis / Je ne sais pas</span></label>
+        </div>
+        <p class="verif__aide" id="aide-question">Tu n'as pas besoin d'ouvrir le lien : on se base seulement sur ce que disait le message. Rien n'est envoyé, tout reste dans ton navigateur.</p>
+      </fieldset>
+
+      <button type="submit" class="bouton bouton--principal verif__bouton">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
+             stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 3l8 3v6c0 4.5-3.2 8.3-8 9-4.8-.7-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/>
+        </svg>
+        Vérifier
+      </button>
     </form>
 
     <!-- Le résultat est écrit ici par js/verificateur.js.

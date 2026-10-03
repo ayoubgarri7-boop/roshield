@@ -42,14 +42,27 @@
                placeholder="Paste the link here (example: roblox.com/games/…)"
                autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false"
                maxlength="2048">
-        <button type="submit" class="bouton bouton--principal">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
-               stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M12 3l8 3v6c0 4.5-3.2 8.3-8 9-4.8-.7-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/>
-          </svg>
-          Check
-        </button>
       </div>
+
+      <!-- Question: what the message that came with the link said.
+           It is only used to compare with the real domain: the link is never opened, nothing is sent. -->
+      <fieldset class="verif__question" aria-describedby="aide-question">
+        <legend class="verif__legende">What did the message that came with this link say?</legend>
+        <div class="verif__choix">
+          <label class="choix"><input type="radio" name="attendu" value="roblox"><span>It was about Roblox (profile, game, Robux…)</span></label>
+          <label class="choix"><input type="radio" name="attendu" value="discord"><span>It was about Discord (server, Nitro…)</span></label>
+          <label class="choix"><input type="radio" name="attendu" value="inconnu" checked><span>It didn’t say anything specific / I don’t know</span></label>
+        </div>
+        <p class="verif__aide" id="aide-question">You don’t need to open the link: we only go by what the message said. Nothing is sent anywhere, and everything stays in your browser.</p>
+      </fieldset>
+
+      <button type="submit" class="bouton bouton--principal verif__bouton">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
+             stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 3l8 3v6c0 4.5-3.2 8.3-8 9-4.8-.7-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/>
+        </svg>
+        Check
+      </button>
     </form>
 
     <!-- The result is written here by js/verificateur.js.

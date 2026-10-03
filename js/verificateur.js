@@ -43,6 +43,15 @@
      https://mon-super-site.com                 (inconnu, sans rapport)
      https://discord.com@roblox.com             (@ mais mène vers un officiel)
 
+   AVEC LA QUESTION "Que disait le message qui accompagnait ce lien ?"  (Roblox / Discord / rien de précis)
+     https://dash.cloudflare.com/sign-up        + Roblox  ou  + Discord  -> ROUGE "Ce n'est pas le vrai site de ..."
+     https://www.roblox.com/games/123           + Roblox  -> VERT (comme d'habitude)
+     https://mon-super-site.com                 + "Je ne sais pas" -> JAUNE (comme d'habitude)
+     https://rob1ox.com                         + Roblox  -> ROUGE avec le titre habituel "Danger..." (déjà rouge)
+     http://mon-super-site.com                  + Roblox  -> ROUGE (la remarque sur http:// reste affichée)
+     http://www.roblox.com                      + Roblox  -> JAUNE (domaine officiel : rien ne change)
+     https://roblox.com@example.com             + Roblox  -> ROUGE (le vrai domaine est example.com)
+
    ERREURS
      (vide)   |   bonjour tout le monde   |   bonjour
    ---------------------------------------------------------- */
@@ -117,11 +126,16 @@
   }
 
   /* ------------------------------------------------------
-     analyser(texte) : le cœur du vérificateur.
+     analyser(texte, attendu) : le cœur du vérificateur.
      Renvoie soit  { erreur: "..." }
      soit { niveau, hote, sous, reel, raisons: [...] }
+
+     "attendu" (facultatif) = de quoi parlait le message qui accompagnait le lien :
+       "roblox" ou "discord"  -> si le domaine réel n'est pas officiel : rouge
+       "inconnu" ou rien      -> comportement habituel, rien ne change
+     Cette réponse ne sert qu'à comparer : le lien n'est jamais visité.
      ------------------------------------------------------ */
-  function analyser(entree) {
+  function analyser(entree, attendu) {
     // --- 1. Nettoyage ---
     const texte = String(entree == null ? "" : entree).trim();
     if (!texte) return { erreur: T.erreurVide };
@@ -271,6 +285,26 @@
       ajouter("jaune", T.inconnu);
     }
 
+    // --- 6c. Le message parlait de Roblox ou de Discord ---
+    // Si le domaine réel n'est PAS officiel (les sous-domaines officiels comptent comme officiels),
+    // c'est rouge : quelqu'un se fait passer pour Roblox/Discord. Les autres raisons restent affichées.
+    // Si le domaine est officiel (même celui de l'AUTRE plateforme), on ne change rien.
+    // Si on ne sait pas, on ne change rien.
+    let titreForce = null;
+    const plateforme = attendu === "roblox" ? "Roblox" : attendu === "discord" ? "Discord" : null;
+    if (plateforme && !officiel) {
+      // Était-ce DÉJÀ rouge sans la question (imitation, adresse IP, punycode...) ?
+      const dejaRouge = raisons.some(function (r) { return r.niveau === "rouge"; });
+      // Le message "inconnu, ça ne veut pas dire dangereux" ne va plus avec un résultat rouge
+      for (let i = raisons.length - 1; i >= 0; i--) {
+        if (raisons[i].message === T.inconnu) raisons.splice(i, 1);
+      }
+      raisons.unshift({ niveau: "rouge", message: T.attenduFaux(plateforme) });
+      // Le titre "Ce n'est pas le vrai site de ..." est réservé aux NOUVEAUX rouges (domaine simplement inconnu).
+      // Un cas déjà rouge garde son titre habituel : "Danger : faux lien probable, ne clique pas".
+      if (!dejaRouge) titreForce = attendu === "roblox" ? "nonOfficielRoblox" : "nonOfficielDiscord";
+    }
+
     // --- 7. Niveau final = le pire des niveaux trouvés ---
     let niveau = "vert";
     raisons.forEach(function (r) {
@@ -298,7 +332,7 @@
 
     // Titre : un seul titre pour tout le jaune ("Domaine inconnu de RoShield").
     // Exception : domaine officiel avec un détail (http://, @) -> "inconnu" serait faux.
-    const titreCle = officiel && niveau === "jaune" ? "officielAttention" : niveau;
+    const titreCle = titreForce || (officiel && niveau === "jaune" ? "officielAttention" : niveau);
 
     return { niveau: niveau, titreCle: titreCle, hote: hote, sous: sous, reel: reel, raisons: messages, notes: notes };
   }
@@ -326,7 +360,16 @@
     return el;
   }
 
-  function afficher(res) {
+  let resultatAffiche = false;   // vrai quand un résultat (pas une erreur) est à l'écran
+
+  // La réponse choisie à la question "Que disait le message qui accompagnait ce lien ?"
+  function reponseChoisie() {
+    const choix = formulaire.querySelector('input[name="attendu"]:checked');
+    return choix ? choix.value : "inconnu";
+  }
+
+  function afficher(res, sansDefiler) {
+    resultatAffiche = !res.erreur;
     zoneResultat.textContent = ""; // vide l'ancien résultat
 
     // Cas d'erreur de saisie
@@ -376,12 +419,20 @@
 
     zoneResultat.appendChild(boite);
     blocApresClic.hidden = false;
-    boite.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    if (!sansDefiler) boite.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
 
   // Quand on clique sur "Vérifier" ou qu'on appuie sur Entrée
   formulaire.addEventListener("submit", function (evenement) {
     evenement.preventDefault(); // empêche la page de se recharger
-    afficher(analyser(champ.value));
+    afficher(analyser(champ.value, reponseChoisie()));
+  });
+
+  // Si on change de réponse alors qu'un résultat est déjà affiché, on le recalcule tout de suite
+  // (sans faire défiler la page).
+  formulaire.addEventListener("change", function (evenement) {
+    if (evenement.target.name === "attendu" && resultatAffiche && champ.value.trim()) {
+      afficher(analyser(champ.value, reponseChoisie()), true);
+    }
   });
 })();

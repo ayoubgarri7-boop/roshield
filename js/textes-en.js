@@ -30,7 +30,10 @@ window.TEXTES_VERIF = {
     jaune: "Domain unknown to RoShield",
     rouge: "Danger: probably a fake link. Don’t click it.",
     // Cas particulier : domaine officiel, mais avec un détail à vérifier (http://, @...)
-    officielAttention: "Official domain, but check the link"
+    officielAttention: "Official domain, but check the link",
+    // Quand le message parlait de Roblox / Discord mais que le domaine réel est un autre (nouveau rouge)
+    nonOfficielRoblox: "This isn’t the real Roblox site",
+    nonOfficielDiscord: "This isn’t the real Discord site"
   },
 
   // ----- Affichage du domaine -----
@@ -85,6 +88,11 @@ window.TEXTES_VERIF = {
   },
   partieProche: function (partie, mot, vrai) {
     return "In “" + vrai + "”, the word “" + partie + "” looks a lot like “" + mot + "”. It’s probably a typo made on purpose to trick you.";
+  },
+  // Question "What did the message that came with this link say?" (plateforme = "Roblox" ou "Discord")
+  attenduFaux: function (plateforme) {
+    return "The message was about " + plateforme + ", but this link’s real domain is a different one. " +
+      "Never type your password or a code on it, and never share your screen.";
   },
   inconnu:
     "RoShield only knows the official domains of Roblox and Discord. That doesn’t mean this link is dangerous, " +
