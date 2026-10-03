@@ -51,12 +51,11 @@
      http://mon-super-site.com                  + Roblox  -> ROUGE (la remarque sur http:// reste affichée)
      http://www.roblox.com                      + Roblox  -> JAUNE (domaine officiel : rien ne change)
      https://roblox.com@example.com             + Roblox  -> ROUGE (le vrai domaine est example.com)
-     https://www.youtube.com/watch?v=abc        + Roblox  -> GRIS-BLEU "Ce n'est pas Roblox : c'est un autre site connu"
-     https://en.wikipedia.org/wiki/Roblox       + Roblox  -> GRIS-BLEU
      https://youtube.com.evil.test              + Roblox  -> ROUGE (le vrai domaine est evil.test)
+     https://www.youtube.com/watch?v=abc        + Roblox  -> ROUGE "Ce n'est pas le vrai site de Roblox" (tout site non officiel, même YouTube)
+     https://www.youtube.com/redirect?q=https%3A%2F%2Fexample.test + "Je ne sais pas" -> JAUNE + note "autre adresse cachée"
+     https://www.roblox.com/redirect?url=https%3A%2F%2Fexample.test -> VERT + note "autre adresse cachée" (pas sur le rouge)
      https://www.youtube.com/watch?v=abc        + "Je ne sais pas" -> JAUNE (comme d'habitude)
-     https://www.youtube.com/redirect?q=https%3A%2F%2Fexample.test + Roblox -> GRIS-BLEU + note "autre adresse cachée"
-     https://gist.github.com/x                  + Roblox  -> ROUGE (github.com : noms exacts seulement)
 
    ERREURS
      (vide)   |   bonjour tout le monde   |   bonjour
@@ -70,7 +69,6 @@
   const MOTS_CLES = window.MOTS_CLES;
   const NOMS_OFFICIELS = window.NOMS_OFFICIELS;
   const RACCOURCISSEURS = window.RACCOURCISSEURS;
-  const TIERS_CONNUS = window.DOMAINES_TIERS_CONNUS || [];
 
   // Une AUTRE adresse complète cachée dans le chemin ou la requête d'un lien ?
   //   https://...   http://...   https%3A%2F%2F...   %3A%2F%2F...   (et la version encodée deux fois)
@@ -79,8 +77,7 @@
   const ADRESSE_CACHEE = /https?(?::|%3a)(?:\/|%2f){2}|%3a%2f%2f|%253a%252f%252f/i;
 
   // Gravité des niveaux : permet de garder "le pire" à la fin
-  // "neutre" (gris-bleu) : un autre site connu quand on t'a parlé de Roblox/Discord (voir 6c)
-  const GRAVITE = { vert: 0, neutre: 0.5, jaune: 1, rouge: 2 };
+  const GRAVITE = { vert: 0, jaune: 1, rouge: 2 };
 
   /* ------------------------------------------------------
      Distance de Levenshtein : combien de changements
@@ -115,14 +112,6 @@
   // On vérifie la FIN du nom, jamais le début : c'est la clé de tout.
   function estOuSousDomaine(hote, base) {
     return hote === base || hote.endsWith("." + base);
-  }
-
-  // Le vrai domaine est-il un grand site tiers connu (liste courte dans domaines.js) ?
-  // On compare le VRAI domaine, jamais le chemin : youtube.com.evil.test n'est PAS youtube.com.
-  function trouverSiteConnu(hote) {
-    return TIERS_CONNUS.find(function (d) {
-      return d.hotes ? d.hotes.includes(hote) : estOuSousDomaine(hote, d.domaine);
-    });
   }
 
   // Le "vrai" domaine = les 2 derniers morceaux (roblox.com), ou 3 pour
@@ -175,7 +164,7 @@
         hote: null,
         // Dangereux : explication en rouge. Sinon : explication jaune + petite ligne sur le protocole.
         raisons: dangereux ? [T.protocoleDangereux(p)] : [T.inconnu],
-        notes: dangereux ? [] : [T.protocoleInhabituel(p)]
+        notes: dangereux ? [] : [T.protocoleInhabituel(p)].concat(ADRESSE_CACHEE.test(texte) ? [T.adresseCachee] : [])
       };
     }
 
@@ -200,7 +189,7 @@
         hote: null,
         // Dangereux : explication en rouge. Sinon : explication jaune + petite ligne sur le protocole.
         raisons: dangereux ? [T.protocoleDangereux(p)] : [T.inconnu],
-        notes: dangereux ? [] : [T.protocoleInhabituel(p)]
+        notes: dangereux ? [] : [T.protocoleInhabituel(p)].concat(ADRESSE_CACHEE.test(url.pathname + url.search) ? [T.adresseCachee] : [])
       };
     }
 
@@ -310,8 +299,6 @@
     // --- 6c. Le message disait que c'était une page Roblox ou Discord ---
     // Si le domaine réel n'est PAS officiel (les sous-domaines officiels comptent comme officiels),
     // c'est rouge : quelqu'un se fait passer pour Roblox/Discord. Les autres raisons restent affichées.
-    // SAUF si c'est un grand site tiers connu (YouTube, Reddit...) ET que ce n'était pas déjà rouge :
-    // alors le niveau est "neutre" (gris-bleu), jamais vert.
     // Si le domaine est officiel (même celui de l'AUTRE plateforme), on ne change rien.
     // Si on ne sait pas, on ne change rien.
     let titreForce = null;
@@ -323,20 +310,12 @@
       for (let i = raisons.length - 1; i >= 0; i--) {
         if (raisons[i].message === T.inconnu) raisons.splice(i, 1);
       }
-      // Un cas DÉJÀ rouge (imitation, mot-clé, punycode, IP, @...) reste rouge, même si un site connu
-      // apparaît dans le chemin ou dans le lien.
-      const siteConnu = !dejaRouge && trouverSiteConnu(hote);
-      if (siteConnu) {
-        raisons.unshift({ niveau: "neutre", message: T.autreSiteConnu(plateforme) });
-        // Le niveau reste gris-bleu, mais si le lien cache une AUTRE adresse, on le dit en petite ligne
-        if (ADRESSE_CACHEE.test(url.pathname + url.search)) notes.push(T.adresseCachee);
-        titreForce = attendu === "roblox" ? "autreSiteConnuRoblox" : "autreSiteConnuDiscord";
-      } else {
-        raisons.unshift({ niveau: "rouge", message: T.attenduFaux(plateforme) });
-        // Le titre "Ce n'est pas le vrai site de ..." est réservé aux NOUVEAUX rouges (domaine simplement inconnu).
-        // Un cas déjà rouge garde son titre habituel : "Danger : faux lien probable, ne clique pas".
-        if (!dejaRouge) titreForce = attendu === "roblox" ? "nonOfficielRoblox" : "nonOfficielDiscord";
-      }
+      // Tout domaine non officiel est rouge, quel que soit le site (même YouTube) : le message prétendait
+      // que c'était Roblox/Discord, et ce n'est pas vrai.
+      raisons.unshift({ niveau: "rouge", message: T.attenduFaux(plateforme) });
+      // Le titre "Ce n'est pas le vrai site de ..." est réservé aux NOUVEAUX rouges (domaine simplement inconnu).
+      // Un cas déjà rouge garde son titre habituel : "Danger : faux lien probable, ne clique pas".
+      if (!dejaRouge) titreForce = attendu === "roblox" ? "nonOfficielRoblox" : "nonOfficielDiscord";
     }
 
     // --- 7. Niveau final = le pire des niveaux trouvés ---
@@ -362,6 +341,13 @@
     } else if (officiel) {
       // Officiel mais avec un souci : on précise d'abord que le domaine est bon
       messages.unshift(T.officielInfo(officiel.domaine));
+    }
+
+    // Petite ligne : le chemin ou la requête cache une AUTRE adresse complète (redirection ?).
+    // Seulement sur le VERT et le JAUNE : le rouge a déjà un avertissement fort. On l'ajoute APRÈS le calcul
+    // du niveau, pour qu'un lien vert reste vert.
+    if ((niveau === "vert" || niveau === "jaune") && ADRESSE_CACHEE.test(url.pathname + url.search)) {
+      notes.push(T.adresseCachee);
     }
 
     // Titre : un seul titre pour tout le jaune ("Domaine inconnu de RoShield").

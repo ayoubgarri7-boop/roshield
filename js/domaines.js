@@ -53,32 +53,3 @@ window.RACCOURCISSEURS = [
   "ow.ly", "buff.ly", "shorturl.at", "tiny.cc", "rebrand.ly", "t.ly",
   "s.id", "v.gd", "shorte.st", "adf.ly", "lnkd.in", "bl.ink"
 ];
-
-// ---------- 5. Grands sites tiers connus (utilisés SEULEMENT avec la question du vérificateur) ----------
-// Quand le message disait "c'est une page Roblox ou Discord", que le lien n'est PAS officiel, mais que son vrai
-// domaine est un de ces grands sites, le résultat est gris-bleu ("c'est un autre site connu") au lieu de rouge.
-// Ce n'est PAS un verdict de confiance : on dit seulement "ce n'est pas Roblox / Discord, c'est un autre site connu".
-//
-// RÈGLES POUR AJOUTER UN DOMAINE :
-//  - la liste reste COURTE ;
-//  - on compare le VRAI domaine (les sous-domaines comptent : fr.wikipedia.org), jamais le chemin du lien ;
-//    youtube.com.evil.test n'est donc PAS youtube.com ;
-//  - JAMAIS un hébergeur où n'importe qui peut publier une page : github.io, pages.dev, netlify.app,
-//    vercel.app, blogspot.com, weebly.com, wixsite.com, sites.google.com, web.app, glitch.me...
-//  - "hotes" (facultatif) : si présent, seuls ces noms EXACTS sont acceptés (pas les sous-domaines).
-window.DOMAINES_TIERS_CONNUS = [
-  { domaine: "youtube.com",   note: "YouTube : vidéos (liens youtube.com/watch...)" },
-  { domaine: "youtu.be",      note: "Liens courts officiels de YouTube" },
-  { domaine: "reddit.com",    note: "Reddit : forum (liens reddit.com/r/...)" },
-  { domaine: "wikipedia.org", note: "Wikipédia et ses langues (en.wikipedia.org, fr.wikipedia.org...)" },
-  // GitHub : noms exacts seulement. PAS gist.github.com ni github.io, où n'importe qui publie (donc rouge).
-  { domaine: "github.com",    hotes: ["github.com", "www.github.com"], note: "GitHub : code et documentation (github.com/Roblox/...)" },
-  { domaine: "twitch.tv",     note: "Twitch : vidéos en direct" },
-  { domaine: "x.com",         note: "X, le nouveau nom de Twitter : réseau social" },
-  { domaine: "twitter.com",   note: "Twitter, ancien nom de X" },
-  { domaine: "tiktok.com",    note: "TikTok : vidéos courtes" },
-  { domaine: "fandom.com",    note: "Fandom : wikis de jeux (chaque wiki est un sous-domaine, ex. roblox.fandom.com)" },
-  // Google : seulement la page d'accueil/recherche. PAS les sous-domaines (sites.google.com, docs.google.com,
-  // drive.google.com, forms...) où n'importe qui peut publier une page ou un formulaire.
-  { domaine: "google.com",    hotes: ["google.com", "www.google.com"], note: "Google : moteur de recherche (noms exacts uniquement)" }
-];

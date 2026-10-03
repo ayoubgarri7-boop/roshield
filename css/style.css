@@ -26,7 +26,6 @@
 
   /* Niveaux du vérificateur : vert (officiel), jaune (inconnu), rouge (danger) */
   --jaune: #ffd43b;                   /* domaine inconnu (contraste 13:1 sur fond sombre) */
-  --neutre: #8fa8c8;                  /* gris-bleu : "c'est un autre site connu" (contraste 7,7:1 sur la carte) */
   --rouge: #ff5d6c;
 
   /* Cartes en "verre" */
@@ -464,7 +463,6 @@ a.carte:hover {
 }
 .resultat--vert   { border-color: rgba(62, 224, 143, 0.55); box-shadow: 0 0 30px rgba(62, 224, 143, 0.12); }
 .resultat--jaune  { border-color: rgba(255, 212, 59, 0.55); box-shadow: 0 0 30px rgba(255, 212, 59, 0.12); }
-.resultat--neutre { border-color: rgba(143, 168, 200, 0.55); box-shadow: 0 0 30px rgba(143, 168, 200, 0.12); }
 .resultat--rouge  { border-color: rgba(255, 93, 108, 0.6);  box-shadow: 0 0 30px rgba(255, 93, 108, 0.14); }
 .resultat--erreur { border-color: rgba(255, 93, 108, 0.45); }
 .resultat__erreur { margin: 0; }
@@ -483,11 +481,9 @@ a.carte:hover {
 }
 .resultat__rond--vert   { background: var(--vert);   box-shadow: 0 0 0.6em var(--vert); }
 .resultat__rond--jaune  { background: var(--jaune);  box-shadow: 0 0 0.6em var(--jaune); }
-.resultat__rond--neutre { background: var(--neutre); box-shadow: 0 0 0.6em var(--neutre); }
 .resultat__rond--rouge  { background: var(--rouge);  box-shadow: 0 0 0.6em var(--rouge); }
 .resultat--vert   .resultat__titre { color: var(--vert); }
 .resultat--jaune  .resultat__titre { color: var(--jaune); }
-.resultat--neutre .resultat__titre { color: var(--neutre); }
 .resultat--rouge  .resultat__titre { color: var(--rouge); }
 
 .domaine {

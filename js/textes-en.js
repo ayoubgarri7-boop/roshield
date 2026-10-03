@@ -33,10 +33,7 @@ window.TEXTES_VERIF = {
     officielAttention: "Official domain, but check the link",
     // Quand le message disait "c'est une page Roblox / Discord" mais que le domaine réel est un autre (nouveau rouge)
     nonOfficielRoblox: "This isn’t the real Roblox site",
-    nonOfficielDiscord: "This isn’t the real Discord site",
-    // Quand le message disait "c'est une page Roblox / Discord" mais que le lien mène vers un autre grand site connu (gris-bleu)
-    autreSiteConnuRoblox: "This isn’t Roblox: it’s another well-known site",
-    autreSiteConnuDiscord: "This isn’t Discord: it’s another well-known site"
+    nonOfficielDiscord: "This isn’t the real Discord site"
   },
 
   // ----- Affichage du domaine -----
@@ -97,12 +94,7 @@ window.TEXTES_VERIF = {
     return "The message said this link was a " + plateforme + " page, but its real domain is a different one. " +
       "Never type your password or a code on it, and never share your screen.";
   },
-  // Niveau gris-bleu : un autre grand site connu (jamais "safe", jamais vert)
-  autreSiteConnu: function (plateforme) {
-    return "The message said it was " + plateforme + ", but this link goes to another well-known site. " +
-      "That doesn’t mean it’s dangerous, but make sure the page doesn’t ask you to log in.";
-  },
-  // Petite ligne (niveau gris-bleu) : le lien cache une autre adresse
+  // Petite ligne (sur le vert et le jaune) : le lien cache une autre adresse
   adresseCachee: "This link contains another address inside it: it may send you somewhere else.",
   inconnu:
     "RoShield only knows the official domains of Roblox and Discord. That doesn’t mean this link is dangerous, " +
