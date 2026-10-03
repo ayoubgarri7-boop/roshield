@@ -1,1 +1,4 @@
 .claude/
+
+# Données externes (listes de phishing) : jamais commitées
+donnees-externes/
