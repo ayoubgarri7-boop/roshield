@@ -1,0 +1,14 @@
+# Fichiers qui ne doivent PAS être publiés avec le site (syntaxe comme .gitignore).
+# Demandés :
+outils/
+wrangler.jsonc
+.assetsignore
+
+# Ajoutés par sécurité (le dossier du site est servi en entier : "directory": "./") :
+# donnees-externes/ contient les listes de phishing téléchargées (74 Mo, dont un fichier de 66 Mo : plus que la limite de
+# 25 Mio par fichier de Cloudflare) et d'éventuels liens de test : à ne jamais publier.
+donnees-externes/
+.git
+.claude/
+.gitignore
+node_modules/

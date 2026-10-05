@@ -1,0 +1,10 @@
+{
+  // Site statique RoShield sur Cloudflare Workers (fichiers statiques, pas de code de Worker).
+  // Aucun secret ici, et pas d'Account ID : wrangler le trouve après « wrangler login ».
+  "name": "roshield",
+  "compatibility_date": "2025-01-01",
+  "assets": {
+    // Tout le dossier du site est servi ; ce qu'il ne faut PAS publier est listé dans .assetsignore
+    "directory": "./"
+  }
+}
