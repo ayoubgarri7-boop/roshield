@@ -38,6 +38,9 @@ window.TEXTES_VERIF = {
     // List of reported links (Phishing.Database): red. “Reported” never means “proven”.
     signale: "Reported as dangerous",
     signaleFichier: "This specific file was reported as dangerous",
+    // The link text shows a different address than the real one ([text](address))
+    adresseAfficheeRouge: "Danger: the displayed address is not the real address",
+    adresseAfficheeJaune: "Warning: the displayed address is not the real address",
     alerteChemin: "Warning: Roblox’s (or Discord’s) name is copied into this link",
     alerteMarque_roblox: "This isn’t one of the official Roblox sites that RoShield knows: its name contains “Roblox”",
     alerteMarque_rbx: "This isn’t one of the official Roblox sites that RoShield knows: its name contains “rbx”",
@@ -80,7 +83,7 @@ window.TEXTES_VERIF = {
   punycode: "This domain name is encoded (it contains “xn--”). That’s often used to hide letters from another alphabet that look like ours (for example, a Russian “о” instead of an “o”). It’s a classic trick used by fake sites.",
   // Petites lignes d'explication (affichées sous le message principal, en jaune)
   raccourcisseur: function (domaine) {
-    return "This is a shortened link (“" + domaine + "”): you can’t see where it goes.";
+    return "Hidden destination: this is a shortened link (“" + domaine + "”), you can’t see where it goes.";
   },
   http: "This link starts with “http://” instead of “https://”: the connection isn’t encrypted.",
   imiteSousDomaine: function (officiel, vrai) {
@@ -116,6 +119,17 @@ window.TEXTES_VERIF = {
   listeHote: "This domain name appears in a public list of phishing links (Phishing.Database). A list can be wrong, but it’s better not to go there. Never type your password or a code, and never share your screen.",
   listeLien: "This specific link appears in a public list of phishing links (Phishing.Database). A list can be wrong, but it’s better not to open it. Never type your password or a code, and never share your screen.",
   listeFichier: "The domain really belongs to an official site, but this specific file appears in a public list of phishing links (Phishing.Database). It was sent by a user. Don’t open it, and never run a file sent by a stranger.",
+  // [text](address) form: the text shows one address, the link goes somewhere else
+  adresseAffichee: function (visible, reel, officiel) {
+    return "The link text shows “" + visible + "”" + (officiel ? " (an official site)" : "") +
+      ", but the link really goes to “" + reel + "”. Only the real address counts, not the displayed text. " +
+      "Never type your password or a code on this page, and never share your screen.";
+  },
+  // Neutral info about how the link was prepared (they don't change the level)
+  infoCaracteres: "We ignored some characters around the link (brackets, parentheses, quotes...) to check it.",
+  infoDefendue: "This address was written in a “defanged” form (hxxp, [.]): we put it back in shape to check it. That doesn’t make it more dangerous.",
+  infoTexteLien: "The link text is not an address: only the real address, behind the text, is checked.",
+  infoAfficheeRemise: "The displayed address had spaces or slips: we put it back in shape to compare it.",
   adresseCachee: "This link contains another address inside it: it may send you somewhere else.",
   inconnu:
     "RoShield only knows the official domains of Roblox and Discord. That doesn’t mean this link is dangerous, " +

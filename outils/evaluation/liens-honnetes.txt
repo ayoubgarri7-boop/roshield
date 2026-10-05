@@ -377,3 +377,17 @@ https://discarded-ideas.example/
 https://discorde.example/
 https://pomme-de-discorde.example/
 https://discordance-musicale.example/
+# --- adresses entourées ou « défendues » (le verdict doit être celui de l'adresse nue : jamais rouge avec « autre chose ») ---
+[https://exemple.com
+[https://exemple.com]
+[exemple.com
+<https://exemple.com/page>
+(https://exemple.com/page)
+"https://exemple.com/page"
+https://exemple.com/page).
+[Mon site](https://exemple.com)
+[https://exemple.com](https://exemple.com/page)
+[https://www.roblox.com/home](https://www.roblox.com/home)
+hxxps://exemple[.]com/page
+exemple[.]com
+hxxps://www[.]roblox[.]com/home

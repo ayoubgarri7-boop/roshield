@@ -249,7 +249,141 @@
        "inconnu" ou rien      -> comportement habituel, rien ne change
      Cette réponse ne sert qu'à comparer : le lien n'est jamais visité.
      ------------------------------------------------------ */
+  /* ======================================================
+     PRÉPARATION de ce que la personne a collé (avant l'analyse)
+     - retire ce qui entoure l'adresse : [https://exemple.com   <https://exemple.com>   "https://exemple.com"
+     - remet en forme les adresses « défendues » : hxxps://exemple[.]com  (sans en faire une accusation : c'est
+       la façon normale de partager un lien dangereux sans qu'il soit cliquable)
+     - forme [texte](adresse) : on analyse l'adresse RÉELLE, et on compare avec l'adresse AFFICHÉE si le texte en est une
+     Tout ce qui ne contient rien de tout ça passe tel quel dans analyserAdresse() : même résultat qu'avant.
+     ====================================================== */
+
+  // Une adresse IPv6 commence par "[" : ce n'est pas un crochet à retirer
+  const IPV6_AU_DEBUT = /^\[[0-9a-f:.]+\]/i;
+
+  function compter(texte, caractere) { return texte.split(caractere).length - 1; }
+
+  // hxxp:// -> http://, hxxps// (deux-points oublié) -> https://, [.] -> ".", [://] -> "://"
+  function remettreEnForme(s) {
+    let r = s;
+    r = r.replace(/\[\s*\.\s*\]|\(\s*\.\s*\)|\{\s*\.\s*\}|\[\s*dot\s*\]|\(\s*dot\s*\)/gi, ".");
+    r = r.replace(/\[\s*:\s*\/\/\s*\]/g, "://").replace(/\[\s*:\s*\]/g, ":");
+    r = r.replace(/^hxxp(s?)(?=:|\/\/)/i, "http$1");
+    r = r.replace(/^(https?)\/\//i, "$1://");
+    return r;
+  }
+
+  // Retire ce qui entoure l'adresse : [ < ( " ' « au début ; ] > ) " ' » , ; ! et un point après une parenthèse à la fin.
+  // Une parenthèse ou un crochet final n'est retiré que s'il est de trop (https://exemple.com/a_(b) reste intact).
+  // Le point final tout seul n'est PAS retiré : "https://www.roblox.com." est une adresse valide.
+  function enleverEntourage(s) {
+    let r = s;
+    while (r.length > 0 && /^[\[<("'«]/.test(r) && !IPV6_AU_DEBUT.test(r)) r = r.slice(1);
+    for (let i = 0; i < 12 && r.length > 0; i++) {
+      const dernier = r.slice(-1);
+      const avant = r.slice(-2, -1);
+      if (/[,;!>"'»]/.test(dernier)) { r = r.slice(0, -1); continue; }
+      if (dernier === "." && /[)\]>"'»]/.test(avant)) { r = r.slice(0, -1); continue; }
+      if (dernier === ")" && compter(r, ")") > compter(r, "(")) { r = r.slice(0, -1); continue; }
+      if (dernier === "]" && compter(r, "]") > compter(r, "[")) { r = r.slice(0, -1); continue; }
+      break;
+    }
+    return r;
+  }
+
+  // Le texte ressemble-t-il à une adresse de site (nom de domaine avec un point et une fin en lettres) ?
+  function ressembleAdresse(s) {
+    const hote = s.replace(/^[a-z][a-z0-9+.-]*:\/\//i, "").split(/[\/:?#]/)[0];
+    return /^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}$/i.test(hote);
+  }
+
+  // Le texte AFFICHÉ d'un lien [texte](adresse) : est-ce une adresse ? On le nettoie (liens imbriqués, espaces au milieu du
+  // chemin, deux-points oublié, parenthèse manquante...). Renvoie { hote, remise } ou null si c'est un texte ordinaire.
+  function adresseAffichee(texteAffiche) {
+    let t = texteAffiche;
+    // un lien imbriqué [texte](adresse) dans le texte affiché : on garde son texte (ou son adresse s'il est vide)
+    t = t.replace(/\[([^\[\]]*)\]\(([^()\s]*)\)?/g, function (m, a, b) { return a || b; });
+    t = remettreEnForme(t.trim());
+    t = t.replace(/[\[\]]/g, "");                       // crochets restants
+    const jetons = t.split(/\s+/).filter(Boolean);
+    if (!jetons.length) return null;
+    const premier = remettreEnForme(enleverEntourage(jetons[0]));
+    if (!ressembleAdresse(premier)) return null;
+    // si le chemin a été coupé par des espaces ("users/ 123/profil e"), on recolle tout
+    const sansSchema = premier.replace(/^[a-z][a-z0-9+.-]*:\/\//i, "");
+    const complet = sansSchema.indexOf("/") !== -1 ? enleverEntourage(jetons.join("")) : premier;
+    let hote;
+    try {
+      hote = new URL(/^[a-z][a-z0-9+.-]*:\/\//i.test(complet) ? complet : "https://" + complet).hostname.toLowerCase().replace(/\.$/, "");
+    } catch (e) {
+      return null;
+    }
+    return { hote: hote, remise: complet !== texteAffiche.trim() };
+  }
+
+  // Décide ce qu'on analyse. Renvoie null si rien ne change (le texte passe tel quel, comme avant).
+  function preparer(entree) {
+    const texte = String(entree == null ? "" : entree).trim();
+    if (!texte || texte.length > 2048) return null;       // les erreurs de saisie restent gérées par analyserAdresse
+    const infos = [];
+    let adresse = texte, affichee = null, texteLien = false;
+
+    // [texte](adresse) : l'adresse réelle est la dernière parenthèse (un niveau de parenthèses permis dans l'adresse)
+    const md = texte.match(/^\[(.*)\]\(((?:[^\s()]|\([^\s()]*\))+)\)?$/);
+    if (md && md[1].length > 0) {
+      adresse = md[2];
+      affichee = adresseAffichee(md[1]);
+      texteLien = !affichee;
+    }
+
+    // Ordre : entourage, puis remise en forme (hxxp seulement au tout début : "[hxxps://..." doit marcher), puis entourage
+    const sansEntourage = enleverEntourage(adresse);
+    const defendue = remettreEnForme(sansEntourage);
+    const nettoyee = enleverEntourage(defendue);
+    if (!affichee && !texteLien && nettoyee === texte && defendue === texte) return null;   // rien à faire
+    if (defendue !== sansEntourage) infos.push(T.infoDefendue);
+    if (sansEntourage !== adresse || nettoyee !== defendue) infos.push(T.infoCaracteres);
+    if (texteLien) infos.push(T.infoTexteLien);
+    if (affichee && affichee.remise) infos.push(T.infoAfficheeRemise);
+    return { adresse: nettoyee, affichee: affichee, infos: infos };
+  }
+
+  // L'analyse complète : prépare, analyse l'adresse RÉELLE, puis compare avec l'adresse AFFICHÉE (si le texte du lien en est une).
   function analyser(entree, attendu) {
+    const prep = preparer(entree);
+    if (!prep) return analyserAdresse(entree, attendu);
+    const r = analyserAdresse(prep.adresse, attendu);
+    if (r.erreur) return r;
+
+    if (prep.affichee && r.hote) {
+      const vh = prep.affichee.hote;
+      const vIP = /^\d{1,3}(\.\d{1,3}){3}$/.test(vh) || vh.startsWith("[");
+      const memeSite = !vIP && domaineReel(vh) === r.reel;
+      if (!memeSite) {
+        const visibleOfficiel = OFFICIELS.find(function (d) { return estOuSousDomaine(vh, d.domaine); });
+        const reelOfficiel = OFFICIELS.find(function (d) { return estOuSousDomaine(r.hote, d.domaine); });
+        const message = T.adresseAffichee(vh, r.hote, !!visibleOfficiel);
+        if (visibleOfficiel && !reelOfficiel) {
+          // Le texte affiche un site OFFICIEL, le lien mène ailleurs (raccourcisseur ou autre) : toujours rouge
+          r.niveau = "rouge";
+          r.titreCle = "adresseAfficheeRouge";
+          r.raisons = [message].concat(r.raisons);
+        } else if (r.niveau !== "rouge") {
+          // Le texte affiche une autre adresse : alerte forte (jaune)
+          r.niveau = "jaune";
+          r.titreCle = "adresseAfficheeJaune";
+          r.raisons = [message].concat(r.raisons.filter(function (m) { return m !== T.inconnu; }));
+        } else {
+          r.raisons = [message].concat(r.raisons);     // déjà rouge pour une autre raison : on garde son titre
+        }
+      }
+    }
+    if (prep.infos.length) r.infos = prep.infos;
+    return r;
+  }
+
+  // L'analyse d'UNE adresse (déjà préparée par analyser)
+  function analyserAdresse(entree, attendu) {
     // --- 1. Nettoyage ---
     const texte = String(entree == null ? "" : entree).trim();
     if (!texte) return { erreur: T.erreurVide };
@@ -651,6 +785,11 @@
     const liste = creer("ul", "resultat__raisons");
     res.raisons.forEach(function (r) { liste.appendChild(creer("li", "", r)); });
     boite.appendChild(liste);
+
+    // Infos neutres sur la préparation du lien (caractères retirés, adresse « défendue »...) : elles ne changent pas le niveau
+    (res.infos || []).forEach(function (n) {
+      boite.appendChild(creer("p", "resultat__note", n));
+    });
 
     // Petites lignes en plus (raccourcisseur, http://...) : sous le message principal
     (res.notes || []).forEach(function (n) {

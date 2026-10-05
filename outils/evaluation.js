@@ -96,6 +96,7 @@ const REGLES = [
   [/utilise une adresse IP/, function () { return "adresse IP"; }],
   [/Le lien contient un « @ »/, function () { return "trompe-l'œil avec @"; }],
   [/Ce n'est pas un lien de site web/, function () { return "protocole dangereux"; }],
+  [/Le texte du lien affiche/, function () { return "adresse affichée différente de l'adresse réelle"; }],
   [/Son vrai domaine est un autre\. Ne tape jamais/, function () { return "nom officiel complet dans le chemin ou la requête"; }]
 ];
 function regleDuRouge(r) {
@@ -123,7 +124,13 @@ function titre(t) { log("\n" + "=".repeat(96) + "\n" + t + "\n" + "=".repeat(96)
 function ligneTableau(cols, largeurs) { return cols.map(function (c, i) { return String(c).padEnd(largeurs[i]); }).join(" "); }
 
 // ---------- 4. Vérifications du jeu de test lui-même ----------
+// Forme [texte](adresse) : c'est l'adresse RÉELLE (la dernière parenthèse) qui doit être un domaine réservé
+function adresseReelle(lien) {
+  const m = lien.match(/^\[(.*)\]\(((?:[^\s()]|\([^\s()]*\))+)\)?$/);
+  return (m ? m[2] : lien).replace(/^hxxp(s?):?\/\//i, "http$1://");
+}
 function hoteReserve(lien) {
+  lien = adresseReelle(lien);
   let u;
   try { u = new URL(lien.indexOf("://") !== -1 ? lien : "https://" + lien); } catch (e) { return false; }
   const h = u.hostname.replace(/^\[|\]$/g, "").toLowerCase();

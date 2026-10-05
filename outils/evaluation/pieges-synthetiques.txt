@@ -159,3 +159,12 @@ https://tyk058da.example/verify-roblox-account/step-2?token=YJEfmyMk6isJ2bJhgCmP
 https://0yf7ygk6.test/nitro/discord-com-gift?code=Gt5cNnAiYfFXE8Mv
 https://qqbztab.example/steam-gift-card-roblox-1710
 https://3gg51k6.example/robux-for-free/claim/7290961
+# --- Texte affiché ≠ adresse réelle : le texte affiche un faux profil / site officiel, le lien mène ailleurs (TOUJOURS rouge) ---
+# Forme [texte](adresse), avec des espaces, un « : » oublié ou une parenthèse manquante dans le texte affiché.
+[hxxps://[www.roblox.com/users/](https://www.roblox.com/users/) 123/profil e](hxxps://court.test/abc)
+[hxxps//[www.roblox.com/users/](https://www.roblox.com/users/) 123/profil e](hxxps//court.test/abc)
+[hxxps://[www.roblox.com/users/](https://www.roblox.com/users/ 123/profil e](hxxps://court.test/abc
+[hxxps://www[.]roblox[.]com/users/123/profile](https://court.test/abc)
+[https://www.roblox.com/home](https://autre.test/login)
+[www.discord.com/invite/abc](https://autre.test/x)
+[https://discord.gg/abc](https://court.test/x)
