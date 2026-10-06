@@ -12,6 +12,11 @@
 window.DOMAINES_OFFICIELS = [
   // --- Roblox ---
   { domaine: "roblox.com",      note: "Site officiel de Roblox (et tous ses sous-domaines : www, web, create, devforum...)" },
+  // discord.media : confirmé par la documentation OFFICIELLE de Discord, le 6 octobre 2026.
+  // Page : https://docs.discord.com/developers/topics/voice-connections (« Voice Connections »). Son exemple de message de serveur
+  // vocal donne l'adresse "sweetwater-12345.discord.media:2048" comme point d'accès vocal de Discord. Ce n'est pas un site qu'on visite
+  // (serveurs vocaux), mais Discord le présente comme son propre domaine.
+  { domaine: "discord.media",   note: "Serveurs vocaux de Discord, cités par la documentation officielle (docs.discord.com)" },
   // ro.blox.com : confirmé par une page OFFICIELLE de Roblox, le 3 octobre 2026.
   // Page : https://create.roblox.com/docs/production/promotion/deeplinks (« Deep links »). Elle donne ce préfixe pour les
   // liens d'ouverture de l'app Roblox : « https://ro.blox.com/Ebh5? ». Seul « ro.blox.com » (et ses sous-domaines) est officiel,
@@ -37,7 +42,7 @@ window.DOMAINES_A_CONFIRMER = [
   "roblox.link",     // liens de partage Roblox (à confirmer)
   "rblx.co",         // raccourci Roblox (à confirmer)
   // (ro.blox.com est maintenant confirmé et listé plus haut ; « blox.com » lui-même ne l'est PAS)
-  "discord.media",   // serveurs vocaux Discord (jamais dans un lien cliqué)
+  // (discord.media est maintenant confirmé et listé plus haut)
   "dis.gd",          // raccourci Discord (à confirmer)
   "discordstatus.com", // page d'état de Discord (à confirmer)
   "discord.new"      // modèles de serveurs Discord (à confirmer)

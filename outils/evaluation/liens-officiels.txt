@@ -58,3 +58,6 @@ http://discord.com/
 # --- Liens d'ouverture de l'app Roblox (ro.blox.com, confirmé par create.roblox.com le 2026-10-03) ---
 https://ro.blox.com/Ebh5
 https://ro.blox.com/Gwbr6h
+# --- Serveurs vocaux de Discord (discord.media, confirmé par docs.discord.com le 2026-10-06) ---
+https://discord.media/
+https://sweetwater-12345.discord.media/

@@ -41,14 +41,13 @@ const CAS = [
   ["https://discrod-egift.example/", "inconnu", "rouge", "rouge"],
   ["https://dlscordapps.example/", "inconnu", "rouge", "rouge"],
   ["https://dicsord-summer.example/", "inconnu", "rouge", "rouge"],
-  // --- Mots honnêtes proches de "discord" : "discard" n'est PAS « discord » (jaune simple). Mais depuis la règle finale, un
-  //     domaine non officiel qui CONTIENT « discord » est rouge, même un mot honnête (discorde, discordance...) : cas connus. ---
+  // --- Mots honnêtes proches de "discord" : JAMAIS rouges avec « autre chose » (jaune simple, ou alerte si "discord" y figure) ---
   ["https://discard.example/", "inconnu", "jaune", "jaune"],
   ["https://discarded-ideas.example/", "inconnu", "jaune", "jaune"],
-  ["https://discorde.example/", "inconnu", "rouge", "rouge"],
-  ["https://pomme-de-discorde.example/", "inconnu", "rouge", "rouge"],
-  ["https://discordance-musicale.example/", "inconnu", "rouge", "rouge"],
-  ["https://discordant.example/", "inconnu", "rouge", "rouge"],
+  ["https://discorde.example/", "inconnu", "jaune", "alerteMarque_discord"],
+  ["https://pomme-de-discorde.example/", "inconnu", "jaune", "alerteMarque_discord"],
+  ["https://discordance-musicale.example/", "inconnu", "jaune", "alerteMarque_discord"],
+  ["https://discordant.example/", "inconnu", "jaune", "alerteMarque_discord"],
   // --- Règle finale : mots d'appât ROBUX / NITRO dans le NOM D'HÔTE d'un domaine non officiel : ROUGE ---
   ["https://free-robux.xyz/", "inconnu", "rouge", "rouge"],
   ["https://discord-nitro.gift/", "inconnu", "rouge", "rouge"],
@@ -59,8 +58,13 @@ const CAS = [
   ["https://promo-nitro.example/", "inconnu", "rouge", "rouge"],
   ["https://freenitro.example/", "inconnu", "rouge", "rouge"],
   ["https://mes-robux-gratuits.example/", "inconnu", "rouge", "rouge"],
-  ["https://roblox-fans.example/", "inconnu", "rouge", "rouge"],
-  ["https://todoroblox.example/", "inconnu", "rouge", "rouge"],
+  // « roblox » ou « discord » SEULS dans le nom : jaune avec alerte forte (rouge seulement avec un mot d'arnaque)
+  ["https://roblox-fans.example/", "inconnu", "jaune", "alerteMarque_roblox"],
+  ["https://todoroblox.example/", "inconnu", "jaune", "alerteMarque_roblox"],
+  ["https://roblox-free.example/", "inconnu", "rouge", "rouge"],
+  ["https://discord-login.example/", "inconnu", "rouge", "rouge"],
+  ["https://roblox.fandom.com/wiki/Gear", "inconnu", "jaune", "jaune"],
+  ["https://roblox-gratuit.fandom.com/", "inconnu", "rouge", "rouge"],
   ["https://nitrogen.example/", "inconnu", "jaune", "jaune"],
   ["https://rbxcdn.example/", "inconnu", "jaune", "jaune"],
   // --- Dans le CHEMIN d'un domaine non officiel : jaune avec alerte plus forte, JAMAIS rouge ---
@@ -76,6 +80,12 @@ const CAS = [
   ["https://robux.roblox.com/", "inconnu", "vert", "vert"],
   ["https://discord.com/nitro", "inconnu", "vert", "vert"],
   ["https://discord.gift/abc", "inconnu", "vert", "vert"],
+  ["https://sweetwater-12345.discord.media/", "inconnu", "vert", "vert"],     // confirmé par docs.discord.com (voir js/domaines.js)
+  ["https://discord.media/", "inconnu", "vert", "vert"],
+  ["https://roblox.link/abc", "inconnu", "jaune", "alerteMarque_roblox"],      // PAS confirmé : reste une alerte jaune
+  ["https://discordstatus.com/", "inconnu", "jaune", "alerteMarque_discord"],
+  ["https://discord.new/abc", "inconnu", "jaune", "alerteMarque_discord"],
+  ["https://robloxlabs.com/", "inconnu", "jaune", "alerteMarque_roblox"],
   ["https://roblox.com/catalog", "roblox", "vert", "vert"],
   ["https://roblox.com/catalog", "discord", "vert", "vert"],
   // --- "nitro" n'est pas concerné par la faute de frappe dans un morceau ("intro" est un vrai mot) ---

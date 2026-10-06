@@ -230,7 +230,6 @@ https://www.robloxlabs.com/
 https://discordstatus.com/
 https://discord.new/qh5VFKsyPGpc
 https://dis.gd/dzm9CT
-https://discord.media/
 # --- Redirections et liens de sites connus (adresse complète dans le lien) ---
 https://www.youtube.com/redirect?event=video_description&redir_token=gBK4c96LfxJ58SRLQuFheJ5hU6UvYb&q=https%3A%2F%2Fgithub.com%2FRoblox%2Fcreator-docs
 https://www.youtube.com/redirect?q=https%3A%2F%2Fcreate.roblox.com%2Fdocs&event=comments&redir_token=Bmqm3FV9iLjjftfQ3fR7egvJPsLnty

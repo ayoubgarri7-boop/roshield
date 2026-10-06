@@ -554,31 +554,31 @@
       }
 
       // c) mots d'APPÂT et noms de marque dans le NOM D'HÔTE d'un domaine non officiel (les officiels sont déjà verts, avant tout)
-      //    A) "robux" (morceau) ou "nitro" (mot entier), ou une forme collée connue qui en contient un (freerobux...) : ROUGE.
-      //       Peu importe les mots qui les accompagnent (gift, giveaway, promo, free...) : ils ne changent rien.
-      //    B) "roblox" ou "discord" dans le nom (todoroblox, discord-gift...) : ROUGE.
-      //    C) "rbx" (mot entier) avec un mot d'arnaque (free, login...) : ROUGE ; tout seul : alerte JAUNE (marqueSeule).
-      //    Le CHEMIN après le premier "/" ne rend jamais rouge : voir f).
+      //    A) "robux" (morceau) ou "nitro" (mot entier), ou une forme collée contenant robux / nitro (freerobux...) : ROUGE,
+      //       avec le texte « il parle de Robux ou de Nitro ». Les mots qui les accompagnent (gift, giveaway, promo, free...)
+      //       ne changent rien.
+      //    B) "roblox" ou "discord" SEULS dans le nom (todoroblox, discordance...) : JAUNE avec alerte forte (marqueSeule),
+      //       car des sites honnêtes les portent ; ROUGE seulement avec un mot d'arnaque (free, gift, login...) ou une forme collée.
+      //    C) "rbx" (mot entier) : pareil que B.
+      //    "roblox", "discord" sont cherchés comme morceaux (todoroblox) ; "rbx" et les mots d'arnaque comme MOTS ENTIERS
+      //    (séparés par des points ou des tirets). Le CHEMIN après le premier "/" ne rend jamais rouge : voir f).
       let marqueSeule = null;
       if (!trouve && !sansMotCle) {
         const mots = hote.split(/[.\-]/);
         const entier = function (m) { return mots.includes(m); };
         const collee = FORMES_COLLEES.find(function (f) { return hote.includes(f); });
         const appat = hote.indexOf("robux") !== -1 || entier("nitro") || (collee && /robux|nitro/.test(collee));
-        const marqueOfficielle = ["roblox", "discord"].find(function (m) { return hote.indexOf(m) !== -1; });
         if (appat) {
           ajouter("rouge", T.appatRobuxNitro);
           trouve = true;
-        } else if (marqueOfficielle || collee) {
-          ajouter("rouge", T.motCle(collee || marqueOfficielle, reel));
-          trouve = true;
-        } else if (entier("rbx")) {
-          const arnaque = MOTS_ARNAQUE.find(function (m) { return entier(m); });
+        } else {
+          const marque = ["roblox", "discord"].find(function (m) { return hote.indexOf(m) !== -1; }) || (entier("rbx") ? "rbx" : null);
+          const arnaque = collee || (marque && MOTS_ARNAQUE.find(function (m) { return m !== marque && entier(m); }));
           if (arnaque) {
-            ajouter("rouge", T.motCle("rbx", reel));
+            ajouter("rouge", T.motCle(collee || marque, reel));
             trouve = true;
-          } else {
-            marqueSeule = "rbx";
+          } else if (marque) {
+            marqueSeule = marque;
           }
         }
       }
