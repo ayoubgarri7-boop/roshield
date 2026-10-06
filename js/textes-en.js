@@ -46,6 +46,8 @@ window.TEXTES_VERIF = {
     reputationUnRouge: "Danger: one security engine flags this domain name",
     reputationPlusieursJaune: "Warning: several security engines flag this domain name",
     reputationPlusieursRouge: "Several security engines flag this domain name",
+    // Bait word (Robux, Nitro) in the path of a non-official domain: yellow, stronger warning
+    alerteAppatChemin: "Warning: this link talks about Robux or Nitro",
     alerteChemin: "Warning: Roblox’s (or Discord’s) name is copied into this link",
     alerteMarque_roblox: "This isn’t one of the official Roblox sites that RoShield knows: its name contains “Roblox”",
     alerteMarque_rbx: "This isn’t one of the official Roblox sites that RoShield knows: its name contains “rbx”",
@@ -151,6 +153,9 @@ window.TEXTES_VERIF = {
   reputationAvertissement: "No reports doesn’t mean safe.",
   reputationConseil: "Never type your password or a code on this page, and never share your screen.",
   reputationIndisponible: "Additional check unavailable right now: the result above is still valid.",
+  // Bait words: Robux, Nitro
+  appatRobuxNitro: "This is not an official site and it talks about Robux or Nitro. Roblox and Discord never give out Robux or Nitro through another site. Don’t log in there.",
+  appatDansChemin: "This is not an official site, and its address talks about Robux or Nitro. Roblox and Discord never give out Robux or Nitro through another site. Be very careful and don’t log in there.",
   adresseCachee: "This link contains another address inside it: it may send you somewhere else.",
   inconnu:
     "RoShield only knows the official domains of Roblox and Discord. That doesn’t mean this link is dangerous, " +

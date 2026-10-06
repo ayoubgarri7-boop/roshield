@@ -37,6 +37,8 @@ window.TEXTES_VERIF = {
     reputationUnRouge: "Danger : un moteur de sécurité signale ce nom de domaine",
     reputationPlusieursJaune: "Attention : plusieurs moteurs de sécurité signalent ce nom de domaine",
     reputationPlusieursRouge: "Plusieurs moteurs de sécurité signalent ce nom de domaine",
+    // Mot d'appât (Robux, Nitro) dans le chemin d'un domaine non officiel : jaune, alerte plus forte
+    alerteAppatChemin: "Attention : ce lien parle de Robux ou de Nitro",
     alerteChemin: "Attention : le nom de Roblox (ou Discord) est copié dans ce lien",
     alerteMarque_roblox: "Ce site ne fait pas partie des sites officiels de Roblox que RoShield connaît : son nom contient « Roblox »",
     alerteMarque_rbx: "Ce site ne fait pas partie des sites officiels de Roblox que RoShield connaît : son nom contient « rbx »",
@@ -142,6 +144,9 @@ window.TEXTES_VERIF = {
   reputationAvertissement: "Aucun signalement ne veut pas dire sûr.",
   reputationConseil: "Ne tape jamais ton mot de passe ou un code sur cette page, et ne partage jamais ton écran.",
   reputationIndisponible: "Vérification complémentaire indisponible pour le moment : le résultat ci-dessus reste valable.",
+  // Mots d'appât : Robux, Nitro
+  appatRobuxNitro: "Ce n'est pas un site officiel et il parle de Robux ou de Nitro. Roblox et Discord ne donnent jamais de Robux ou de Nitro par un autre site. Ne t'y connecte pas.",
+  appatDansChemin: "Ce n'est pas un site officiel, et son adresse parle de Robux ou de Nitro. Roblox et Discord ne donnent jamais de Robux ou de Nitro par un autre site. Fais très attention et ne t'y connecte pas.",
   adresseCachee: "Ce lien contient une autre adresse cachée : il peut t'envoyer ailleurs.",
   inconnu:
     "RoShield ne connaît que les domaines officiels de Roblox et de Discord. Ça ne veut pas dire que ce lien " +

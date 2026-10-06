@@ -53,7 +53,10 @@ verif(R.doitInterroger(jaune, ACTIVE) === "exemple.com", "activée : un résulta
 const cas = [
   ["https://exemple.com/page", "inconnu", "exemple.com"],
   ["https://www.exemple.com/page?x=1#a", "inconnu", "www.exemple.com"],
-  ["https://todoroblox.example/", "inconnu", "todoroblox.example"],                       // jaune alerte forte (mot de marque)
+  ["https://rbx-fans.example/", "inconnu", "rbx-fans.example"],                          // jaune alerte forte (mot de marque « rbx » seul)
+  ["https://exemple.com/robux", "inconnu", "exemple.com"],                               // jaune alerte forte (mot d'appât dans le chemin)
+  ["https://todoroblox.example/", "inconnu", null],                                      // « roblox » dans le nom d'un domaine non officiel : rouge (règle finale)
+  ["https://free-robux.xyz/", "inconnu", null],                                          // mot d'appât dans le nom : rouge, rien à vérifier
   ["https://evil.test/roblox.com", "inconnu", "evil.test"],                              // jaune alerte forte (nom copié dans le chemin)
   ["[exemple.com](https://autre.test/x)", "inconnu", "autre.test"],                      // adresse affichée différente : jaune ; on envoie l'adresse RÉELLE
   ["[Mon site](https://exemple.com/page)", "inconnu", "exemple.com"],                    // [texte](adresse) : le domaine de l'adresse réelle

@@ -41,13 +41,43 @@ const CAS = [
   ["https://discrod-egift.example/", "inconnu", "rouge", "rouge"],
   ["https://dlscordapps.example/", "inconnu", "rouge", "rouge"],
   ["https://dicsord-summer.example/", "inconnu", "rouge", "rouge"],
-  // --- Mots honnêtes proches de "discord" : JAMAIS rouges avec « autre chose » (jaune simple, ou alerte si "discord" y figure) ---
+  // --- Mots honnêtes proches de "discord" : "discard" n'est PAS « discord » (jaune simple). Mais depuis la règle finale, un
+  //     domaine non officiel qui CONTIENT « discord » est rouge, même un mot honnête (discorde, discordance...) : cas connus. ---
   ["https://discard.example/", "inconnu", "jaune", "jaune"],
   ["https://discarded-ideas.example/", "inconnu", "jaune", "jaune"],
-  ["https://discorde.example/", "inconnu", "jaune", "alerteMarque_discord"],
-  ["https://pomme-de-discorde.example/", "inconnu", "jaune", "alerteMarque_discord"],
-  ["https://discordance-musicale.example/", "inconnu", "jaune", "alerteMarque_discord"],
-  ["https://discordant.example/", "inconnu", "jaune", "alerteMarque_discord"],
+  ["https://discorde.example/", "inconnu", "rouge", "rouge"],
+  ["https://pomme-de-discorde.example/", "inconnu", "rouge", "rouge"],
+  ["https://discordance-musicale.example/", "inconnu", "rouge", "rouge"],
+  ["https://discordant.example/", "inconnu", "rouge", "rouge"],
+  // --- Règle finale : mots d'appât ROBUX / NITRO dans le NOM D'HÔTE d'un domaine non officiel : ROUGE ---
+  ["https://free-robux.xyz/", "inconnu", "rouge", "rouge"],
+  ["https://discord-nitro.gift/", "inconnu", "rouge", "rouge"],
+  ["https://robux.example/", "inconnu", "rouge", "rouge"],
+  ["https://nitro.example/", "inconnu", "rouge", "rouge"],
+  ["https://nitro-gratuit.example/", "inconnu", "rouge", "rouge"],
+  ["https://giveaway-robux.example/", "inconnu", "rouge", "rouge"],
+  ["https://promo-nitro.example/", "inconnu", "rouge", "rouge"],
+  ["https://freenitro.example/", "inconnu", "rouge", "rouge"],
+  ["https://mes-robux-gratuits.example/", "inconnu", "rouge", "rouge"],
+  ["https://roblox-fans.example/", "inconnu", "rouge", "rouge"],
+  ["https://todoroblox.example/", "inconnu", "rouge", "rouge"],
+  ["https://nitrogen.example/", "inconnu", "jaune", "jaune"],
+  ["https://rbxcdn.example/", "inconnu", "jaune", "jaune"],
+  // --- Dans le CHEMIN d'un domaine non officiel : jaune avec alerte plus forte, JAMAIS rouge ---
+  ["https://exemple.com/robux", "inconnu", "jaune", "alerteAppatChemin"],
+  ["https://exemple.com/nitro/claim", "inconnu", "jaune", "alerteAppatChemin"],
+  ["https://exemple.com/?offre=free-robux", "inconnu", "jaune", "alerteAppatChemin"],
+  ["https://exemple.com/a/b/RoBuX-gratuits", "inconnu", "jaune", "alerteAppatChemin"],
+  ["https://www.reddit.com/r/roblox/comments/1/free_robux_scam_warning/", "inconnu", "jaune", "alerteAppatChemin"],
+  ["https://exemple.com/robux", "roblox", "rouge", "nonOfficielRoblox"],
+  // --- Les domaines officiels restent VERTS avant toute autre règle (même avec robux / nitro dans le nom ou le chemin) ---
+  ["https://www.roblox.com/catalog", "inconnu", "vert", "vert"],
+  ["https://www.roblox.com/robux", "inconnu", "vert", "vert"],
+  ["https://robux.roblox.com/", "inconnu", "vert", "vert"],
+  ["https://discord.com/nitro", "inconnu", "vert", "vert"],
+  ["https://discord.gift/abc", "inconnu", "vert", "vert"],
+  ["https://roblox.com/catalog", "roblox", "vert", "vert"],
+  ["https://roblox.com/catalog", "discord", "vert", "vert"],
   // --- "nitro" n'est pas concerné par la faute de frappe dans un morceau ("intro" est un vrai mot) ---
   ["https://intro-guides.example/", "inconnu", "jaune", "jaune"],
   // --- Ce qui entoure l'adresse est ignoré (jamais une erreur, jamais une accusation) ---
@@ -96,6 +126,30 @@ CAS.forEach(function (c) {
   const r = analyser(c[0], c[1]);
   const ok = r.niveau === c[2] && r.titreCle === c[3];
   if (!ok) { echecs++; console.log("ÉCHEC : " + c[0] + " [" + c[1] + "] -> " + r.niveau + "/" + r.titreCle + " (attendu " + c[2] + "/" + c[3] + ")"); }
+});
+// Le texte du rouge « mot d'appât » (FR et EN), exact, et jamais « arnaque confirmée »
+const TEXTE_FR = "Ce n'est pas un site officiel et il parle de Robux ou de Nitro. Roblox et Discord ne donnent jamais de Robux ou de Nitro par un autre site. Ne t'y connecte pas.";
+const TEXTE_EN = "This is not an official site and it talks about Robux or Nitro. Roblox and Discord never give out Robux or Nitro through another site. Don’t log in there.";
+{
+  const fr = analyser("https://free-robux.xyz/", "inconnu");
+  if (fr.raisons.indexOf(TEXTE_FR) === -1) { echecs++; console.log("ÉCHEC : le texte du rouge (FR) n'est pas celui demandé"); }
+  if (T.appatRobuxNitro !== TEXTE_FR) { echecs++; console.log("ÉCHEC : T.appatRobuxNitro (FR) différent du texte demandé"); }
+  const ctxEn = vm.createContext({ URL: URL }); ctxEn.window = ctxEn;
+  ["domaines.js", "textes-en.js", "verificateur.js"].forEach(function (f) { vm.runInContext(fs.readFileSync(path.join(__dirname, "..", "js", f), "utf8"), ctxEn, { filename: f }); });
+  const en = ctxEn.window.RoShieldVerif.analyser("https://free-robux.xyz/", "inconnu");
+  if (en.niveau !== "rouge" || en.raisons.indexOf(TEXTE_EN) === -1) { echecs++; console.log("ÉCHEC : le texte du rouge (EN) n'est pas celui demandé"); }
+  const tousTextes = JSON.stringify([T.appatRobuxNitro, T.appatDansChemin, ctxEn.window.TEXTES_VERIF.appatRobuxNitro, ctxEn.window.TEXTES_VERIF.appatDansChemin]);
+  if (/arnaque confirm|confirmed scam|scam confirmed/i.test(tousTextes)) { echecs++; console.log("ÉCHEC : « arnaque confirmée » ne doit jamais être écrit"); }
+}
+// Un mot d'appât dans le CHEMIN n'est JAMAIS rouge avec « autre chose » ; un domaine officiel est vert avant toute règle
+["https://exemple.com/robux", "https://exemple.org/nitro", "https://exemple.net/x?q=free-nitro-gift", "https://forum.exemple.com/t/robux-giveaway-promo/12",
+  "https://exemple.com/a/b/c/ROBUX", "https://exemple.com/%72obux"].forEach(function (l) {
+  const x = analyser(l, "inconnu");
+  if (x.niveau === "rouge") { echecs++; console.log("ÉCHEC : un mot d'appât dans le chemin ne doit jamais être rouge : " + l); }
+});
+["https://www.roblox.com/robux", "https://www.roblox.com/giftcards", "https://discord.com/nitro", "https://create.roblox.com/robux-nitro", "https://discord.gg/nitro"].forEach(function (l) {
+  const x = analyser(l, "inconnu");
+  if (x.niveau !== "vert") { echecs++; console.log("ÉCHEC : un domaine officiel doit rester vert : " + l + " -> " + x.niveau); }
 });
 // Le piège « faux profil Roblox » ne doit JAMAIS sortir jaune ni vert, quelle que soit la réponse (ou l'absence de réponse)
 const PIEGE = "[hxxps://[www.roblox.com/users/](https://www.roblox.com/users/) 123/profil e](hxxps://court.test/abc)";

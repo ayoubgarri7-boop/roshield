@@ -87,6 +87,7 @@ function categorie(r) {
 
 // Devine QUELLE règle a rendu un résultat rouge (en lisant le texte du message, sans toucher à la logique)
 const REGLES = [
+  [/il parle de Robux ou de Nitro/, function () { return "mot d'appât (Robux / Nitro) dans le nom d'hôte"; }],
   [/Ce domaine contient le mot « (\w+) »/, function (m) { return "mot-clé « " + m[1] + " » dans le domaine"; }],
   [/Ce lien imite « /, function () { return "nom officiel au début du domaine"; }],
   [/« [^»]+ » ressemble beaucoup à « [^»]+ » mais/, function () { return "domaine presque identique à un officiel"; }],

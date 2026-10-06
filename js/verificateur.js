@@ -180,6 +180,19 @@
   }
 
   // Gravité des niveaux : permet de garder "le pire" à la fin
+  // Un mot d'APPÂT (robux, nitro) dans le CHEMIN ou la requête d'un domaine non officiel : alerte jaune plus forte, JAMAIS rouge
+  // (des articles, des forums et des wikis honnêtes parlent de Robux). "robux" est cherché comme morceau, "nitro" comme mot entier.
+  function appatDansChemin(url) {
+    let texte = url.pathname + " " + url.search;
+    for (let i = 0; i < 3; i++) {
+      let decode;
+      try { decode = decodeURIComponent(texte); } catch (e) { break; }
+      if (decode === texte) break;
+      texte = decode;
+    }
+    return texte.toLowerCase().split(/[^a-z0-9]+/).some(function (m) { return m.indexOf("robux") !== -1 || m === "nitro"; });
+  }
+
   const GRAVITE = { vert: 0, jaune: 1, rouge: 2 };
 
   /* ------------------------------------------------------
@@ -540,24 +553,33 @@
         }
       }
 
-      // c) un mot de MARQUE dans le nom d'hôte (roblox, discord, robux, rbx, nitro)
-      //    - avec un mot d'arnaque dans le nom d'hôte (free, gift, login...) : ROUGE
-      //    - tout seul : on le garde de côté (marqueSeule) ; ce sera une alerte JAUNE si rien de plus grave n'est trouvé
-      //    "roblox", "discord", "robux" sont cherchés comme morceaux (todoroblox) ; "rbx", "nitro" et tous les mots
-      //    d'arnaque comme MOTS ENTIERS (séparés par des points ou des tirets), sauf quelques formes collées connues.
+      // c) mots d'APPÂT et noms de marque dans le NOM D'HÔTE d'un domaine non officiel (les officiels sont déjà verts, avant tout)
+      //    A) "robux" (morceau) ou "nitro" (mot entier), ou une forme collée connue qui en contient un (freerobux...) : ROUGE.
+      //       Peu importe les mots qui les accompagnent (gift, giveaway, promo, free...) : ils ne changent rien.
+      //    B) "roblox" ou "discord" dans le nom (todoroblox, discord-gift...) : ROUGE.
+      //    C) "rbx" (mot entier) avec un mot d'arnaque (free, login...) : ROUGE ; tout seul : alerte JAUNE (marqueSeule).
+      //    Le CHEMIN après le premier "/" ne rend jamais rouge : voir f).
       let marqueSeule = null;
       if (!trouve && !sansMotCle) {
         const mots = hote.split(/[.\-]/);
         const entier = function (m) { return mots.includes(m); };
         const collee = FORMES_COLLEES.find(function (f) { return hote.includes(f); });
-        const marque = MOTS_MARQUE_MORCEAUX.find(function (m) { return hote.includes(m); }) ||
-                       MOTS_MARQUE_ENTIERS.find(entier);
-        const arnaque = collee || (marque && MOTS_ARNAQUE.find(function (m) { return m !== marque && entier(m); }));
-        if (arnaque) {
-          ajouter("rouge", T.motCle(collee || marque, reel));
+        const appat = hote.indexOf("robux") !== -1 || entier("nitro") || (collee && /robux|nitro/.test(collee));
+        const marqueOfficielle = ["roblox", "discord"].find(function (m) { return hote.indexOf(m) !== -1; });
+        if (appat) {
+          ajouter("rouge", T.appatRobuxNitro);
           trouve = true;
-        } else if (marque) {
-          marqueSeule = marque;
+        } else if (marqueOfficielle || collee) {
+          ajouter("rouge", T.motCle(collee || marqueOfficielle, reel));
+          trouve = true;
+        } else if (entier("rbx")) {
+          const arnaque = MOTS_ARNAQUE.find(function (m) { return entier(m); });
+          if (arnaque) {
+            ajouter("rouge", T.motCle("rbx", reel));
+            trouve = true;
+          } else {
+            marqueSeule = "rbx";
+          }
         }
       }
 
@@ -621,7 +643,11 @@
       //    les déclenchent : archives, moteurs de recherche, wikis, sites de fans...). Avec la réponse « page Roblox /
       //    Discord », le 6c ci-dessous les passe en rouge.
       if (!trouve) {
-        if (nomOfficielDansChemin(url)) {
+        if (appatDansChemin(url)) {
+          // "robux" ou "nitro" après le premier "/" (evil.test/robux) : alerte plus forte, jamais rouge
+          ajouter("jaune", T.appatDansChemin);
+          alerte = "alerteAppatChemin";
+        } else if (nomOfficielDansChemin(url)) {
           // le NOM COMPLET d'un site officiel est écrit dans le chemin ou la requête (evil.test/roblox.com/login)
           ajouter("jaune", T.imiteDansChemin);
           alerte = "alerteChemin";
