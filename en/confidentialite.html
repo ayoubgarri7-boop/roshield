@@ -33,6 +33,16 @@
     </header>
 
     <section class="carte conseil">
+      <h2>In short</h2>
+      <ul>
+        <li>Your full link stays on your device: it is never sent.</li>
+        <li>An additional check with VirusTotal is possible. Its status (on or off) is shown below. When it is on, only a domain name may be sent, and only for a yellow result.</li>
+        <li>A result is never proof, and VirusTotal can only make a result worse, never turn it green.</li>
+      </ul>
+      <p class="note-source">Last updated: October 6, 2026</p>
+    </section>
+
+    <section class="carte conseil">
       <h2>How the checker decides</h2>
       <p>
         It only reads the <strong>text</strong> of the link, on your device. It never opens the link. It looks at the real domain name
@@ -47,7 +57,13 @@
       <h2>What stays on your device</h2>
       <p>
         <strong>Your full link is never sent.</strong> The path, the query and everything after the domain name stay with you.
-        This site uses no cookies, no accounts, no audience measurement and no ads.
+        This site uses no accounts, no audience measurement and no ads.
+        <!-- TO VERIFY before putting a cookie sentence back. Old sentence (removed):
+             "This site uses no cookies, no accounts, no audience measurement and no ads."
+             Proposed sentence (to approve): "This site does not set any cookie itself and keeps nothing in your browser
+             (nothing in its code is meant for that). Its hosts and the services that provide the fonts
+             (GitHub Pages, Cloudflare, Google Fonts) may use their own techniques, which we don’t control."
+             Checked in the code: no document.cookie, localStorage, sessionStorage or audience-measurement tool. -->
       </p>
     </section>
 
@@ -70,7 +86,7 @@
       </p>
       <p>
         When it is on, it applies <strong>only</strong> to a yellow result. It is <strong>never</strong> used for a link shortener, an IP address or an official domain.
-        The site sends a small RoShield service <strong>only the domain name</strong> of the link’s real address (for example <code>exemple.com</code>), never the full link.
+        The site sends a small RoShield service <strong>only the domain name</strong> of the link’s real address (for example <code>example.com</code>), never the full link.
         That small service asks VirusTotal, a site that gathers the opinions of many security engines.
       </p>
       <p>
@@ -98,7 +114,9 @@
       </ul>
       <p>
         Limits: 4 calls per minute and 500 per day for everyone (VirusTotal’s free quota), 2 per minute and 30 per day for you.
-        The small service keeps no IP address, no links, no paths, no cookies (there are none), and writes no logs.
+        The small service keeps no IP address, no links, no paths, and writes no logs.
+        <!-- TO VERIFY: removed mention “no cookies (there are none)”. The service’s code sends no Set-Cookie header,
+             but Cloudflare may add some on its side: confirm before putting it back. -->
         An automatic cleanup deletes anything that has expired every hour.
       </p>
     </section>
@@ -106,9 +124,11 @@
     <section class="carte conseil">
       <h2>What VirusTotal sees</h2>
       <p>
-        VirusTotal receives the domain name and the small service’s address (not yours). Its documentation states that items sent or queried
-        through its interface may be analyzed and added to its database, accessible to its community: a queried domain name may therefore become
+        VirusTotal receives the domain name and the small service’s address (not yours). In the warning on its documentation page about the <strong>API</strong>
+        (“Get a domain report”), VirusTotal writes that any item submitted or queried via the API will be “scanned and added to the VirusTotal dataset”
+        and become accessible to its community. A queried domain name may therefore become
         visible there. That’s why the full link, the path and the query are never sent, and why link shorteners are excluded.
+        <a href="https://docs.virustotal.com/reference/domain-info" target="_blank" rel="noopener noreferrer">Read VirusTotal’s documentation</a>.
       </p>
     </section>
 
@@ -118,6 +138,15 @@
         Like any website, this one is served by a host (GitHub Pages or Cloudflare), which sees your IP address when you load a page.
         The fonts (Inter and Plus Jakarta Sans) are loaded from Google Fonts: Google sees your IP address at that moment.
         The small service runs on Cloudflare, which sees requests like any host does; that can’t be turned off.
+      </p>
+    </section>
+
+    <section class="carte conseil">
+      <h2>A question or a mistake?</h2>
+      <p>
+        Does a result look wrong, or do you see a mistake on this page? Open an issue on the site’s GitHub repository:
+        <a href="https://github.com/ayoubgarri7-boop/roshield/issues" target="_blank" rel="noopener noreferrer">github.com/ayoubgarri7-boop/roshield/issues</a>.
+        Those pages are public: don’t write any password, code you received, or personal information there.
       </p>
     </section>
 

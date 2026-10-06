@@ -33,6 +33,16 @@
     </header>
 
     <section class="carte conseil">
+      <h2>En bref</h2>
+      <ul>
+        <li>Ton lien complet reste sur ton appareil : il n'est jamais envoyé.</li>
+        <li>Une vérification complémentaire avec VirusTotal est possible. Son état (activée ou non) est indiqué plus bas. Quand elle est activée, seul un nom de domaine peut être envoyé, seulement pour un résultat jaune.</li>
+        <li>Un résultat n'est jamais une preuve, et VirusTotal peut seulement aggraver un résultat, jamais le rendre vert.</li>
+      </ul>
+      <p class="note-source">Dernière mise à jour : 6 octobre 2026</p>
+    </section>
+
+    <section class="carte conseil">
       <h2>Comment le vérificateur décide</h2>
       <p>
         Il lit seulement le <strong>texte</strong> du lien, sur ton appareil. Il n'ouvre jamais le lien. Il regarde le vrai nom de domaine
@@ -47,7 +57,13 @@
       <h2>Ce qui reste sur ton appareil</h2>
       <p>
         <strong>Ton lien complet n'est jamais envoyé.</strong> Le chemin, la requête et tout ce qui suit le nom de domaine restent chez toi.
-        Le site n'utilise ni cookie, ni compte, ni mesure d'audience, ni publicité.
+        Le site n'utilise ni compte, ni mesure d'audience, ni publicité.
+        <!-- À VÉRIFIER avant de remettre une phrase sur les cookies. Ancienne phrase (retirée) :
+             « Le site n'utilise ni cookie, ni compte, ni mesure d'audience, ni publicité. »
+             Phrase proposée (à valider) : « Ce site ne dépose lui-même aucun cookie et ne garde rien dans ton navigateur
+             (rien n'est prévu pour ça dans son code). Ses hébergeurs et les services qui fournissent les polices
+             (GitHub Pages, Cloudflare, Google Fonts) peuvent utiliser leurs propres techniques, que nous ne contrôlons pas. »
+             Vérifié dans le code : aucun document.cookie, localStorage, sessionStorage ni outil de mesure d'audience. -->
       </p>
     </section>
 
@@ -99,7 +115,9 @@
       </ul>
       <p>
         Limites : 4 appels par minute et 500 par jour pour tout le monde (c'est le quota gratuit de VirusTotal), 2 par minute et 30 par jour pour toi.
-        Le petit service ne garde ni ton adresse IP, ni les liens, ni les chemins, ni les cookies (il n'y en a pas), et il n'écrit aucun journal.
+        Le petit service ne garde ni ton adresse IP, ni les liens, ni les chemins, et il n'écrit aucun journal.
+        <!-- À VÉRIFIER : ancienne mention retirée « ni les cookies (il n'y en a pas) ». Le code du service n'envoie aucun en-tête Set-Cookie,
+             mais Cloudflare peut en ajouter de son côté : à confirmer avant de la remettre. -->
         Une purge automatique efface chaque heure ce qui a expiré.
       </p>
     </section>
@@ -107,9 +125,11 @@
     <section class="carte conseil">
       <h2>Ce que voit VirusTotal</h2>
       <p>
-        VirusTotal reçoit le nom de domaine et l'adresse du petit service (pas la tienne). Sa documentation précise que les éléments envoyés ou demandés
-        par son interface peuvent être analysés et ajoutés à sa base de données, accessible à sa communauté : un nom de domaine demandé peut donc devenir
+        VirusTotal reçoit le nom de domaine et l'adresse du petit service (pas la tienne). Dans l'avertissement de la page de sa documentation consacrée à l'<strong>API</strong>
+        (« Get a domain report »), VirusTotal écrit que tout élément envoyé ou demandé via l'API sera « scanned and added to the VirusTotal dataset »
+        (analysé et ajouté à sa base de données) et deviendra accessible à sa communauté. Un nom de domaine demandé peut donc devenir
         visible là-bas. C'est pour ça que le lien complet, le chemin et la requête ne sont jamais envoyés, et que les raccourcisseurs sont exclus.
+        <a href="https://docs.virustotal.com/reference/domain-info" target="_blank" rel="noopener noreferrer">Lire la documentation de VirusTotal (en anglais)</a>.
       </p>
     </section>
 
@@ -119,6 +139,15 @@
         Comme tout site, celui-ci est servi par un hébergeur (GitHub Pages ou Cloudflare), qui voit ton adresse IP quand tu charges une page.
         Les polices d'écriture (Inter et Plus Jakarta Sans) sont chargées depuis Google Fonts : Google voit ton adresse IP à ce moment-là.
         Le petit service tourne chez Cloudflare, qui voit les requêtes comme tout hébergeur ; on ne peut pas le désactiver.
+      </p>
+    </section>
+
+    <section class="carte conseil">
+      <h2>Une question ou une erreur ?</h2>
+      <p>
+        Un résultat te semble faux, ou tu vois une erreur sur cette page ? Ouvre une demande sur la page « issues » du dépôt GitHub du site :
+        <a href="https://github.com/ayoubgarri7-boop/roshield/issues" target="_blank" rel="noopener noreferrer">github.com/ayoubgarri7-boop/roshield/issues</a>.
+        Ces pages sont publiques : n'y écris ni mot de passe, ni code reçu, ni information personnelle.
       </p>
     </section>
 
