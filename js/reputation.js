@@ -23,7 +23,8 @@
   "use strict";
 
   const GRAVITE = { vert: 0, jaune: 1, rouge: 2 };
-  const DELAI_MS = 6000;
+  const DELAI_MS = 4000;       // attente maximale de la réponse du Worker (le résultat jaune n'est affiché qu'après)
+  const enVol = new Map();     // demandes en cours : un second clic sur le même lien ne lance PAS une seconde requête
   const cache = new Map();     // nom de domaine -> réponse « connu » / « inconnu », seulement pendant la visite de la page
 
   function textes() { return window.TEXTES_VERIF; }
@@ -118,7 +119,21 @@
   async function interrogerLien(lien, cfg, fetchFn) {
     return appeler("/reputation-lien", { lien: lien }, "lien|" + lien, cfg, fetchFn);
   }
-  async function appeler(chemin, corps, cleCache, cfg, fetchFn) {
+  // Une seule requête à la fois pour le même lien (ou nom de domaine), et jamais plus de DELAI_MS d'attente, même si le
+  // réseau ou fetch ne répondent plus : au-delà, « indisponible » (le résultat jaune s'affiche alors avec une ligne qui le dit).
+  function appeler(chemin, corps, cleCache, cfg, fetchFn) {
+    if (enVol.has(cleCache)) return enVol.get(cleCache);
+    let minuteur = null;
+    const delai = new Promise(function (resoudre) { minuteur = setTimeout(function () { resoudre({ etat: "indisponible" }); }, DELAI_MS); });
+    const demande = Promise.race([envoyer(chemin, corps, cleCache, cfg, fetchFn), delai]).then(function (donnees) {
+      clearTimeout(minuteur);
+      enVol.delete(cleCache);
+      return donnees;
+    });
+    enVol.set(cleCache, demande);
+    return demande;
+  }
+  async function envoyer(chemin, corps, cleCache, cfg, fetchFn) {
     const c = lireConfig(cfg === undefined ? configSite() : cfg);
     if (!c.url) return { etat: "desactive" };
     if (cache.has(cleCache)) return cache.get(cleCache);
@@ -190,18 +205,18 @@
     if (lien) {
       const cle = "lien|" + lien;
       if (cache.has(cle)) { rendre(appliquer(res, cache.get(cle), undefined, "lien")); return; }
-      rendre(Object.assign({}, res, { reputation: { etat: "encours", domaine: res.hote, nature: "lien", lien: lien } }));
+      rendre({ attente: true });     // pas de jaune tout de suite : seulement « Vérification en cours… »
       interrogerLien(lien).then(function (donnees) { rendre(appliquer(res, donnees, undefined, "lien")); });
       return;
     }
     const domaine = doitInterroger(res);
     if (!domaine) { rendre(res); return; }
     if (cache.has(domaine)) { rendre(appliquer(res, cache.get(domaine))); return; }
-    rendre(Object.assign({}, res, { reputation: { etat: "encours", domaine: domaine } }));
+    rendre({ attente: true });       // pas de jaune tout de suite : seulement « Vérification en cours… »
     interroger(domaine).then(function (donnees) { rendre(appliquer(res, donnees)); });
   }
 
-  function viderCache() { cache.clear(); }
+  function viderCache() { cache.clear(); enVol.clear(); }
 
   window.RoShieldReputation = {
     adresseWorker: adresseWorker, lireConfig: lireConfig, doitInterroger: doitInterroger, interroger: interroger,

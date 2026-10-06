@@ -503,6 +503,20 @@ a.carte:hover {
 .resultat__raisons { margin: 0; padding-left: 22px; }
 .resultat__raisons li { margin-bottom: 10px; }
 
+/* « Vérification en cours… » : affiché seul, à la place du résultat jaune, 4 secondes au plus */
+.resultat--attente { display: flex; align-items: center; gap: 12px; border-color: var(--carte-bordure); }
+.attente__texte { margin: 0; color: var(--texte-doux); }
+.attente__rond {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  border: 3px solid rgba(255, 255, 255, 0.18);
+  border-top-color: var(--vert);
+  border-radius: 50%;
+  animation: attente-tourne 0.9s linear infinite;
+}
+@keyframes attente-tourne { to { transform: rotate(360deg); } }
+
 /* Petite ligne d'explication (raccourcisseur, http://...) */
 .resultat__note {
   margin: 14px 0 0;
@@ -767,6 +781,7 @@ code { font-family: ui-monospace, Consolas, monospace; font-size: 0.92em; overfl
 /* Respecte les personnes qui désactivent les animations */
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; scroll-behavior: auto !important; }
+  .attente__rond { animation: none; }
 }
 
 /* ---------- 10. PETITS TÉLÉPHONES (600px et moins) ----------

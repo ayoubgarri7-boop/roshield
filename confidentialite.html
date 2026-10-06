@@ -100,8 +100,10 @@
       </ul>
       <p>
         Seuls les moteurs « malicious » comptent (pas « suspicious », pas « undetected »). Les moteurs se trompent parfois.
-        Si le petit service ne répond pas ou si une limite est atteinte, le vérificateur fonctionne exactement comme avant,
-        avec son résultat local et une ligne qui le dit.
+        Pour un résultat jaune, le site affiche « Vérification en cours… » et attend la réponse du petit service pendant 4 secondes au plus.
+        Si le petit service ne répond pas dans ce délai, s'il est en panne ou si une limite est atteinte, le vérificateur affiche
+        son résultat local, avec une ligne qui le dit. Les résultats rouges, verts, officiels, les adresses IP et les noms locaux
+        s'affichent tout de suite, sans attente.
       </p>
     </section>
 

@@ -150,6 +150,8 @@ window.TEXTES_VERIF = {
     return "The domain name “" + domaine + "” is being compared with VirusTotal (the full link is not sent).";
   },
   reputationEnCours: "Comparing…",
+  // Shown ALONE (instead of the yellow result) while the small service answers, 4 seconds at most
+  verificationEnCours: "Check in progress…",
   reputationResultat: function (m, total, date) {
     const quand = date ? " (analysis of " + date + ")" : "";
     if (m === 0) return "0 security engines out of " + total + " flag this domain name" + quand + ".";

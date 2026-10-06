@@ -832,8 +832,22 @@
   const REPONSE_FIXE = "inconnu";
 
   function afficher(res, sansDefiler) {
-    resultatAffiche = !res.erreur;
+    resultatAffiche = !res.erreur && !res.attente;
     zoneResultat.textContent = ""; // vide l'ancien résultat
+
+    // Un résultat jaune part chez VirusTotal : on n'affiche PAS le jaune tout de suite, seulement « Vérification en cours… »
+    // (la zone est une région « aria-live » : les lecteurs d'écran l'annoncent). Le bouton « Vérifier » reste utilisable.
+    if (res.attente) {
+      const attente = creer("div", "resultat resultat--attente");
+      const rond = creer("span", "attente__rond");
+      rond.setAttribute("aria-hidden", "true");
+      attente.appendChild(rond);
+      attente.appendChild(creer("p", "attente__texte", T.verificationEnCours));
+      zoneResultat.appendChild(attente);
+      blocApresClic.hidden = true;
+      if (!sansDefiler) attente.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      return;
+    }
 
     // Cas d'erreur de saisie
     if (res.erreur) {

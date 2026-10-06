@@ -100,8 +100,10 @@
       </ul>
       <p>
         Only “malicious” engines count (not “suspicious”, not “undetected”). Engines are sometimes wrong.
-        If the small service doesn’t answer or a limit is reached, the checker works exactly as before,
-        with its local result and a line saying so.
+        For a yellow result, the site shows “Check in progress…” and waits for the small service for 4 seconds at most.
+        If the small service doesn’t answer in time, is down, or a limit is reached, the checker shows
+        its local result, with a line saying so. Red and green results, official domains, IP addresses and local names
+        are shown immediately, with no waiting.
       </p>
     </section>
 

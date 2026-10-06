@@ -233,7 +233,7 @@ cas.forEach(function (c) {
     try {
       return await new Promise(function (resolve) {
         const rendus = [];
-        R.lancer(res, function (x) { rendus.push(x); if (!x.reputation || x.reputation.etat !== "encours") resolve({ rendus: rendus, envoyes: envoyes }); });
+        R.lancer(res, function (x) { rendus.push(x); if (!x.attente) resolve({ rendus: rendus, envoyes: envoyes }); });
       });
     } finally { delete W.fetch; W.CONFIG_SITE = JSON.parse(JSON.stringify(VIDE)); }
   }
@@ -242,7 +242,7 @@ cas.forEach(function (c) {
 
   let x = await executer(analyser("https://tinyurl.com/3vk33xhh#ancre-privee", "inconnu"), repConnu(4));
   verif(x.envoyes.length === 1 && x.envoyes[0].url === base2 + "/reputation-lien" && x.envoyes[0].corps === JSON.stringify({ lien: "https://tinyurl.com/3vk33xhh" }), "lancer, raccourci : un seul appel, /reputation-lien, lien sans « # »");
-  verif(x.rendus[0].reputation.etat === "encours" && x.rendus[0].reputation.nature === "lien", "lancer, raccourci : d'abord « en cours »");
+  verif(x.rendus[0].attente === true && x.rendus[0].niveau === undefined && x.rendus[0].titreCle === undefined && x.rendus[0].raisons === undefined, "lancer, raccourci : d'abord SEULEMENT « Vérification en cours… » (aucun jaune)");
   verif(x.rendus[1].niveau === "rouge" && x.rendus[1].titreCle === "reputationLienPlusieursRouge" && x.rendus[1].raisons[0].indexOf("4 moteurs") === 0 && x.rendus[1].raisons[0].indexOf("ce lien") !== -1, "lancer, raccourci : 4 moteurs -> rouge avec le nombre : " + x.rendus[1].raisons[0]);
   verif(x.rendus[1].notes.some(function (n) { return n.indexOf("Destination cachée") === 0; }), "lancer, raccourci : la note « destination cachée » reste");
 
@@ -337,6 +337,110 @@ cas.forEach(function (c) {
   R.viderCache();
 
 
+  // ---------- 5c. Attente : « Vérification en cours… » seule, puis le résultat final (4 secondes au plus) ----------
+  verif(T.verificationEnCours === "Vérification en cours…", "texte français de l'attente");
+  const attendre = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
+  // lance lancer() avec un faux fetch ; renvoie les rendus avec l'instant de chacun (en ms depuis le lancement)
+  function suivre(res, reponse, compteur) {
+    W.CONFIG_SITE = JSON.parse(JSON.stringify(ACTIVE));
+    W.fetch = function (url, init) { if (compteur) compteur.n++; return reponse(url, init); };
+    const t0 = Date.now(), rendus = [];
+    return new Promise(function (resolve) {
+      R.lancer(res, function (x) { rendus.push({ x: x, t: Date.now() - t0 }); if (!x.attente) resolve(rendus); });
+      if (rendus.length && !rendus[0].x.attente) resolve(rendus);
+    }).then(function (r) { return r; });
+  }
+  const finSuivi = function () { delete W.fetch; W.CONFIG_SITE = JSON.parse(JSON.stringify(VIDE)); };
+  const jauneOrd = analyser("https://exemple.org/page", "inconnu");
+
+  // réponse RAPIDE : d'abord l'attente seule, puis le résultat final, bien avant 4 secondes
+  R.viderCache();
+  let suivi = await suivre(jauneOrd, async function () { await attendre(100); return ok({ ok: true, etat: "connu", malveillants: 2, suspects: 0, inoffensifs: 80, nonDetectes: 2, total: 84, date: "2026-01-01" }); });
+  finSuivi();
+  verif(suivi.length === 2 && suivi[0].x.attente === true && suivi[0].t < 50, "réponse rapide : l'attente s'affiche tout de suite");
+  verif(suivi[1].x.niveau === "rouge" && suivi[1].t >= 90 && suivi[1].t < 1000, "réponse rapide : le résultat final arrive dès que le Worker répond (" + suivi[1].t + " ms)");
+
+  // réponse LENTE mais dans les temps (3 s) : on attend, puis le résultat final
+  R.viderCache();
+  suivi = await suivre(jauneOrd, async function () { await attendre(3000); return ok({ ok: true, etat: "connu", malveillants: 0, suspects: 0, inoffensifs: 80, nonDetectes: 4, total: 84, date: "2026-01-01" }); });
+  finSuivi();
+  verif(suivi.length === 2 && suivi[1].x.reputation.etat === "connu" && suivi[1].t >= 2950 && suivi[1].t < 3800, "réponse à 3 s : le résultat final est affiché (" + suivi[1].t + " ms)");
+
+  // réponse TROP LENTE (le Worker ne répond jamais) : au bout de 4 secondes, le jaune avec « indisponible »
+  R.viderCache();
+  suivi = await suivre(jauneOrd, function () { return new Promise(function () {}); });
+  finSuivi();
+  verif(suivi.length === 2 && suivi[1].t >= 3900 && suivi[1].t < 4700, "réponse trop lente : le jaune s'affiche au bout de 4 secondes (" + suivi[1].t + " ms)");
+  verif(suivi[1].x.niveau === "jaune" && suivi[1].x.titreCle === jauneOrd.titreCle && JSON.stringify(suivi[1].x.raisons) === JSON.stringify(jauneOrd.raisons) && suivi[1].x.reputation.etat === "indisponible", "réponse trop lente : jaune inchangé + ligne « indisponible »");
+  verif(T.reputationIndisponible.indexOf("Vérification complémentaire indisponible") === 0, "texte de la ligne « Vérification complémentaire indisponible… »");
+
+  // PANNE immédiate : pas d'attente de 4 secondes
+  R.viderCache();
+  suivi = await suivre(jauneOrd, async function () { throw new TypeError("Failed to fetch"); });
+  finSuivi();
+  verif(suivi.length === 2 && suivi[1].t < 500 && suivi[1].x.niveau === "jaune" && suivi[1].x.reputation.etat === "indisponible", "panne : jaune + « indisponible » tout de suite (" + suivi[1].t + " ms)");
+  R.viderCache();
+  suivi = await suivre(jauneOrd, async function () { return ok({ ok: false, etat: "limite" }, 429); });
+  finSuivi();
+  verif(suivi.length === 2 && suivi[1].t < 500 && suivi[1].x.niveau === "jaune" && suivi[1].x.reputation.etat === "indisponible", "limite (429) : jaune + ligne discrète tout de suite");
+
+  // DEUX CLICS RAPIDES sur le même lien : une seule requête, les deux reçoivent le même résultat final
+  R.viderCache();
+  const cpt = { n: 0 };
+  W.CONFIG_SITE = JSON.parse(JSON.stringify(ACTIVE));
+  W.fetch = function () { cpt.n++; return attendre(150).then(function () { return ok({ ok: true, etat: "connu", malveillants: 1, suspects: 0, inoffensifs: 80, nonDetectes: 3, total: 84, date: "2026-01-01" }); }); };
+  const finaux = [];
+  await new Promise(function (resolve) {
+    const fini = function (x) { if (!x.attente) { finaux.push(x); if (finaux.length === 2) resolve(); } };
+    R.lancer(jauneOrd, fini); R.lancer(jauneOrd, fini);
+  });
+  finSuivi();
+  verif(cpt.n === 1, "deux clics rapides sur le même lien : UNE seule requête (" + cpt.n + ")");
+  verif(finaux.length === 2 && finaux[0].titreCle === "reputationLienUnJaune" && finaux[1].titreCle === "reputationLienUnJaune", "deux clics : les deux reçoivent le résultat final");
+  // trois clics en rafale, lien raccourci puis repli http : toujours une requête par lien
+  R.viderCache(); cpt.n = 0;
+  W.CONFIG_SITE = JSON.parse(JSON.stringify(ACTIVE));
+  W.fetch = function () { cpt.n++; return attendre(100).then(function () { return ok({ ok: true, etat: "inconnu" }); }); };
+  let compte = 0;
+  await new Promise(function (resolve) {
+    const fini = function (x) { if (!x.attente && ++compte === 5) resolve(); };
+    R.lancer(analyser("https://bit.ly/abc", "inconnu"), fini); R.lancer(analyser("https://bit.ly/abc#autre", "inconnu"), fini);
+    R.lancer(analyser("http://exemple.org/x", "inconnu"), fini); R.lancer(analyser("http://exemple.org/y", "inconnu"), fini);
+    R.lancer(analyser("https://exemple.org/page", "inconnu"), fini);
+  });
+  finSuivi();
+  verif(cpt.n === 3, "rafale : une requête par lien distinct (bit.ly/abc ×2 -> 1, http exemple.org ×2 -> 1, exemple.org/page -> 1) : " + cpt.n);
+  // un lien différent n'est pas bloqué par le premier
+  R.viderCache(); cpt.n = 0;
+  W.CONFIG_SITE = JSON.parse(JSON.stringify(ACTIVE));
+  W.fetch = function () { cpt.n++; return attendre(50).then(function () { return ok({ ok: true, etat: "inconnu" }); }); };
+  compte = 0;
+  await new Promise(function (resolve) { const fini = function (x) { if (!x.attente && ++compte === 2) resolve(); }; R.lancer(analyser("https://a.exemple.org/", "inconnu"), fini); R.lancer(analyser("https://b.exemple.org/", "inconnu"), fini); });
+  finSuivi();
+  verif(cpt.n === 2, "deux liens différents : deux requêtes");
+
+  // Rouge, vert, officiel, IP, nom local, raccourci non envoyable : affichés TOUT DE SUITE (un seul rendu, synchrone), sans attente
+  W.CONFIG_SITE = JSON.parse(JSON.stringify(ACTIVE));
+  W.fetch = function () { cpt.n++; return new Promise(function () {}); };
+  cpt.n = 0;
+  for (const l of ["https://roblox-free.test/login", "https://www.roblox.com/home", "https://discord.gg/abc", "https://192.0.2.1/x", "https://exemple.local/x", "https://monpc.lan/x", "https://free-robux.xyz/", "http://bit.ly/abc"]) {
+    const rendus = [];
+    R.lancer(analyser(l, "inconnu"), function (x) { rendus.push(x); });
+    verif(rendus.length === 1 && !rendus[0].attente && rendus[0].niveau, "affiché tout de suite, sans attente : " + l);
+  }
+  verif(cpt.n === 0, "rouge, vert, officiel, IP, nom local : aucune requête");
+  // résultat déjà connu (cache de la visite) : affiché tout de suite aussi
+  finSuivi();
+  R.viderCache();
+  await suivre(jauneOrd, async function () { return ok({ ok: true, etat: "inconnu" }); }); finSuivi();
+  const rapide = [];
+  W.CONFIG_SITE = JSON.parse(JSON.stringify(ACTIVE));
+  W.CONFIG_SITE = JSON.parse(JSON.stringify(ACTIVE));
+  R.lancer(jauneOrd, function (x) { rapide.push(x); });
+  finSuivi();
+  verif(rapide.length === 1 && !rapide[0].attente && rapide[0].reputation && rapide[0].reputation.etat === "inconnu", "résultat déjà en cache : affiché tout de suite");
+  R.viderCache();
+
   // ---------- 6. Anglais : mêmes comportements, texte « sûr » ----------
   const WE = charger("en"), RE = WE.RoShieldReputation, TE = WE.TEXTES_VERIF;
   verif(TE.reputationAvertissement === "No reports doesn’t mean safe." && T.reputationAvertissement === "Aucun signalement ne veut pas dire sûr.", "phrase « Aucun signalement ne veut pas dire sûr » (FR) / « No reports doesn’t mean safe. » (EN)");
@@ -347,6 +451,7 @@ cas.forEach(function (c) {
   verif(!/(sûr|prouvé)/i.test(T.reputationResultat(0, 86, "2026-01-01") + T.reputationInconnu + T.reputationEnvoye("x.com")), "français : pareil");
   verif(!/^Aucun signalement/.test(T.reputationResultat(0, 86, null)), "le résultat seul ne prétend rien");
 
+  verif(TE.verificationEnCours === "Check in progress…", "anglais : texte de l'attente");
   verif(TE.reputationLienAucun === "No antivirus flags it for now. That doesn’t mean it’s safe." && TE.titres.reputationLienPlusieursRouge === "Several security engines flag this link", "anglais : textes du lien complet");
   verif(!/(sûr|prouvé)/i.test(T.reputationLienResultat(0, 86, "2026-01-01") + T.reputationLienInconnu + T.reputationLienEnvoye("https://bit.ly/x")), "français : les textes du raccourci ne disent pas « sûr »");
   verif(!/(safe|secure|proven)/i.test(TE.reputationLienResultat(0, 86, "2026-01-01") + TE.reputationLienInconnu + TE.reputationLienEnvoye("https://bit.ly/x")), "anglais : pareil");

@@ -141,6 +141,8 @@ window.TEXTES_VERIF = {
     return "Le nom de domaine « " + domaine + " » est comparé avec VirusTotal (le lien complet n'est pas envoyé).";
   },
   reputationEnCours: "Comparaison en cours…",
+  // Affiché SEUL (à la place du résultat jaune) pendant que le petit service répond, 4 secondes au plus
+  verificationEnCours: "Vérification en cours…",
   reputationResultat: function (m, total, date) {
     const quand = date ? " (analyse du " + date + ")" : "";
     if (m === 0) return "0 moteur de sécurité sur " + total + " ne signale ce nom de domaine" + quand + ".";
