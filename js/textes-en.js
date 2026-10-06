@@ -48,6 +48,8 @@ window.TEXTES_VERIF = {
     reputationPlusieursRouge: "Several security engines flag this domain name",
     // Bait word (Robux, Nitro) in the path of a non-official domain: yellow, stronger warning
     alerteAppatChemin: "Warning: this link talks about Robux or Nitro",
+    // Brand name + trap word in the path of a non-official domain: yellow, strong warning
+    alerteMarqueChemin: "Warning: this link talks about Roblox (or Discord) with a suspicious word",
     alerteChemin: "Warning: Roblox’s (or Discord’s) name is copied into this link",
     alerteMarque_roblox: "This isn’t one of the official Roblox sites that RoShield knows: its name contains “Roblox”",
     alerteMarque_rbx: "This isn’t one of the official Roblox sites that RoShield knows: its name contains “rbx”",
@@ -156,6 +158,12 @@ window.TEXTES_VERIF = {
   // Bait words: Robux, Nitro
   appatRobuxNitro: "This is not an official site and it talks about Robux or Nitro. Roblox and Discord never give out Robux or Nitro through another site. Don’t log in there.",
   appatDansChemin: "This is not an official site, and its address talks about Robux or Nitro. Roblox and Discord never give out Robux or Nitro through another site. Be very careful and don’t log in there.",
+  // Brand + trap word in the path (login, verify, claim...): yellow, strong warning
+  marqueEtPiegeDansChemin: "This is not an official site, but its address talks about Roblox or Discord with a word like “login”, “verify” or “claim”. Never type your password or a code on this page, and never share your screen.",
+  // “roblox” / “discord” split by hyphens or dots (ro-blox, dis-cord)
+  motCoupe: function (mot, vrai) {
+    return "This domain name spells “" + mot + "” split by hyphens or dots, to look like a real site. The real domain is “" + vrai + "”. It’s a classic fake-site trick.";
+  },
   adresseCachee: "This link contains another address inside it: it may send you somewhere else.",
   inconnu:
     "RoShield only knows the official domains of Roblox and Discord. That doesn’t mean this link is dangerous, " +

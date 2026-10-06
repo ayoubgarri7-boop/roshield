@@ -43,7 +43,7 @@
      https://mon-super-site.com                 (inconnu, sans rapport)
      https://discord.com@roblox.com             (@ mais mène vers un officiel)
 
-   AVEC LA QUESTION "Que disait le message à propos de ce lien ?"  (page Roblox / page Discord / autre chose ou je ne sais pas)
+   AVEC LA RÉPONSE INTERNE "attendu" (plus de question dans l'interface : la page utilise toujours "inconnu")
      https://dash.cloudflare.com/sign-up        + Roblox  ou  + Discord  -> ROUGE "Ce n'est pas le vrai site de ..."
      https://www.roblox.com/games/123           + Roblox  -> VERT (comme d'habitude)
      https://mon-super-site.com                 + "Je ne sais pas" -> JAUNE (comme d'habitude)
@@ -72,6 +72,8 @@
   const MOTS_MARQUE_MORCEAUX = window.MOTS_MARQUE_MORCEAUX;
   const MOTS_MARQUE_ENTIERS = window.MOTS_MARQUE_ENTIERS;
   const FORMES_COLLEES = window.FORMES_COLLEES;
+  const MOTS_PIEGE_CHEMIN = window.MOTS_PIEGE_CHEMIN || [];
+  const MOTS_AVERTISSEMENT = window.MOTS_AVERTISSEMENT || [];
   const MOTS_ARNAQUE = window.MOTS_ARNAQUE;
   const RACCOURCISSEURS = window.RACCOURCISSEURS;
 
@@ -191,6 +193,45 @@
       texte = decode;
     }
     return texte.toLowerCase().split(/[^a-z0-9]+/).some(function (m) { return m.indexOf("robux") !== -1 || m === "nitro"; });
+  }
+
+  // Un nom de marque (roblox / discord) dans le CHEMIN ou la requête, avec un mot de piège (login, verify, claim, unban, gift...)
+  // dans le chemin OU dans le nom d'hôte : alerte jaune forte, JAMAIS rouge (un blog ou une vidéo qui parle de Roblox n'en
+  // déclenche pas, car il n'y a pas de mot de piège ; un article sur les arnaques non plus : mots d'avertissement).
+  function marqueEtPiegeDansChemin(url, hote) {
+    let texte = url.pathname + " " + url.search;
+    for (let i = 0; i < 3; i++) {
+      let decode;
+      try { decode = decodeURIComponent(texte); } catch (e) { break; }
+      if (decode === texte) break;
+      texte = decode;
+    }
+    texte = texte.toLowerCase();
+    const mots = texte.split(/[^a-z0-9]+/).filter(Boolean);
+    const marque = mots.some(function (m) { return m.indexOf("roblox") !== -1 || m.indexOf("discord") !== -1; }) ||
+                   FORMES_COLLEES.some(function (f) { return texte.indexOf(f) !== -1; });
+    if (!marque) return false;
+    if (mots.some(function (m) { return MOTS_AVERTISSEMENT.indexOf(m) !== -1; })) return false;
+    const motsHote = hote.split(/[.\-]/);
+    return mots.concat(motsHote).some(function (m) { return MOTS_PIEGE_CHEMIN.indexOf(m) !== -1; });
+  }
+
+  // « roblox » ou « discord » COUPÉ par des tirets, des points ou des chiffres usuels dans le nom d'hôte (ro-blox, dis-cord,
+  // r0.blox, d1-scord) : des MORCEAUX ENTIERS consécutifs dont la réunion fait exactement le mot. "pro-bloxburg" ne compte pas.
+  function marqueCoupee(hote) {
+    const morceaux = hote.split(/[.\-]/).filter(Boolean);
+    for (let debut = 0; debut < morceaux.length; debut++) {
+      let colle = "";
+      for (let fin = debut; fin < morceaux.length && colle.length < 8; fin++) {
+        colle += morceaux[fin];
+        if (fin === debut) continue;                                   // un seul morceau : ce n'est pas « coupé »
+        const variantes = [normaliser(colle), normaliser(colle.replace(/1/g, "i"))];
+        for (const mot of ["roblox", "discord"]) {
+          if (variantes.indexOf(mot) !== -1) return { mot: mot, colle: colle };
+        }
+      }
+    }
+    return null;
   }
 
   const GRAVITE = { vert: 0, jaune: 1, rouge: 2 };
@@ -624,6 +665,16 @@
         }
       }
 
+      // e4) « roblox » ou « discord » COUPÉ par des tirets ou des points (ro-blox, dis-cord) : ROUGE.
+      //     Morceaux entiers consécutifs seulement : "pro-bloxburg" ne compte pas.
+      if (!trouve && !sansMotCle) {
+        const coupee = marqueCoupee(hote);
+        if (coupee) {
+          ajouter("rouge", T.motCoupe(coupee.mot, reel));
+          trouve = true;
+        }
+      }
+
       // e2) le nom officiel COMPLET écrit avec des tirets dans le nom d'hôte : www-roblox-com.invalid,
       //     roblox-com.example.com, discord-com-invite.test, discord-gg-abc.test. ROUGE.
       //     Le nom doit être ENTIER et délimité (début du nom, point ou tiret de chaque côté) :
@@ -647,6 +698,10 @@
           // "robux" ou "nitro" après le premier "/" (evil.test/robux) : alerte plus forte, jamais rouge
           ajouter("jaune", T.appatDansChemin);
           alerte = "alerteAppatChemin";
+        } else if (marqueEtPiegeDansChemin(url, hote) && !nomOfficielDansChemin(url)) {
+          // « roblox » / « discord » dans le chemin avec un mot de piège (evil.test/roblox/login) : alerte plus forte, jamais rouge
+          ajouter("jaune", T.marqueEtPiegeDansChemin);
+          alerte = "alerteMarqueChemin";
         } else if (nomOfficielDansChemin(url)) {
           // le NOM COMPLET d'un site officiel est écrit dans le chemin ou la requête (evil.test/roblox.com/login)
           ajouter("jaune", T.imiteDansChemin);
@@ -762,11 +817,10 @@
 
   let resultatAffiche = false;   // vrai quand un résultat (pas une erreur) est à l'écran
 
-  // La réponse choisie à la question "Que disait le message à propos de ce lien ?"
-  function reponseChoisie() {
-    const choix = formulaire.querySelector('input[name="attendu"]:checked');
-    return choix ? choix.value : "inconnu";
-  }
+  // Il n'y a plus de question dans l'interface : l'analyse se fait seulement sur le texte collé, avec la réponse
+  // « autre chose / je ne sais pas » ("inconnu") comme comportement FIXE. Le paramètre "attendu" de analyser() reste en interne
+  // (les tests et les outils l'utilisent) mais la page ne le montre plus.
+  const REPONSE_FIXE = "inconnu";
 
   function afficher(res, sansDefiler) {
     resultatAffiche = !res.erreur;
@@ -856,9 +910,9 @@
   let numeroAnalyse = 0;
   function analyserEtAfficher(sansDefiler) {
     const numero = ++numeroAnalyse;
-    const res = analyser(champ.value, reponseChoisie());
+    const res = analyser(champ.value, REPONSE_FIXE);
     if (window.RoShieldReputation) {
-      // la réponse tardive d'un ancien lien (ou d'une ancienne réponse à la question) est ignorée
+      // la réponse tardive d'un ancien lien est ignorée
       let premier = true;
       window.RoShieldReputation.lancer(res, function (resultat) {
         if (numero !== numeroAnalyse) return;
@@ -875,11 +929,4 @@
     analyserEtAfficher(false);
   });
 
-  // Si on change de réponse alors qu'un résultat est déjà affiché, on le recalcule tout de suite
-  // (sans faire défiler la page).
-  formulaire.addEventListener("change", function (evenement) {
-    if (evenement.target.name === "attendu" && resultatAffiche && champ.value.trim()) {
-      analyserEtAfficher(true);
-    }
-  });
 })();

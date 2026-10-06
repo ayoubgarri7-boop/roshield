@@ -337,6 +337,15 @@ https://gamehelp.wiki.example/wiki/Roblox_support_contact_options
 https://www.youtube.com/watch?v=aB3dE5fG7hI&list=roblox-scam-warning-free-robux
 https://www.youtube.com/results?search_query=discord+nitro+free+scam
 https://schoolhelp.example/help?topic=roblox+account+safety
+# --- blogs, vidéos et presse qui parlent de Roblox ou de Discord dans le chemin (jamais d'alerte forte, jamais rouge) ---
+# Un nom de marque dans le chemin SANS mot de piège (login, verify, claim...) ne déclenche rien.
+https://www.youtube.com/watch?v=aB3dE5fG7hI&list=roblox-creator-tips
+https://www.youtube.com/@RobloxLearn
+https://blog.example/2025/roblox-ugc-update
+https://devforum.example/t/roblox-studio-tips/4521
+https://www.bbc.co.uk/news/articles/roblox-ban-in-russia
+https://www.example-news.example/gaming/discord-server-templates-explained
+https://www.twitch.tv/videos/1234567890?t=roblox_obby_speedrun
 # --- sites de fans connus ---
 # Sites de fans et d'outils connus des joueurs, non officiels. Un mot de marque dans le nom (todoroblox) donne une alerte JAUNE, jamais du rouge.
 https://www.rolimons.com/

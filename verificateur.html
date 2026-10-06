@@ -47,18 +47,6 @@
                maxlength="2048">
       </div>
 
-      <!-- Question : ce que le message PRÉTENDAIT à propos du lien (est-ce une page Roblox ou Discord ?).
-           Elle sert seulement à comparer avec le vrai domaine : on n'ouvre jamais le lien, rien n'est envoyé. -->
-      <fieldset class="verif__question" aria-describedby="aide-question">
-        <legend class="verif__legende">Que disait le message à propos de ce lien ?</legend>
-        <div class="verif__choix">
-          <label class="choix"><input type="radio" name="attendu" value="roblox"><span>Il disait que c'était une page Roblox (mon profil, mon jeu, des Robux…)</span></label>
-          <label class="choix"><input type="radio" name="attendu" value="discord"><span>Il disait que c'était une page Discord (invitation, Nitro…)</span></label>
-          <label class="choix"><input type="radio" name="attendu" value="inconnu" checked><span>Il parlait d'autre chose (vidéo, article, wiki…) ou je ne sais pas</span></label>
-        </div>
-        <p class="verif__aide" id="aide-question">Tu n'as pas besoin d'ouvrir le lien : on se base seulement sur ce que disait le message. Ton lien complet reste sur ton appareil (<a href="confidentialite.html">Comment ça marche et confidentialité</a>).</p>
-      </fieldset>
-
       <button type="submit" class="bouton bouton--principal verif__bouton">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
              stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">

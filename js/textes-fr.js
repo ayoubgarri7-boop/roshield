@@ -39,6 +39,8 @@ window.TEXTES_VERIF = {
     reputationPlusieursRouge: "Plusieurs moteurs de sécurité signalent ce nom de domaine",
     // Mot d'appât (Robux, Nitro) dans le chemin d'un domaine non officiel : jaune, alerte plus forte
     alerteAppatChemin: "Attention : ce lien parle de Robux ou de Nitro",
+    // Nom de marque + mot de piège dans le chemin d'un domaine non officiel : jaune, alerte forte
+    alerteMarqueChemin: "Attention : ce lien parle de Roblox (ou Discord) avec un mot suspect",
     alerteChemin: "Attention : le nom de Roblox (ou Discord) est copié dans ce lien",
     alerteMarque_roblox: "Ce site ne fait pas partie des sites officiels de Roblox que RoShield connaît : son nom contient « Roblox »",
     alerteMarque_rbx: "Ce site ne fait pas partie des sites officiels de Roblox que RoShield connaît : son nom contient « rbx »",
@@ -147,6 +149,12 @@ window.TEXTES_VERIF = {
   // Mots d'appât : Robux, Nitro
   appatRobuxNitro: "Ce n'est pas un site officiel et il parle de Robux ou de Nitro. Roblox et Discord ne donnent jamais de Robux ou de Nitro par un autre site. Ne t'y connecte pas.",
   appatDansChemin: "Ce n'est pas un site officiel, et son adresse parle de Robux ou de Nitro. Roblox et Discord ne donnent jamais de Robux ou de Nitro par un autre site. Fais très attention et ne t'y connecte pas.",
+  // Marque + mot de piège dans le chemin (login, verify, claim...) : jaune, alerte forte
+  marqueEtPiegeDansChemin: "Ce n'est pas un site officiel, mais son adresse parle de Roblox ou de Discord avec un mot comme « login », « verify » ou « claim ». Ne tape jamais ton mot de passe ou un code sur cette page, et ne partage jamais ton écran.",
+  // « roblox » / « discord » coupé par des tirets ou des points (ro-blox, dis-cord)
+  motCoupe: function (mot, vrai) {
+    return "Ce nom de domaine écrit « " + mot + " » coupé par des tirets ou des points, pour ressembler à un vrai site. Le vrai domaine est « " + vrai + " ». C'est une astuce classique de faux site.";
+  },
   adresseCachee: "Ce lien contient une autre adresse cachée : il peut t'envoyer ailleurs.",
   inconnu:
     "RoShield ne connaît que les domaines officiels de Roblox et de Discord. Ça ne veut pas dire que ce lien " +

@@ -92,9 +92,16 @@ window.MOTS_CLES = ["roblox", "discord", "robux", "nitro"];
 // le rencontre vraiment. Le mot « roblox » y est dans le NOM DE SOUS-DOMAINE, pas dans le domaine réel (fandom.com).
 // ATTENTION : la comparaison est EXACTE. N'importe quel autre sous-domaine de fandom.com
 // (roblox-gratuit.fandom.com : mot d'arnaque -> rouge ; robux.fandom.com : alerte jaune) n'est PAS exempté : n'importe qui peut en créer un.
-// Ces hôtes restent JAUNES (domaine inconnu) avec « autre chose », et ROUGES avec « page Roblox / Discord ».
+// Ces hôtes restent JAUNES (domaine inconnu). (Le paramètre interne « page Roblox / Discord » les passerait en ROUGE ; il n'est plus dans l'interface.)
 // Les règles a) et b) (imitation d'un domaine officiel) s'appliquent toujours.
 window.HOTES_SANS_MOT_CLE = ["roblox.fandom.com"];
+
+// Mots de PIÈGE cherchés avec un nom de marque (roblox / discord) dans le CHEMIN d'un domaine non officiel
+// (evil.test/roblox/login, login-evil.test/roblox) : jaune avec alerte forte, JAMAIS rouge. On y ajoute "join" et "friends".
+window.MOTS_PIEGE_CHEMIN = window.MOTS_ARNAQUE.concat(["join", "friends"]);
+// Mots d'AVERTISSEMENT : un chemin qui en contient un (articles, forums, vidéos qui parlent d'arnaques) ne déclenche PAS cette alerte.
+// Ce n'est qu'une alerte jaune : un lien piégé qui les imite perd seulement l'alerte forte, il reste jaune.
+window.MOTS_AVERTISSEMENT = ["scam", "scams", "scammer", "scammers", "fake", "warning", "avoid", "phishing", "beware", "arnaque", "arnaques"];
 
 // Mots HONNÊTES à une faute de "discord" ou "roblox" : la règle « faute de frappe dans un long morceau du nom d'hôte »
 // ne les compte pas. Un morceau du nom d'hôte (entre deux points ou tirets) doit être EXACTEMENT l'un de ces mots.

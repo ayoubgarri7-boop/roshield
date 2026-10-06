@@ -74,6 +74,41 @@ const CAS = [
   ["https://exemple.com/a/b/RoBuX-gratuits", "inconnu", "jaune", "alerteAppatChemin"],
   ["https://www.reddit.com/r/roblox/comments/1/free_robux_scam_warning/", "inconnu", "jaune", "alerteAppatChemin"],
   ["https://exemple.com/robux", "roblox", "rouge", "nonOfficielRoblox"],
+  // --- Marque (roblox / discord) dans le CHEMIN avec un mot de piège : jaune ALERTE FORTE « Attention », jamais rouge ---
+  ["https://exemple.test/roblox/login", "inconnu", "jaune", "alerteMarqueChemin"],
+  ["https://exemple.test/verify?service=discord", "inconnu", "jaune", "alerteMarqueChemin"],
+  ["https://login-exemple.test/roblox", "inconnu", "jaune", "alerteMarqueChemin"],
+  ["https://exemple.test/groups/1/roblox-official", "inconnu", "jaune", "alerteMarqueChemin"],
+  ["https://exemple.test/join/roblox-friends-1", "inconnu", "jaune", "alerteMarqueChemin"],
+  ["https://exemple.test/steam-gift-card-roblox-1710", "inconnu", "jaune", "alerteMarqueChemin"],
+  ["https://exemple.test/discord-claim", "inconnu", "jaune", "alerteMarqueChemin"],
+  ["https://exemple.test/roblox-unban/appeal", "inconnu", "jaune", "alerteMarqueChemin"],
+  ["https://exemple.test/%72oblox/login", "inconnu", "jaune", "alerteMarqueChemin"],
+  // --- Liens honnêtes proches (blog, vidéo, wiki, presse qui parlent de Roblox) : PAS d'alerte forte (jaune simple) ---
+  ["https://www.youtube.com/watch?v=abc&list=roblox-tips", "inconnu", "jaune", "jaune"],
+  ["https://www.youtube.com/@RobloxLearn", "inconnu", "jaune", "jaune"],
+  ["https://blog.example/2025/roblox-ugc-update", "inconnu", "jaune", "jaune"],
+  ["https://devforum.example/t/roblox-studio-tips/123", "inconnu", "jaune", "jaune"],
+  ["https://en.wikipedia.org/wiki/Roblox", "inconnu", "jaune", "jaune"],
+  ["https://www.bbc.co.uk/news/articles/roblox-ban-in-russia", "inconnu", "jaune", "jaune"],
+  ["https://exemple.test/discord-server-templates", "inconnu", "jaune", "jaune"],
+  ["https://exemple.test/news/roblox-login-scam-warning", "inconnu", "jaune", "jaune"],    // article d'avertissement : pas d'alerte forte
+  ["https://exemple.test/how-to-avoid-roblox-phishing-login-pages", "inconnu", "jaune", "jaune"],
+  ["https://exemple.test/verify-your-account", "inconnu", "jaune", "jaune"],               // mots de piège SANS marque : inchangé
+  ["https://verify-56ncg.test/account", "inconnu", "jaune", "jaune"],
+  ["https://bit.ly/abc123", "inconnu", "jaune", "jaune"],                                  // raccourcisseur : inchangé
+  // --- « roblox » / « discord » COUPÉ par des tirets, des points ou des chiffres (ro-blox, dis-cord) : ROUGE ---
+  ["https://ro-blox.test/home", "inconnu", "rouge", "rouge"],
+  ["https://dis-cord.test/", "inconnu", "rouge", "rouge"],
+  ["https://r0-blox.test/", "inconnu", "rouge", "rouge"],
+  ["https://d1-scord.test/", "inconnu", "rouge", "rouge"],
+  ["https://ro.blox.example/", "inconnu", "rouge", "rouge"],
+  ["https://free-ro-blox.example/", "inconnu", "rouge", "rouge"],
+  ["https://d-i-s-c-o-r-d.example/", "inconnu", "rouge", "rouge"],                          // « discord » écrit lettre par lettre avec des tirets : rouge
+  ["https://pro-bloxburg.example/", "inconnu", "jaune", "jaune"],                          // « bloxburg » est un vrai jeu : pas « roblox » coupé
+  ["https://bloxburg-fans.example/", "inconnu", "jaune", "jaune"],
+  ["https://micro-blox.example/", "inconnu", "jaune", "jaune"],
+  ["https://ro.blox.com/Ebh5", "inconnu", "vert", "vert"],                                  // officiel : vert avant toute règle
   // --- Les domaines officiels restent VERTS avant toute autre règle (même avec robux / nitro dans le nom ou le chemin) ---
   ["https://www.roblox.com/catalog", "inconnu", "vert", "vert"],
   ["https://www.roblox.com/robux", "inconnu", "vert", "vert"],
