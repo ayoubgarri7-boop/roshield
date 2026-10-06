@@ -29,7 +29,9 @@
       <h1 class="page__titre">Is this link <span class="texte-degrade">official</span><span class="point-couleur">?</span></h1>
       <p class="page__intro">
         Paste the link someone sent you. This site checks it <strong>without ever opening it</strong>:
-        everything is checked on your device and your link is not sent anywhere.
+        Your full link is never sent: it’s checked on your device.
+        For some links (“unknown domain”), only its domain name may be sent to a checking service.
+        Details: <a href="confidentialite.html">How it works and privacy</a>.
         Your browser only downloads, like any other file on the site, a list of links that have already been reported, the same for everyone.
       </p>
     </header>
@@ -54,7 +56,7 @@
           <label class="choix"><input type="radio" name="attendu" value="discord"><span>It said this was a Discord page (invite, Nitro…)</span></label>
           <label class="choix"><input type="radio" name="attendu" value="inconnu" checked><span>It was about something else (video, article, wiki…) or I don’t know</span></label>
         </div>
-        <p class="verif__aide" id="aide-question">You don’t need to open the link: we only go by what the message said. Your link is not sent anywhere and stays on your device.</p>
+        <p class="verif__aide" id="aide-question">You don’t need to open the link: we only go by what the message said. Your full link stays on your device (<a href="confidentialite.html">How it works and privacy</a>).</p>
       </fieldset>
 
       <button type="submit" class="bouton bouton--principal verif__bouton">
@@ -65,6 +67,8 @@
         Check
       </button>
     </form>
+
+    <p class="lien-confidentialite"><a href="confidentialite.html">How it works and privacy</a></p>
 
     <!-- The result is written here by js/verificateur.js.
          aria-live: screen readers announce the result. -->
@@ -108,6 +112,7 @@
   <script src="../js/commun.js"></script>
   <script src="../js/domaines.js"></script>
   <script src="../js/textes-en.js"></script>
+  <script src="../js/reputation.js"></script>
   <script src="../js/verificateur.js"></script>
 </body>
 </html>

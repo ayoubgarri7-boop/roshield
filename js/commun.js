@@ -182,6 +182,14 @@
     // Mention légale
     const bas = creer("div", "pied__bas conteneur");
     bas.appendChild(creer("p", "", t.pasAffilie));
+    // Lien vers la page "Comment ça marche et confidentialité" (même nom de fichier dans chaque langue)
+    if (t.confidentialite) {
+      const lienConf = creer("a", "pied__lien", t.confidentialite);
+      lienConf.href = "confidentialite.html";
+      const pConf = creer("p", "pied__confidentialite");
+      pConf.appendChild(lienConf);
+      bas.appendChild(pConf);
+    }
     footer.appendChild(bas);
 
     conteneur.appendChild(footer);

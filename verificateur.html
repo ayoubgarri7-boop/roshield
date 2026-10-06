@@ -29,7 +29,9 @@
       <h1 class="page__titre">Ce lien est-il <span class="texte-degrade">officiel</span><span class="point-couleur">?</span></h1>
       <p class="page__intro">
         Colle le lien qu'on t'a envoyé. Le site l'analyse <strong>sans jamais l'ouvrir</strong> :
-        tout est comparé sur ton appareil et ton lien n'est envoyé nulle part.
+        Ton lien complet n'est jamais envoyé : il est analysé sur ton appareil.
+        Pour certains liens (« domaine inconnu »), seul son nom de domaine peut être envoyé à un service de vérification.
+        Détails : <a href="confidentialite.html">Comment ça marche et confidentialité</a>.
         Ton navigateur télécharge seulement, comme n'importe quel fichier du site, une liste de liens déjà signalés, la même pour tout le monde.
       </p>
     </header>
@@ -54,7 +56,7 @@
           <label class="choix"><input type="radio" name="attendu" value="discord"><span>Il disait que c'était une page Discord (invitation, Nitro…)</span></label>
           <label class="choix"><input type="radio" name="attendu" value="inconnu" checked><span>Il parlait d'autre chose (vidéo, article, wiki…) ou je ne sais pas</span></label>
         </div>
-        <p class="verif__aide" id="aide-question">Tu n'as pas besoin d'ouvrir le lien : on se base seulement sur ce que disait le message. Ton lien n'est envoyé nulle part et reste sur ton appareil.</p>
+        <p class="verif__aide" id="aide-question">Tu n'as pas besoin d'ouvrir le lien : on se base seulement sur ce que disait le message. Ton lien complet reste sur ton appareil (<a href="confidentialite.html">Comment ça marche et confidentialité</a>).</p>
       </fieldset>
 
       <button type="submit" class="bouton bouton--principal verif__bouton">
@@ -65,6 +67,8 @@
         Vérifier
       </button>
     </form>
+
+    <p class="lien-confidentialite"><a href="confidentialite.html">Comment ça marche et confidentialité</a></p>
 
     <!-- Le résultat est écrit ici par js/verificateur.js.
          aria-live : les lecteurs d'écran annoncent le résultat. -->
@@ -107,6 +111,7 @@
   <script src="js/commun.js"></script>
   <script src="js/domaines.js"></script>
   <script src="js/textes-fr.js"></script>
+  <script src="js/reputation.js"></script>
   <script src="js/verificateur.js"></script>
 </body>
 </html>

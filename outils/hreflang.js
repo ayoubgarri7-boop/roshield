@@ -19,7 +19,7 @@ const fs = require("fs");
 const path = require("path");
 
 const racine = path.join(__dirname, "..");
-const PAGES = ["index.html", "verificateur.html", "guides.html", "securite.html", "a-propos.html"];
+const PAGES = ["index.html", "verificateur.html", "guides.html", "securite.html", "a-propos.html", "confidentialite.html"];
 
 // 1. Lire l'adresse du site dans js/config.js
 const config = fs.readFileSync(path.join(racine, "js", "config.js"), "utf8");
