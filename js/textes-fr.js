@@ -37,6 +37,11 @@ window.TEXTES_VERIF = {
     reputationUnRouge: "Danger : un moteur de sécurité signale ce nom de domaine",
     reputationPlusieursJaune: "Attention : plusieurs moteurs de sécurité signalent ce nom de domaine",
     reputationPlusieursRouge: "Plusieurs moteurs de sécurité signalent ce nom de domaine",
+    // Idem pour un lien RACCOURCI (le lien complet est comparé, pas seulement le nom de domaine)
+    reputationLienUnJaune: "Attention : un moteur de sécurité signale ce lien raccourci",
+    reputationLienUnRouge: "Danger : un moteur de sécurité signale ce lien raccourci",
+    reputationLienPlusieursJaune: "Attention : plusieurs moteurs de sécurité signalent ce lien raccourci",
+    reputationLienPlusieursRouge: "Plusieurs moteurs de sécurité signalent ce lien raccourci",
     // Mot d'appât (Robux, Nitro) dans le chemin d'un domaine non officiel : jaune, alerte plus forte
     alerteAppatChemin: "Attention : ce lien parle de Robux ou de Nitro",
     // Nom de marque + mot de piège dans le chemin d'un domaine non officiel : jaune, alerte forte
@@ -143,6 +148,18 @@ window.TEXTES_VERIF = {
     return m + " moteurs de sécurité sur " + total + " signalent ce nom de domaine comme malveillant" + quand + ".";
   },
   reputationInconnu: "VirusTotal ne connaît pas ce nom de domaine.",
+  // Lien RACCOURCI : le lien complet (sans « # ») est envoyé, parce que le nom du site seul ne dit pas où il mène
+  reputationLienEnvoye: function (lien) {
+    return "Le lien complet « " + String(lien).replace(/^https:\/\//, "") + " » est comparé avec VirusTotal, parce que le nom du site seul ne dit pas où il mène. VirusTotal peut garder cette adresse et la partager avec la communauté de sécurité.";
+  },
+  reputationLienResultat: function (m, total, date) {
+    const quand = date ? " (analyse du " + date + ")" : "";
+    if (m === 0) return "0 moteur de sécurité sur " + total + " ne signale ce lien" + quand + ".";
+    if (m === 1) return "1 moteur de sécurité sur " + total + " signale ce lien comme malveillant" + quand + ".";
+    return m + " moteurs de sécurité sur " + total + " signalent ce lien comme malveillant" + quand + ".";
+  },
+  reputationLienInconnu: "VirusTotal n'a pas encore de résultat pour ce lien.",
+  reputationLienAucun: "Aucun antivirus ne le signale pour l'instant. Ça ne veut pas dire sûr.",
   reputationAvertissement: "Aucun signalement ne veut pas dire sûr.",
   reputationConseil: "Ne tape jamais ton mot de passe ou un code sur cette page, et ne partage jamais ton écran.",
   reputationIndisponible: "Vérification complémentaire indisponible pour le moment : le résultat ci-dessus reste valable.",

@@ -778,7 +778,15 @@
     // Exception : domaine officiel avec un détail (http://, @) -> "inconnu" serait faux.
     const titreCle = titreForce || (alerte && niveau === "jaune" ? alerte : (officiel && niveau === "jaune" ? "officielAttention" : niveau));
 
-    return { niveau: niveau, titreCle: titreCle, hote: hote, sous: sous, reel: reel, raisons: messages, notes: notes };
+    // Lien RACCOURCI : le lien complet, SANS « # », que la vérification complémentaire pourra envoyer (https seulement, 200 caractères
+    // au plus, sans identifiant ni port). Pour tout autre lien : null (seul le nom de domaine pourra être envoyé).
+    let lien = null;
+    if (raccourci && url.protocol === "https:" && !url.username && !url.password && !url.port) {
+      const complet = "https://" + hote + url.pathname + url.search;
+      if (complet.length <= 200) lien = complet;
+    }
+
+    return { niveau: niveau, titreCle: titreCle, hote: hote, sous: sous, reel: reel, raisons: messages, notes: notes, lien: lien };
   }
 
   // On expose la fonction pour pouvoir la tester (et la réutiliser)
@@ -883,16 +891,19 @@
       const verif = creer("div", "verification-externe");
       verif.setAttribute("aria-live", "polite");
       verif.appendChild(creer("h3", "verification-externe__titre", T2.reputationTitreBloc));
-      verif.appendChild(creer("p", "verification-externe__ligne", T2.reputationEnvoye(r.domaine)));
+      const lienEnvoye = r.nature === "lien";     // lien RACCOURCI : c'est le lien complet qui est comparé, pas le nom de domaine
+      const resultat = lienEnvoye ? T2.reputationLienResultat : T2.reputationResultat;
+      const avertissement = lienEnvoye ? T2.reputationLienAucun : T2.reputationAvertissement;
+      verif.appendChild(creer("p", "verification-externe__ligne", lienEnvoye ? T2.reputationLienEnvoye(r.lien) : T2.reputationEnvoye(r.domaine)));
       if (r.etat === "encours") {
         verif.appendChild(creer("p", "verification-externe__ligne", T2.reputationEnCours));
       } else if (r.etat === "connu") {
-        verif.appendChild(creer("p", "verification-externe__ligne" + (r.malveillants > 0 ? " verification-externe__ligne--alerte" : ""), T2.reputationResultat(r.malveillants, r.total, r.date)));
+        verif.appendChild(creer("p", "verification-externe__ligne" + (r.malveillants > 0 ? " verification-externe__ligne--alerte" : ""), resultat(r.malveillants, r.total, r.date)));
         // « Aucun signalement ne veut pas dire sûr » : quand rien n'est signalé
-        if (r.malveillants === 0) verif.appendChild(creer("p", "verification-externe__ligne", T2.reputationAvertissement));
+        if (r.malveillants === 0) verif.appendChild(creer("p", "verification-externe__ligne", avertissement));
       } else if (r.etat === "inconnu") {
-        verif.appendChild(creer("p", "verification-externe__ligne", T2.reputationInconnu));
-        verif.appendChild(creer("p", "verification-externe__ligne", T2.reputationAvertissement));
+        verif.appendChild(creer("p", "verification-externe__ligne", lienEnvoye ? T2.reputationLienInconnu : T2.reputationInconnu));
+        verif.appendChild(creer("p", "verification-externe__ligne", avertissement));
       } else {
         verif.appendChild(creer("p", "verification-externe__ligne", T2.reputationIndisponible));
       }

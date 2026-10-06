@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Comment ça marche et confidentialité</title>
-  <meta name="description" content="Comment le vérificateur de liens décide, ce qui reste sur ton appareil, ce qui peut être envoyé (seulement un nom de domaine) et ce que le petit service garde.">
+  <meta name="description" content="Comment le vérificateur de liens décide, ce qui reste sur ton appareil, ce qui peut être envoyé (un nom de domaine, ou le lien complet d'un lien raccourci) et ce que le petit service garde.">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -35,8 +35,8 @@
     <section class="carte conseil">
       <h2>En bref</h2>
       <ul>
-        <li>Ton lien complet reste sur ton appareil : il n'est jamais envoyé.</li>
-        <li>Une vérification complémentaire avec VirusTotal est possible. Son état (activée ou non) est indiqué plus bas. Quand elle est activée, seul un nom de domaine peut être envoyé, seulement pour un résultat jaune.</li>
+        <li>Ton lien reste sur ton appareil, sauf s'il est raccourci (comme tinyurl.com/abc) : dans ce cas seulement, le lien complet est envoyé.</li>
+        <li>Une vérification complémentaire avec VirusTotal est possible. Son état (activée ou non) est indiqué plus bas. Quand elle est activée, seul un nom de domaine peut être envoyé, seulement pour un résultat jaune. Exception : un lien raccourci, dont le lien complet est envoyé, car le nom du site seul ne dit pas où il mène.</li>
         <li>Un résultat n'est jamais une preuve, et VirusTotal peut seulement aggraver un résultat, jamais le rendre vert.</li>
       </ul>
       <p class="note-source">Dernière mise à jour : 6 octobre 2026</p>
@@ -56,7 +56,7 @@
     <section class="carte conseil">
       <h2>Ce qui reste sur ton appareil</h2>
       <p>
-        <strong>Ton lien complet n'est jamais envoyé.</strong> Le chemin, la requête et tout ce qui suit le nom de domaine restent chez toi.
+        <strong>Ton lien complet reste chez toi, sauf s'il est raccourci</strong> (voir plus bas). Pour tout autre lien, le chemin, la requête et tout ce qui suit le nom de domaine restent chez toi.
         Le site n'utilise ni compte, ni mesure d'audience, ni publicité. Ce site ne dépose lui-même aucun cookie et ne garde rien dans ton navigateur (rien n'est prévu pour ça dans son code). Ses hébergeurs et les services qui fournissent les polices (GitHub Pages, Cloudflare, Google Fonts) peuvent utiliser leurs propres techniques, que nous ne contrôlons pas.
       </p>
     </section>
@@ -80,9 +80,15 @@
       </p>
       <p>
         Quand elle est activée, elle s'applique <strong>seulement</strong> à un résultat jaune. Elle n'est <strong>jamais</strong> utilisée pour
-        un raccourcisseur de liens, une adresse IP ni un domaine officiel. Le site envoie à un petit service de RoShield
+        une adresse IP ni pour un domaine officiel. Pour la plupart des liens, le site envoie à un petit service de RoShield
         <strong>seulement le nom de domaine</strong> de l'adresse réelle du lien (par exemple <code>exemple.com</code>), jamais le lien complet.
         Ce petit service interroge VirusTotal, un site qui rassemble les avis de nombreux moteurs de sécurité.
+      </p>
+      <p>
+        <strong>Exception : un lien raccourci</strong> (par exemple <code>tinyurl.com/abc</code>). Le nom du site seul ne dit pas où il mène,
+        donc le <strong>lien complet</strong> (sans la partie après « # ») est envoyé à notre petit service, puis à VirusTotal.
+        Avec 0 moteur « malicious », le résultat reste jaune (« destination cachée »), avec une ligne qui dit qu'aucun antivirus ne le signale
+        pour l'instant, ce qui ne veut pas dire sûr.
       </p>
       <p>
         Le résultat peut seulement <strong>aggraver</strong> ce que tu vois, jamais le rendre vert :
@@ -104,12 +110,13 @@
       <p>Pour respecter les limites de VirusTotal, il garde très peu de choses, et seulement le temps indiqué :</p>
       <ul>
         <li><strong>Un résultat par nom de domaine</strong> : une empreinte secrète du nom (jamais le nom lui-même), quelques nombres et une date. <strong>6 heures</strong> si VirusTotal connaît le domaine, <strong>2 heures</strong> sinon.</li>
+        <li><strong>Un résultat par lien raccourci</strong> : une empreinte secrète du lien (jamais le lien lui-même), quelques nombres et une date. <strong>1 heure</strong> seulement, parce qu'un lien raccourci peut changer de destination.</li>
         <li><strong>Un compteur par visiteur</strong> : une empreinte secrète de ton adresse IP (jamais l'adresse elle-même), qui change chaque jour. <strong>1 minute</strong> pour le compteur de la minute, <strong>jusqu'à la fin de la journée (24 heures au plus)</strong> pour celui du jour.</li>
         <li><strong>Des compteurs généraux</strong> (nombre d'appels à VirusTotal), sans aucune donnée personnelle : 1 minute et 1 jour.</li>
       </ul>
       <p>
-        Limites : 4 appels par minute et 500 par jour pour tout le monde (c'est le quota gratuit de VirusTotal), 2 par minute et 30 par jour pour toi.
-        Le petit service ne garde ni ton adresse IP, ni les liens, ni les chemins, et il n'écrit aucun journal.
+        Limites : 4 appels par minute et 500 par jour pour tout le monde (c'est le quota gratuit de VirusTotal), 2 par minute et 30 par jour pour toi (la vérification d'un lien raccourci compte pour 2).
+        Le petit service ne garde ni ton adresse IP, ni les liens, ni les chemins. En cas de panne, il écrit seulement une courte cause technique (par exemple « délai dépassé »), jamais de lien, de nom de domaine ni d'adresse IP.
         Une purge automatique efface chaque heure ce qui a expiré.
       </p>
     </section>
@@ -117,10 +124,12 @@
     <section class="carte conseil">
       <h2>Ce que voit VirusTotal</h2>
       <p>
-        VirusTotal reçoit le nom de domaine et l'adresse du petit service (pas la tienne). Dans l'avertissement de la page de sa documentation consacrée à l'<strong>API</strong>
+        VirusTotal reçoit le nom de domaine (ou, pour un lien raccourci, le lien complet) et l'adresse du petit service (pas la tienne). Dans l'avertissement de la page de sa documentation consacrée à l'<strong>API</strong>
         (« Get a domain report »), VirusTotal écrit que tout élément envoyé ou demandé via l'API sera « scanned and added to the VirusTotal dataset »
         (analysé et ajouté à sa base de données) et deviendra accessible à sa communauté. Un nom de domaine demandé peut donc devenir
-        visible là-bas. C'est pour ça que le lien complet, le chemin et la requête ne sont jamais envoyés, et que les raccourcisseurs sont exclus.
+        visible là-bas. C'est pour ça que, pour un lien qui n'est pas raccourci, le chemin et la requête ne sont jamais envoyés.
+        Pour un lien raccourci, c'est le lien complet qui est envoyé : VirusTotal peut le garder et le partager avec la communauté de sécurité.
+        Ne colle donc pas ici un lien raccourci qui contient quelque chose de privé.
         <a href="https://docs.virustotal.com/reference/domain-info" target="_blank" rel="noopener noreferrer">Lire la documentation de VirusTotal (en anglais)</a>.
       </p>
     </section>

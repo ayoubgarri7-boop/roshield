@@ -6,9 +6,11 @@
 
    QUAND ELLE EST ACTIVÉE
    - Seulement pour un résultat JAUNE (pas le rouge, pas le vert, pas « officiel mais vérifie le lien »).
-   - Jamais pour un raccourcisseur, ni pour une adresse IP, ni pour un domaine officiel.
-   - On envoie SEULEMENT le nom de domaine de l'adresse réelle (jamais le lien complet) : POST <urlWorker>/reputation
-     avec {"domaine":"exemple.com"}, sans cookie ni referer.
+   - Jamais pour une adresse IP, ni pour un domaine officiel.
+   - Pour tout lien SAUF un raccourci : on envoie SEULEMENT le nom de domaine de l'adresse réelle (jamais le lien complet) :
+     POST <urlWorker>/reputation avec {"domaine":"exemple.com"}, sans cookie ni referer.
+   - Pour un lien RACCOURCI (hôte de la liste RACCOURCISSEURS, https, 200 caractères au plus) : on envoie le lien complet, SANS le
+     « # », à POST <urlWorker>/reputation-lien avec {"lien":"https://tinyurl.com/abc"}. Jamais pour un autre lien.
    - Le résultat peut être AGGRAVÉ, jamais allégé, jamais vert :
        0 moteur « malicious »              -> rien ne change
        au moins seuilAlerte (1)            -> jaune, alerte forte avec le nombre de moteurs
@@ -65,6 +67,20 @@
     return hote;
   }
 
+  // ---------- Lien RACCOURCI : faut-il envoyer le lien complet ? Renvoie le lien (sans « # »), ou null ----------
+  // C'est la SEULE situation où un lien complet part : un résultat jaune, un hôte de la liste des raccourcisseurs, en https.
+  function lienAEnvoyer(res, cfg) {
+    if (!lireConfig(cfg === undefined ? configSite() : cfg).url) return null;                 // désactivée
+    if (!res || res.erreur || res.niveau !== "jaune" || res.titreCle === "officielAttention" || !res.hote) return null;
+    const hote = String(res.hote).toLowerCase();
+    if (!(window.RACCOURCISSEURS || []).some(function (r) { return estOuSousDomaine(hote, r); })) return null;   // PAS un raccourcisseur
+    const lien = res.lien;
+    if (typeof lien !== "string" || lien.length > 200 || lien.indexOf("#") !== -1) return null;
+    if (lien.indexOf("https://" + hote + "/") !== 0) return null;                            // https, et le bon hôte
+    if (/[\s\u0000-\u001f\u007f]/.test(lien)) return null;
+    return lien;
+  }
+
   // ---------- La réponse du Worker : on la contrôle avant d'en croire un mot ----------
   function entier(v, max) { return Number.isInteger(v) && v >= 0 && v <= max; }
   function valider(corps) {
@@ -84,18 +100,25 @@
 
   // ---------- L'appel au Worker (la seule requête de ce fichier) ----------
   async function interroger(domaine, cfg, fetchFn) {
+    return appeler("/reputation", { domaine: domaine }, domaine, cfg, fetchFn);
+  }
+  // Lien RACCOURCI : le lien complet (sans « # ») part vers /reputation-lien
+  async function interrogerLien(lien, cfg, fetchFn) {
+    return appeler("/reputation-lien", { lien: lien }, "lien|" + lien, cfg, fetchFn);
+  }
+  async function appeler(chemin, corps, cleCache, cfg, fetchFn) {
     const c = lireConfig(cfg === undefined ? configSite() : cfg);
     if (!c.url) return { etat: "desactive" };
-    if (cache.has(domaine)) return cache.get(domaine);
+    if (cache.has(cleCache)) return cache.get(cleCache);
     const f = fetchFn || (typeof fetch === "function" ? fetch : null);
     if (!f) return { etat: "indisponible" };
     const controleur = typeof AbortController === "function" ? new AbortController() : null;
     const minuteur = controleur ? setTimeout(function () { controleur.abort(); }, DELAI_MS) : null;
     try {
-      const reponse = await f(c.url + "/reputation", {
+      const reponse = await f(c.url + chemin, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ domaine: domaine }),     // SEULEMENT le nom de domaine
+        body: JSON.stringify(corps),     // SEULEMENT le nom de domaine (ou, pour un raccourci, le lien complet sans « # »)
         credentials: "omit",
         referrerPolicy: "no-referrer",
         cache: "no-store",
@@ -105,7 +128,7 @@
       if (reponse.status === 429) return { etat: "limite" };
       if (!reponse.ok) return { etat: "indisponible" };
       const donnees = valider(await reponse.json());
-      if (donnees.etat === "connu" || donnees.etat === "inconnu") cache.set(domaine, donnees);
+      if (donnees.etat === "connu" || donnees.etat === "inconnu") cache.set(cleCache, donnees);
       return donnees;
     } catch (e) {
       return { etat: "indisponible" };                   // réseau coupé, délai dépassé, réponse illisible...
@@ -115,20 +138,23 @@
   }
 
   // ---------- Appliquer la réponse au résultat : on peut AGGRAVER, jamais alléger ----------
-  function appliquer(res, donnees, cfg) {
+  // nature : "lien" pour un lien RACCOURCI (le lien complet a été comparé), sinon le nom de domaine
+  function appliquer(res, donnees, cfg, nature) {
     const c = lireConfig(cfg === undefined ? configSite() : cfg);
     const T = textes();
     if (!res || res.erreur) return res;
     const domaine = res.hote;
+    const estLien = nature === "lien";
+    const base = estLien ? { domaine: domaine, nature: "lien", lien: res.lien } : { domaine: domaine };
     if (!donnees || (donnees.etat !== "connu" && donnees.etat !== "inconnu")) {
-      return Object.assign({}, res, { reputation: { etat: "indisponible", domaine: domaine } });
+      return Object.assign({}, res, { reputation: Object.assign({ etat: "indisponible" }, base) });
     }
     if (donnees.etat === "inconnu") {
-      return Object.assign({}, res, { reputation: { etat: "inconnu", domaine: domaine } });
+      return Object.assign({}, res, { reputation: Object.assign({ etat: "inconnu" }, base) });
     }
     const m = donnees.malveillants;
     const suite = Object.assign({}, res, {
-      reputation: { etat: "connu", domaine: domaine, malveillants: m, total: donnees.total, date: donnees.date }
+      reputation: Object.assign({ etat: "connu", malveillants: m, total: donnees.total, date: donnees.date }, base)
     });
     // Seul un résultat JAUNE peut être aggravé (un vert reste vert, un rouge reste tel quel)
     if (res.niveau === "jaune" && m >= c.seuilAlerte) {
@@ -136,8 +162,8 @@
       const niveau = rouge ? "rouge" : "jaune";
       if (GRAVITE[niveau] >= GRAVITE[res.niveau]) {
         suite.niveau = niveau;
-        suite.titreCle = "reputation" + (m === 1 ? "Un" : "Plusieurs") + (rouge ? "Rouge" : "Jaune");
-        suite.raisons = [T.reputationResultat(m, donnees.total, donnees.date) + " " + T.reputationConseil]
+        suite.titreCle = "reputation" + (estLien ? "Lien" : "") + (m === 1 ? "Un" : "Plusieurs") + (rouge ? "Rouge" : "Jaune");
+        suite.raisons = [(estLien ? T.reputationLienResultat : T.reputationResultat)(m, donnees.total, donnees.date) + " " + T.reputationConseil]
           .concat((res.raisons || []).filter(function (r) { return r !== T.inconnu; }));
       }
     }
@@ -147,6 +173,15 @@
   // ---------- Pour le vérificateur : affiche d'abord le résultat local (+ « en cours »), puis le résultat complété ----------
   // rendre(resultat) est appelée une ou deux fois ; l'appelant ignore les réponses devenues inutiles.
   function lancer(res, rendre) {
+    // Lien RACCOURCI : le lien complet (sans « # ») est comparé ; en cas de panne ou de limite, le jaune « destination cachée » reste
+    const lien = lienAEnvoyer(res);
+    if (lien) {
+      const cle = "lien|" + lien;
+      if (cache.has(cle)) { rendre(appliquer(res, cache.get(cle), undefined, "lien")); return; }
+      rendre(Object.assign({}, res, { reputation: { etat: "encours", domaine: res.hote, nature: "lien", lien: lien } }));
+      interrogerLien(lien).then(function (donnees) { rendre(appliquer(res, donnees, undefined, "lien")); });
+      return;
+    }
     const domaine = doitInterroger(res);
     if (!domaine) { rendre(res); return; }
     if (cache.has(domaine)) { rendre(appliquer(res, cache.get(domaine))); return; }
@@ -158,6 +193,7 @@
 
   window.RoShieldReputation = {
     adresseWorker: adresseWorker, lireConfig: lireConfig, doitInterroger: doitInterroger, interroger: interroger,
+    lienAEnvoyer: lienAEnvoyer, interrogerLien: interrogerLien,
     appliquer: appliquer, lancer: lancer, viderCache: viderCache
   };
 })();

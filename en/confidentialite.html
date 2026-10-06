@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>How it works and privacy</title>
-  <meta name="description" content="How the link checker decides, what stays on your device, what may be sent (only a domain name), and what the small service keeps.">
+  <meta name="description" content="How the link checker decides, what stays on your device, what may be sent (a domain name, or the full link of a shortened link), and what the small service keeps.">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -35,8 +35,8 @@
     <section class="carte conseil">
       <h2>In short</h2>
       <ul>
-        <li>Your full link stays on your device: it is never sent.</li>
-        <li>An additional check with VirusTotal is possible. Its status (on or off) is shown below. When it is on, only a domain name may be sent, and only for a yellow result.</li>
+        <li>Your link stays on your device, unless it is shortened (like tinyurl.com/abc): only then is the full link sent.</li>
+        <li>An additional check with VirusTotal is possible. Its status (on or off) is shown below. When it is on, only a domain name may be sent, and only for a yellow result. Exception: a shortened link, whose full link is sent, because the site name alone doesn’t say where it leads.</li>
         <li>A result is never proof, and VirusTotal can only make a result worse, never turn it green.</li>
       </ul>
       <p class="note-source">Last updated: October 6, 2026</p>
@@ -56,7 +56,7 @@
     <section class="carte conseil">
       <h2>What stays on your device</h2>
       <p>
-        <strong>Your full link is never sent.</strong> The path, the query and everything after the domain name stay with you.
+        <strong>Your full link stays with you, unless it is shortened</strong> (see below). For any other link, the path, the query and everything after the domain name stay with you.
         This site uses no accounts, no audience measurement and no ads. This site does not set any cookie itself and keeps nothing in your browser (nothing in its code is meant for that). Its hosts and the services that provide the fonts (GitHub Pages, Cloudflare, Google Fonts) may use their own techniques, which we don’t control.
       </p>
     </section>
@@ -79,9 +79,15 @@
         <strong id="statut-reputation">Status of this check on this site: …</strong>
       </p>
       <p>
-        When it is on, it applies <strong>only</strong> to a yellow result. It is <strong>never</strong> used for a link shortener, an IP address or an official domain.
-        The site sends a small RoShield service <strong>only the domain name</strong> of the link’s real address (for example <code>example.com</code>), never the full link.
+        When it is on, it applies <strong>only</strong> to a yellow result. It is <strong>never</strong> used for an IP address or an official domain.
+        For most links, the site sends a small RoShield service <strong>only the domain name</strong> of the link’s real address (for example <code>example.com</code>), never the full link.
         That small service asks VirusTotal, a site that gathers the opinions of many security engines.
+      </p>
+      <p>
+        <strong>Exception: a shortened link</strong> (for example <code>tinyurl.com/abc</code>). The site name alone doesn’t say where it leads,
+        so the <strong>full link</strong> (without the part after “#”) is sent to our small service, and then to VirusTotal.
+        With 0 “malicious” engines, the result stays yellow (“hidden destination”), with a line saying that no antivirus flags it
+        for now, which doesn’t mean it’s safe.
       </p>
       <p>
         The answer can only make what you see <strong>worse</strong>, never turn it green:
@@ -103,12 +109,13 @@
       <p>To respect VirusTotal’s limits, it keeps very little, and only for the time shown:</p>
       <ul>
         <li><strong>One result per domain name</strong>: a secret fingerprint of the name (never the name itself), a few numbers and a date. <strong>6 hours</strong> if VirusTotal knows the domain, <strong>2 hours</strong> if not.</li>
+        <li><strong>One result per shortened link</strong>: a secret fingerprint of the link (never the link itself), a few numbers and a date. <strong>1 hour</strong> only, because a shortened link can change destination.</li>
         <li><strong>One counter per visitor</strong>: a secret fingerprint of your IP address (never the address itself), which changes every day. <strong>1 minute</strong> for the per-minute counter, <strong>until the end of the day (24 hours at most)</strong> for the daily one.</li>
         <li><strong>General counters</strong> (number of calls to VirusTotal), with no personal data: 1 minute and 1 day.</li>
       </ul>
       <p>
-        Limits: 4 calls per minute and 500 per day for everyone (VirusTotal’s free quota), 2 per minute and 30 per day for you.
-        The small service keeps no IP address, no links, no paths, and writes no logs.
+        Limits: 4 calls per minute and 500 per day for everyone (VirusTotal’s free quota), 2 per minute and 30 per day for you (checking a shortened link counts as 2).
+        The small service keeps no IP address, no links, no paths. When something breaks, it writes only a short technical cause (for example “timeout”), never a link, a domain name or an IP address.
         An automatic cleanup deletes anything that has expired every hour.
       </p>
     </section>
@@ -116,10 +123,12 @@
     <section class="carte conseil">
       <h2>What VirusTotal sees</h2>
       <p>
-        VirusTotal receives the domain name and the small service’s address (not yours). In the warning on its documentation page about the <strong>API</strong>
+        VirusTotal receives the domain name (or, for a shortened link, the full link) and the small service’s address (not yours). In the warning on its documentation page about the <strong>API</strong>
         (“Get a domain report”), VirusTotal writes that any item submitted or queried via the API will be “scanned and added to the VirusTotal dataset”
         and become accessible to its community. A queried domain name may therefore become
-        visible there. That’s why the full link, the path and the query are never sent, and why link shorteners are excluded.
+        visible there. That’s why, for a link that is not shortened, the path and the query are never sent.
+        For a shortened link, the full link is sent: VirusTotal may keep it and share it with the security community.
+        So don’t paste a shortened link that contains anything private.
         <a href="https://docs.virustotal.com/reference/domain-info" target="_blank" rel="noopener noreferrer">Read VirusTotal’s documentation</a>.
       </p>
     </section>

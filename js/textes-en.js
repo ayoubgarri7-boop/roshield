@@ -46,6 +46,11 @@ window.TEXTES_VERIF = {
     reputationUnRouge: "Danger: one security engine flags this domain name",
     reputationPlusieursJaune: "Warning: several security engines flag this domain name",
     reputationPlusieursRouge: "Several security engines flag this domain name",
+    // Same for a SHORTENED link (the full link is compared, not just the domain name)
+    reputationLienUnJaune: "Warning: one security engine flags this shortened link",
+    reputationLienUnRouge: "Danger: one security engine flags this shortened link",
+    reputationLienPlusieursJaune: "Warning: several security engines flag this shortened link",
+    reputationLienPlusieursRouge: "Several security engines flag this shortened link",
     // Bait word (Robux, Nitro) in the path of a non-official domain: yellow, stronger warning
     alerteAppatChemin: "Warning: this link talks about Robux or Nitro",
     // Brand name + trap word in the path of a non-official domain: yellow, strong warning
@@ -152,6 +157,18 @@ window.TEXTES_VERIF = {
     return m + " security engines out of " + total + " flag this domain name as malicious" + quand + ".";
   },
   reputationInconnu: "VirusTotal doesn’t know this domain name.",
+  // SHORTENED link: the full link (without “#”) is sent, because the site name alone doesn’t say where it leads
+  reputationLienEnvoye: function (lien) {
+    return "The full link “" + String(lien).replace(/^https:\/\//, "") + "” is being compared with VirusTotal, because the site name alone doesn’t say where it leads. VirusTotal may keep this address and share it with the security community.";
+  },
+  reputationLienResultat: function (m, total, date) {
+    const quand = date ? " (analysis of " + date + ")" : "";
+    if (m === 0) return "0 security engines out of " + total + " flag this link" + quand + ".";
+    if (m === 1) return "1 security engine out of " + total + " flags this link as malicious" + quand + ".";
+    return m + " security engines out of " + total + " flag this link as malicious" + quand + ".";
+  },
+  reputationLienInconnu: "VirusTotal has no result for this link yet.",
+  reputationLienAucun: "No antivirus flags it for now. That doesn’t mean it’s safe.",
   reputationAvertissement: "No reports doesn’t mean safe.",
   reputationConseil: "Never type your password or a code on this page, and never share your screen.",
   reputationIndisponible: "Additional check unavailable right now: the result above is still valid.",
