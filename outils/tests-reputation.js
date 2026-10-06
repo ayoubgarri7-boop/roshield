@@ -9,13 +9,18 @@ const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
 
-function charger(langue, configPerso) {
+// Ces tests ne lisent PAS js/config.js : ils utilisent leur propre configuration, VIDE (rien n'est activé).
+// Ainsi, activer ou désactiver la vérification dans js/config.js ne change jamais leur résultat.
+// Chaque test qui a besoin d'une configuration active la fournit lui-même (voir ACTIVE plus bas).
+const VIDE = { reputation: { urlWorker: "", seuilAlerte: 1, seuilRouge: 2 } };
+
+function charger(langue) {
   const ctx = vm.createContext({ URL: URL, setTimeout: setTimeout, clearTimeout: clearTimeout, AbortController: AbortController });
   ctx.window = ctx;
-  ["config.js", "domaines.js", "textes-" + langue + ".js", "reputation.js", "verificateur.js"].forEach(function (f) {
+  ctx.window.CONFIG_SITE = JSON.parse(JSON.stringify(VIDE));      // la configuration du test, pas celle du site
+  ["domaines.js", "textes-" + langue + ".js", "reputation.js", "verificateur.js"].forEach(function (f) {
     vm.runInContext(fs.readFileSync(path.join(__dirname, "..", "js", f), "utf8"), ctx, { filename: f });
   });
-  if (configPerso) Object.assign(ctx.window.CONFIG_SITE.reputation, configPerso);
   return ctx.window;
 }
 
@@ -28,9 +33,10 @@ const GRAVITE = { vert: 0, jaune: 1, rouge: 2 };
 const ACTIVE = { reputation: { urlWorker: "https://roshield-sante.exemple.workers.dev", seuilAlerte: 1, seuilRouge: 2 } };
 const jaune = analyser("https://exemple.com/page", "inconnu");
 
-// ---------- 1. Désactivée par défaut ----------
-verif(W.CONFIG_SITE.reputation.urlWorker === "", "config.js : urlWorker doit être vide par défaut");
-verif(R.doitInterroger(jaune) === null, "désactivée par défaut : aucun nom de domaine à envoyer");
+// ---------- 1. Une configuration VIDE n'envoie rien ----------
+verif(R.lireConfig(VIDE).url === null, "configuration vide : aucune adresse de Worker");
+verif(R.doitInterroger(jaune, VIDE) === null, "configuration vide : aucun nom de domaine à envoyer");
+verif(R.doitInterroger(jaune) === null, "configuration du test (vide) utilisée par défaut : aucun nom de domaine à envoyer");
 verif(R.doitInterroger(jaune, {}) === null && R.doitInterroger(jaune, { reputation: {} }) === null, "sans réglage : rien");
 ["", "   ", "pas une adresse", "http://exemple.com", "https://exemple.com", "https://exemple.workers.dev.evil.test", "https://evil.test/roshield-sante.workers.dev",
   "https://u:p@roshield-sante.exemple.workers.dev", "https://roshield-sante.exemple.workers.dev/chemin", "https://roshield-sante.exemple.workers.dev/?x=1",
