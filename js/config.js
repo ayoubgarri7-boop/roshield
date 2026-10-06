@@ -35,7 +35,7 @@ window.CONFIG_SITE = {
   //   VirusTotal ne rend JAMAIS un lien vert : il ne peut qu'aggraver un résultat. Seuls les moteurs « malicious » comptent
   //   (pas « suspicious », pas « undetected »).
   reputation: {
-    urlWorker: "",
+    urlWorker: "https://roshield-sante.rs-k7x2p9qa.workers.dev",
     seuilAlerte: 1,
     seuilRouge: 2
   },
