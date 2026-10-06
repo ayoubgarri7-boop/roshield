@@ -34,6 +34,7 @@
       don: "Support the project",
       donBientot: "Support the project (soon)",
       pied: "Protect your account. Protect your friends.",
+      confidentialite: "How it works and privacy",
 
       // Libellés pour les lecteurs d'écran
       accueilAria: "home",

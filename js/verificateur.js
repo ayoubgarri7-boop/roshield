@@ -796,22 +796,64 @@
       boite.appendChild(creer("p", "resultat__note", n));
     });
 
+    // Vérification complémentaire (VirusTotal) : seulement si elle est activée et s'applique à ce résultat
+    if (res.reputation) {
+      const T2 = T;
+      const r = res.reputation;
+      const verif = creer("div", "verification-externe");
+      verif.setAttribute("aria-live", "polite");
+      verif.appendChild(creer("h3", "verification-externe__titre", T2.reputationTitreBloc));
+      verif.appendChild(creer("p", "verification-externe__ligne", T2.reputationEnvoye(r.domaine)));
+      if (r.etat === "encours") {
+        verif.appendChild(creer("p", "verification-externe__ligne", T2.reputationEnCours));
+      } else if (r.etat === "connu") {
+        verif.appendChild(creer("p", "verification-externe__ligne" + (r.malveillants > 0 ? " verification-externe__ligne--alerte" : ""), T2.reputationResultat(r.malveillants, r.total, r.date)));
+        // « Aucun signalement ne veut pas dire sûr » : quand rien n'est signalé
+        if (r.malveillants === 0) verif.appendChild(creer("p", "verification-externe__ligne", T2.reputationAvertissement));
+      } else if (r.etat === "inconnu") {
+        verif.appendChild(creer("p", "verification-externe__ligne", T2.reputationInconnu));
+        verif.appendChild(creer("p", "verification-externe__ligne", T2.reputationAvertissement));
+      } else {
+        verif.appendChild(creer("p", "verification-externe__ligne", T2.reputationIndisponible));
+      }
+      boite.appendChild(verif);
+    }
+
     zoneResultat.appendChild(boite);
     blocApresClic.hidden = false;
     if (!sansDefiler) boite.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
 
   // Quand on clique sur "Vérifier" ou qu'on appuie sur Entrée
+  // Analyse locale, puis (si elle est activée dans config.js) vérification complémentaire du nom de domaine.
+  // Le site marche entièrement sans elle : si le service ne répond pas, le résultat local reste affiché tel quel.
+  let numeroAnalyse = 0;
+  function analyserEtAfficher(sansDefiler) {
+    const numero = ++numeroAnalyse;
+    const res = analyser(champ.value, reponseChoisie());
+    if (window.RoShieldReputation) {
+      // la réponse tardive d'un ancien lien (ou d'une ancienne réponse à la question) est ignorée
+      let premier = true;
+      window.RoShieldReputation.lancer(res, function (resultat) {
+        if (numero !== numeroAnalyse) return;
+        afficher(resultat, premier ? sansDefiler : true);   // on ne défile qu'à la première image
+        premier = false;
+      });
+    } else {
+      afficher(res, sansDefiler);
+    }
+  }
+
   formulaire.addEventListener("submit", function (evenement) {
     evenement.preventDefault(); // empêche la page de se recharger
-    afficher(analyser(champ.value, reponseChoisie()));
+    analyserEtAfficher(false);
   });
 
   // Si on change de réponse alors qu'un résultat est déjà affiché, on le recalcule tout de suite
   // (sans faire défiler la page).
   formulaire.addEventListener("change", function (evenement) {
     if (evenement.target.name === "attendu" && resultatAffiche && champ.value.trim()) {
-      afficher(analyser(champ.value, reponseChoisie()), true);
+      analyserEtAfficher(true);
     }
   });
 })();

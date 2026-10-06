@@ -23,6 +23,23 @@ window.CONFIG_SITE = {
   // puis lance  node outils/hreflang.js  (il met à jour toutes les pages d'un coup).
   urlSite: "https://ayoubgarri7-boop.github.io/roshield/",
 
+  // Vérification complémentaire d'un nom de domaine avec VirusTotal, par l'intermédiaire du petit service roshield-sante
+  // (un Worker Cloudflare). DÉSACTIVÉE PAR DÉFAUT : tant que "urlWorker" est vide, RIEN n'est envoyé, jamais.
+  //   - urlWorker : l'adresse du Worker, par exemple "https://roshield-sante.ton-sous-domaine.workers.dev"
+  //     (seules les adresses https://....workers.dev sont acceptées, et http://localhost pour les essais en local).
+  //   - Quand elle est activée : seulement pour un résultat JAUNE, jamais pour un raccourcisseur, et seulement le NOM DE
+  //     DOMAINE de l'adresse réelle (jamais le lien complet).
+  //   - seuilAlerte : à partir de ce nombre de moteurs « malicious » chez VirusTotal, le résultat reste jaune mais devient une
+  //     alerte forte avec le nombre de moteurs.
+  //   - seuilRouge : à partir de ce nombre de moteurs « malicious », le résultat devient ROUGE.
+  //   VirusTotal ne rend JAMAIS un lien vert : il ne peut qu'aggraver un résultat. Seuls les moteurs « malicious » comptent
+  //   (pas « suspicious », pas « undetected »).
+  reputation: {
+    urlWorker: "",
+    seuilAlerte: 1,
+    seuilRouge: 2
+  },
+
   // Le menu du haut. "fichier" doit être le nom exact de la page.
   menu: [
     { texte: "Accueil",      fichier: "index.html" },
@@ -40,6 +57,7 @@ window.CONFIG_SITE = {
     don: "Soutenir le projet",
     donBientot: "Soutenir le projet (bientôt)",
     pied: "Protège ton compte, protège tes amis.",
+    confidentialite: "Comment ça marche et confidentialité",
 
     // Libellés pour les lecteurs d'écran
     accueilAria: "accueil",

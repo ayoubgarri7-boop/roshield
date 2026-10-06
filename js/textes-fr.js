@@ -32,6 +32,11 @@ window.TEXTES_VERIF = {
     // Le texte du lien affiche une autre adresse que l'adresse réelle ([texte](adresse))
     adresseAfficheeRouge: "Danger : l'adresse affichée n'est pas l'adresse réelle",
     adresseAfficheeJaune: "Attention : l'adresse affichée n'est pas l'adresse réelle",
+    // Vérification complémentaire (VirusTotal) : un résultat jaune peut être aggravé, jamais allégé
+    reputationUnJaune: "Attention : un moteur de sécurité signale ce nom de domaine",
+    reputationUnRouge: "Danger : un moteur de sécurité signale ce nom de domaine",
+    reputationPlusieursJaune: "Attention : plusieurs moteurs de sécurité signalent ce nom de domaine",
+    reputationPlusieursRouge: "Plusieurs moteurs de sécurité signalent ce nom de domaine",
     alerteChemin: "Attention : le nom de Roblox (ou Discord) est copié dans ce lien",
     alerteMarque_roblox: "Ce site ne fait pas partie des sites officiels de Roblox que RoShield connaît : son nom contient « Roblox »",
     alerteMarque_rbx: "Ce site ne fait pas partie des sites officiels de Roblox que RoShield connaît : son nom contient « rbx »",
@@ -121,6 +126,22 @@ window.TEXTES_VERIF = {
   infoDefendue: "Cette adresse était écrite sous une forme « défendue » (hxxp, [.]) : on l'a remise en forme pour l'analyser. Ça ne la rend pas plus dangereuse.",
   infoTexteLien: "Le texte du lien n'est pas une adresse : seule l'adresse réelle, derrière le texte, est analysée.",
   infoAfficheeRemise: "L'adresse affichée contenait des espaces ou des oublis : on l'a remise en forme pour la comparer.",
+  // ----- Vérification complémentaire (VirusTotal) -----
+  reputationTitreBloc: "Vérification complémentaire (VirusTotal)",
+  reputationEnvoye: function (domaine) {
+    return "Le nom de domaine « " + domaine + " » est comparé avec VirusTotal (le lien complet n'est pas envoyé).";
+  },
+  reputationEnCours: "Comparaison en cours…",
+  reputationResultat: function (m, total, date) {
+    const quand = date ? " (analyse du " + date + ")" : "";
+    if (m === 0) return "0 moteur de sécurité sur " + total + " ne signale ce nom de domaine" + quand + ".";
+    if (m === 1) return "1 moteur de sécurité sur " + total + " signale ce nom de domaine comme malveillant" + quand + ".";
+    return m + " moteurs de sécurité sur " + total + " signalent ce nom de domaine comme malveillant" + quand + ".";
+  },
+  reputationInconnu: "VirusTotal ne connaît pas ce nom de domaine.",
+  reputationAvertissement: "Aucun signalement ne veut pas dire sûr.",
+  reputationConseil: "Ne tape jamais ton mot de passe ou un code sur cette page, et ne partage jamais ton écran.",
+  reputationIndisponible: "Vérification complémentaire indisponible pour le moment : le résultat ci-dessus reste valable.",
   adresseCachee: "Ce lien contient une autre adresse cachée : il peut t'envoyer ailleurs.",
   inconnu:
     "RoShield ne connaît que les domaines officiels de Roblox et de Discord. Ça ne veut pas dire que ce lien " +

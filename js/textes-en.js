@@ -41,6 +41,11 @@ window.TEXTES_VERIF = {
     // The link text shows a different address than the real one ([text](address))
     adresseAfficheeRouge: "Danger: the displayed address is not the real address",
     adresseAfficheeJaune: "Warning: the displayed address is not the real address",
+    // Additional check (VirusTotal): a yellow result can be made worse, never milder
+    reputationUnJaune: "Warning: one security engine flags this domain name",
+    reputationUnRouge: "Danger: one security engine flags this domain name",
+    reputationPlusieursJaune: "Warning: several security engines flag this domain name",
+    reputationPlusieursRouge: "Several security engines flag this domain name",
     alerteChemin: "Warning: Roblox’s (or Discord’s) name is copied into this link",
     alerteMarque_roblox: "This isn’t one of the official Roblox sites that RoShield knows: its name contains “Roblox”",
     alerteMarque_rbx: "This isn’t one of the official Roblox sites that RoShield knows: its name contains “rbx”",
@@ -130,6 +135,22 @@ window.TEXTES_VERIF = {
   infoDefendue: "This address was written in a “defanged” form (hxxp, [.]): we put it back in shape to check it. That doesn’t make it more dangerous.",
   infoTexteLien: "The link text is not an address: only the real address, behind the text, is checked.",
   infoAfficheeRemise: "The displayed address had spaces or slips: we put it back in shape to compare it.",
+  // ----- Additional check (VirusTotal) -----
+  reputationTitreBloc: "Additional check (VirusTotal)",
+  reputationEnvoye: function (domaine) {
+    return "The domain name “" + domaine + "” is being compared with VirusTotal (the full link is not sent).";
+  },
+  reputationEnCours: "Comparing…",
+  reputationResultat: function (m, total, date) {
+    const quand = date ? " (analysis of " + date + ")" : "";
+    if (m === 0) return "0 security engines out of " + total + " flag this domain name" + quand + ".";
+    if (m === 1) return "1 security engine out of " + total + " flags this domain name as malicious" + quand + ".";
+    return m + " security engines out of " + total + " flag this domain name as malicious" + quand + ".";
+  },
+  reputationInconnu: "VirusTotal doesn’t know this domain name.",
+  reputationAvertissement: "No reports doesn’t mean safe.",
+  reputationConseil: "Never type your password or a code on this page, and never share your screen.",
+  reputationIndisponible: "Additional check unavailable right now: the result above is still valid.",
   adresseCachee: "This link contains another address inside it: it may send you somewhere else.",
   inconnu:
     "RoShield only knows the official domains of Roblox and Discord. That doesn’t mean this link is dangerous, " +

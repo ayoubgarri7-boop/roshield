@@ -521,6 +521,17 @@ a.carte:hover {
 /* Petite mention de la source de la liste de liens signalés (bas du vérificateur) */
 .note-source { margin: 20px 0 0; font-size: 0.85rem; color: var(--texte-doux); }
 .note-source a { text-decoration: underline; }
+
+/* Lien « Comment ça marche et confidentialité » (sous le formulaire du vérificateur et dans le pied de page) */
+.lien-confidentialite { margin: 10px 0 0; font-size: 0.9rem; }
+.lien-confidentialite a, .pied__confidentialite a { text-decoration: underline; }
+.pied__confidentialite { margin: 8px 0 0; font-size: 0.9rem; }
+
+/* Vérification complémentaire (VirusTotal), sous le résultat */
+.verification-externe { margin-top: 16px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.15); }
+.verification-externe__titre { margin: 0 0 6px; font-size: 1rem; }
+.verification-externe__ligne { margin: 4px 0; font-size: 0.92rem; overflow-wrap: anywhere; }
+.verification-externe__ligne--alerte { font-weight: 700; }
 .conseil p + p { margin-top: 12px; }
 .conseil ul { margin: 0; padding-left: 20px; color: var(--texte-doux); }
 .conseil li { margin-bottom: 10px; }
