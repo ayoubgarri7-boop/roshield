@@ -203,7 +203,7 @@ cas.forEach(function (c) {
   verif(mauvais === 0, "jeu de test : aucun résultat plus bas ou interrogé à tort");
   console.log("Jeu de test : " + tous.length + " liens, " + comparaisons + " comparaisons (0, 1, 2, 3, 10 moteurs) ; " + declenchent + " liens déclencheraient une demande (jaunes, hors raccourcisseurs et officiels).");
 
-  // ---------- 5b. Liens RACCOURCIS : le lien complet (sans « # ») part vers /reputation-lien, et SEULEMENT pour eux ----------
+  // ---------- 5b. Le LIEN COMPLET d'un résultat jaune (sans « # », sans requête sauf raccourci) part vers /reputation-lien ----------
   const RACC = W.RACCOURCISSEURS;
   const hoteDe = function (l) { return new URL(l).hostname.toLowerCase(); };
   const estRacc = function (h) { return RACC.some(function (r) { return h === r || h.endsWith("." + r); }); };
@@ -246,38 +246,56 @@ cas.forEach(function (c) {
   verif(x.rendus[1].niveau === "rouge" && x.rendus[1].titreCle === "reputationLienPlusieursRouge" && x.rendus[1].raisons[0].indexOf("4 moteurs") === 0 && x.rendus[1].raisons[0].indexOf("ce lien") !== -1, "lancer, raccourci : 4 moteurs -> rouge avec le nombre : " + x.rendus[1].raisons[0]);
   verif(x.rendus[1].notes.some(function (n) { return n.indexOf("Destination cachée") === 0; }), "lancer, raccourci : la note « destination cachée » reste");
 
-  // jaune ORDINAIRE : seulement /reputation avec le nom de domaine, jamais /reputation-lien
+  // jaune ORDINAIRE : le lien complet, sans « # » ni paramètres de requête, vers /reputation-lien (jamais /reputation)
   x = await executer(analyser("https://exemple.org/chemin/secret?jeton=12345#ancre", "inconnu"), repConnu(0));
-  verif(x.envoyes.length === 1 && x.envoyes[0].url === base2 + "/reputation" && x.envoyes[0].corps === JSON.stringify({ domaine: "exemple.org" }), "jaune ordinaire : seulement le nom de domaine, vers /reputation");
-  verif(!x.envoyes.some(function (e) { return e.url.indexOf("/reputation-lien") !== -1; }), "jaune ordinaire : n'appelle JAMAIS /reputation-lien");
+  verif(x.envoyes.length === 1 && x.envoyes[0].url === base2 + "/reputation-lien" && x.envoyes[0].corps === JSON.stringify({ lien: "https://exemple.org/chemin/secret" }), "jaune ordinaire : le lien complet sans « # » ni requête, vers /reputation-lien : " + JSON.stringify(x.envoyes));
+  verif(!JSON.stringify(x.envoyes).includes("jeton") && !JSON.stringify(x.envoyes).includes("12345") && !JSON.stringify(x.envoyes).includes("ancre"), "jaune ordinaire : ni la requête ni l'ancre ne partent");
+  verif(!x.envoyes.some(function (e) { return e.url === base2 + "/reputation"; }), "jaune ordinaire : plus d'appel à /reputation quand le lien peut être envoyé");
+  // un raccourci garde ses paramètres de requête (ils peuvent faire partie de l'identifiant)
+  x = await executer(analyser("https://bit.ly/abc?x=1#f", "inconnu"), repConnu(0));
+  verif(x.envoyes.length === 1 && x.envoyes[0].corps === JSON.stringify({ lien: "https://bit.ly/abc?x=1" }), "raccourci : la requête reste, le « # » part");
+  // lien en http (ou trop long) : repli sur le nom de domaine seul
+  x = await executer(analyser("http://exemple.org/page?a=1", "inconnu"), repConnu(0));
+  verif(x.envoyes.length === 1 && x.envoyes[0].url === base2 + "/reputation" && x.envoyes[0].corps === JSON.stringify({ domaine: "exemple.org" }), "http : repli sur le nom de domaine seul : " + JSON.stringify(x.envoyes));
+  x = await executer(analyser("https://exemple.org/" + "a".repeat(250), "inconnu"), repConnu(0));
+  verif(x.envoyes.length === 1 && x.envoyes[0].url === base2 + "/reputation" && x.envoyes[0].corps === JSON.stringify({ domaine: "exemple.org" }), "trop long : repli sur le nom de domaine seul");
+  // JAMAIS rouge, vert, officiel, IP, nom local : rien ne part
+  for (const l of ["https://roblox-free.test/login", "https://www.roblox.com/home", "https://discord.gg/abc", "https://192.0.2.1/x", "https://exemple.local/x", "https://monpc.lan/page", "https://localhost/x", "https://free-robux.xyz/"]) {
+    x = await executer(analyser(l, "inconnu"), repConnu(0));
+    verif(x.envoyes.length === 0, "rien n'est envoyé pour : " + l + " (" + analyser(l, "inconnu").niveau + ") " + JSON.stringify(x.envoyes));
+  }
 
-  // sur TOUT le jeu de test : seuls les raccourcis envoient un lien ; tout autre lien n'envoie que son nom de domaine
-  let nbRacc = 0, nbAutres = 0, faux1 = 0;
-  const liensRacc = [], liensTest = tous.concat(["https://bit.ly/abc", "https://tinyurl.com/x?a=1#z", "https://www.bit.ly/abc", "https://t.co/Ab12", "https://rb.gy/zzz", "http://bit.ly/abc", "https://u:p@bit.ly/abc",
-    "https://bit.ly.exemple.test/abc", "https://exemple.test/bit.ly/abc", "https://exemple.test/?u=https://bit.ly/abc", "https://bit.ly/" + "a".repeat(300)]);
+  // sur TOUT le jeu de test : seul un résultat JAUNE envoie un lien (https, sans « # », sans requête sauf raccourci) ; jamais rouge ni vert
+  let nbLiens = 0, nbRepli = 0, nbRien = 0, faux1 = 0;
+  const liensTest = tous.concat(["https://bit.ly/abc", "https://tinyurl.com/x?a=1#z", "https://www.bit.ly/abc", "https://t.co/Ab12", "https://rb.gy/zzz", "http://bit.ly/abc", "https://u:p@bit.ly/abc",
+    "https://exemple.test/bit.ly/abc", "https://exemple.test/?u=https://bit.ly/abc", "https://bit.ly/" + "a".repeat(300), "http://exemple.test/page", "https://exemple.test:8443/page", "https://exemple.local/x"]);
   for (const l of liensTest) {
     const res = analyser(l, "inconnu");
     if (res.erreur) continue;
     const lien = R.lienAEnvoyer(res, ACTIVE), dom3 = R.doitInterroger(res, ACTIVE);
     if (lien) {
-      nbRacc++;
-      if (!(estRacc(hoteDe(lien)) && lien.indexOf("https://") === 0 && lien.indexOf("#") === -1 && lien.length <= 200 && res.niveau === "jaune" && dom3 === null)) { faux1++; console.log("ÉCHEC : lien envoyé à tort : " + l.slice(0, 70)); }
-      liensRacc.push(lien);
-    } else {
-      if (dom3) { nbAutres++; if (!/^[a-z0-9.-]+$/.test(dom3) || dom3.indexOf("/") !== -1 || estRacc(dom3)) { faux1++; console.log("ÉCHEC : domaine envoyé à tort : " + l.slice(0, 70)); } }
-      if (res.lien && !estRacc(res.hote)) { faux1++; console.log("ÉCHEC : « lien » présent pour un non-raccourci : " + l.slice(0, 70)); }
-    }
+      nbLiens++;
+      const h = hoteDe(lien);
+      if (!(res.niveau === "jaune" && res.titreCle !== "officielAttention" && lien.indexOf("https://") === 0 && lien.indexOf("#") === -1 && lien.length <= 200 &&
+            (lien.indexOf("?") === -1 || estRacc(h)) && !/^[0-9.]+$/.test(h) && /\./.test(h) && !/\.(local|lan|internal|localhost)$/.test(h))) { faux1++; console.log("ÉCHEC : lien envoyé à tort : " + l.slice(0, 70)); }
+    } else if (dom3) {
+      nbRepli++;
+      if (res.niveau !== "jaune" || !/^[a-z0-9.-]+$/.test(dom3) || estRacc(dom3)) { faux1++; console.log("ÉCHEC : domaine envoyé à tort : " + l.slice(0, 70)); }
+    } else nbRien++;
+    if (res.niveau !== "jaune" && (lien || dom3)) { faux1++; console.log("ÉCHEC : rouge ou vert interrogé : " + l.slice(0, 70)); }
   }
-  verif(faux1 === 0, "jeu de test : seul un raccourci en https, sans « # », envoie un lien ; les autres n'envoient que leur nom de domaine");
-  console.log("Raccourcis : " + nbRacc + " liens complets (sans « # ») seraient envoyés ; " + nbAutres + " autres liens n'enverraient que leur nom de domaine.");
-  ["http://bit.ly/abc", "https://u:p@bit.ly/abc", "https://bit.ly/" + "a".repeat(300), "https://bit.ly.exemple.test/abc", "https://exemple.test/bit.ly/abc", "https://exemple.test/?u=https://bit.ly/abc"].forEach(function (l) {
+  verif(faux1 === 0, "jeu de test : seul un résultat jaune envoie un lien (https, sans « # », sans requête sauf raccourci) ; jamais un rouge ou un vert");
+  console.log("Lien complet : " + nbLiens + " liens complets seraient envoyés (jaunes) ; " + nbRepli + " enverraient seulement le nom de domaine (http, trop long, port...) ; " + nbRien + " n'enverraient rien (rouges, verts, officiels, IP, noms locaux, raccourcis non envoyables).");
+  ["http://bit.ly/abc", "https://u:p@bit.ly/abc", "https://bit.ly/" + "a".repeat(300), "https://exemple.local/x", "https://monpc.lan/x", "https://127.0.0.1/x", "https://roblox-free.test/login", "https://www.roblox.com/home"].forEach(function (l) {
     verif(R.lienAEnvoyer(analyser(l, "inconnu"), ACTIVE) === null, "aucun lien envoyé pour : " + l.slice(0, 60));
   });
-  // un résultat truqué à la main ne peut pas non plus faire partir un autre lien
-  const truque = Object.assign({}, analyser("https://exemple.org/", "inconnu"), { lien: "https://exemple.org/secret" });
-  verif(R.lienAEnvoyer(truque, ACTIVE) === null, "un lien n'est jamais envoyé si l'hôte n'est pas un raccourcisseur");
+  // un résultat truqué à la main ne peut pas non plus faire partir autre chose
+  const ord = analyser("https://exemple.org/page", "inconnu");
+  verif(R.lienAEnvoyer(ord, ACTIVE) === "https://exemple.org/page", "lien ordinaire : https://exemple.org/page");
+  verif(R.lienAEnvoyer(Object.assign({}, ord, { lien: "https://autre.test/x" }), ACTIVE) === null, "un lien d'un autre hôte n'est jamais envoyé");
+  verif(R.lienAEnvoyer(Object.assign({}, ord, { lien: "https://exemple.org/x?a=1" }), ACTIVE) === null, "une requête n'est jamais envoyée (sauf raccourci)");
   verif(R.lienAEnvoyer(Object.assign({}, court, { lien: "https://tinyurl.com/x#f" }), ACTIVE) === null, "un lien avec « # » n'est jamais envoyé");
-  verif(R.lienAEnvoyer(Object.assign({}, court, { niveau: "rouge" }), ACTIVE) === null && R.lienAEnvoyer(Object.assign({}, court, { niveau: "vert" }), ACTIVE) === null, "seulement le jaune");
+  verif(R.lienAEnvoyer(Object.assign({}, ord, { niveau: "rouge" }), ACTIVE) === null && R.lienAEnvoyer(Object.assign({}, ord, { niveau: "vert" }), ACTIVE) === null, "seulement le jaune");
 
   // les seuils pour un raccourci : mêmes que pour les domaines
   const racc = analyser("https://tinyurl.com/3vk33xhh", "inconnu");
@@ -285,7 +303,7 @@ cas.forEach(function (c) {
   verif(r0.niveau === "jaune" && r0.titreCle === racc.titreCle && JSON.stringify(r0.raisons) === JSON.stringify(racc.raisons) && r0.reputation.malveillants === 0, "raccourci, 0 moteur : reste jaune « destination cachée », rien ne change");
   verif(r1.niveau === "jaune" && r1.titreCle === "reputationLienUnJaune" && r1.raisons[0].indexOf("1 moteur de sécurité sur 84 signale ce lien") === 0, "raccourci, 1 moteur : alerte forte jaune avec le nombre : " + r1.raisons[0]);
   verif(r2l.niveau === "rouge" && r2l.titreCle === "reputationLienPlusieursRouge", "raccourci, 2 moteurs : rouge");
-  verif(T.titres.reputationLienPlusieursRouge === "Plusieurs moteurs de sécurité signalent ce lien raccourci" && T.titres.reputationLienUnJaune === "Attention : un moteur de sécurité signale ce lien raccourci", "titres exacts (raccourci)");
+  verif(T.titres.reputationLienPlusieursRouge === "Plusieurs moteurs de sécurité signalent ce lien" && T.titres.reputationLienUnJaune === "Attention : un moteur de sécurité signale ce lien", "titres exacts (lien complet)");
   [0, 1, 2, 10].forEach(function (m) { verif(GRAVITE[R.appliquer(racc, connu(m), ACTIVE, "lien").niveau] >= GRAVITE[racc.niveau], "raccourci : le niveau ne baisse jamais (" + m + ")"); });
   verif(T.reputationLienAucun === "Aucun antivirus ne le signale pour l'instant. Ça ne veut pas dire sûr.", "ligne « Aucun antivirus ne le signale pour l'instant. Ça ne veut pas dire sûr. »");
   const inconnuLien = R.appliquer(racc, { etat: "inconnu" }, ACTIVE, "lien");
@@ -300,8 +318,9 @@ cas.forEach(function (c) {
     ["JSON illisible", function () { return { ok: true, status: 200, json: async function () { throw new Error("x"); } }; }],
     ["réponse inventée", function () { return ok({ ok: true, etat: "connu", malveillants: 99, total: 3 }); }]
   ];
-  for (const pl of pannesLien) {
+  for (const pl of pannesLien.concat(pannesLien.map(function (q) { return [q[0] + ' (lien ordinaire)', q[1], true]; }))) {
     R.viderCache();
+    const racc = pl[2] ? analyser("https://exemple.org/page", "inconnu") : analyser("https://tinyurl.com/3vk33xhh", "inconnu");
     const sortie = await executer(racc, pl[1]);
     const dernier = sortie.rendus[sortie.rendus.length - 1];
     verif(dernier.niveau === "jaune" && dernier.titreCle === racc.titreCle && JSON.stringify(dernier.raisons) === JSON.stringify(racc.raisons) && JSON.stringify(dernier.notes) === JSON.stringify(racc.notes), pl[0] + " : le jaune « destination cachée » reste tel quel");
@@ -328,7 +347,7 @@ cas.forEach(function (c) {
   verif(!/(sûr|prouvé)/i.test(T.reputationResultat(0, 86, "2026-01-01") + T.reputationInconnu + T.reputationEnvoye("x.com")), "français : pareil");
   verif(!/^Aucun signalement/.test(T.reputationResultat(0, 86, null)), "le résultat seul ne prétend rien");
 
-  verif(TE.reputationLienAucun === "No antivirus flags it for now. That doesn’t mean it’s safe." && TE.titres.reputationLienPlusieursRouge === "Several security engines flag this shortened link", "anglais : textes du lien raccourci");
+  verif(TE.reputationLienAucun === "No antivirus flags it for now. That doesn’t mean it’s safe." && TE.titres.reputationLienPlusieursRouge === "Several security engines flag this link", "anglais : textes du lien complet");
   verif(!/(sûr|prouvé)/i.test(T.reputationLienResultat(0, 86, "2026-01-01") + T.reputationLienInconnu + T.reputationLienEnvoye("https://bit.ly/x")), "français : les textes du raccourci ne disent pas « sûr »");
   verif(!/(safe|secure|proven)/i.test(TE.reputationLienResultat(0, 86, "2026-01-01") + TE.reputationLienInconnu + TE.reputationLienEnvoye("https://bit.ly/x")), "anglais : pareil");
   verif(T.reputationLienEnvoye("https://tinyurl.com/abc").indexOf("tinyurl.com/abc") !== -1 && T.reputationLienEnvoye("https://tinyurl.com/abc").indexOf("https://") === -1, "la ligne montre le lien envoyé (sans https://)");

@@ -37,11 +37,11 @@ window.TEXTES_VERIF = {
     reputationUnRouge: "Danger : un moteur de sécurité signale ce nom de domaine",
     reputationPlusieursJaune: "Attention : plusieurs moteurs de sécurité signalent ce nom de domaine",
     reputationPlusieursRouge: "Plusieurs moteurs de sécurité signalent ce nom de domaine",
-    // Idem pour un lien RACCOURCI (le lien complet est comparé, pas seulement le nom de domaine)
-    reputationLienUnJaune: "Attention : un moteur de sécurité signale ce lien raccourci",
-    reputationLienUnRouge: "Danger : un moteur de sécurité signale ce lien raccourci",
-    reputationLienPlusieursJaune: "Attention : plusieurs moteurs de sécurité signalent ce lien raccourci",
-    reputationLienPlusieursRouge: "Plusieurs moteurs de sécurité signalent ce lien raccourci",
+    // Idem quand le LIEN COMPLET est comparé (cas normal d'un résultat jaune)
+    reputationLienUnJaune: "Attention : un moteur de sécurité signale ce lien",
+    reputationLienUnRouge: "Danger : un moteur de sécurité signale ce lien",
+    reputationLienPlusieursJaune: "Attention : plusieurs moteurs de sécurité signalent ce lien",
+    reputationLienPlusieursRouge: "Plusieurs moteurs de sécurité signalent ce lien",
     // Mot d'appât (Robux, Nitro) dans le chemin d'un domaine non officiel : jaune, alerte plus forte
     alerteAppatChemin: "Attention : ce lien parle de Robux ou de Nitro",
     // Nom de marque + mot de piège dans le chemin d'un domaine non officiel : jaune, alerte forte
@@ -148,9 +148,9 @@ window.TEXTES_VERIF = {
     return m + " moteurs de sécurité sur " + total + " signalent ce nom de domaine comme malveillant" + quand + ".";
   },
   reputationInconnu: "VirusTotal ne connaît pas ce nom de domaine.",
-  // Lien RACCOURCI : le lien complet (sans « # ») est envoyé, parce que le nom du site seul ne dit pas où il mène
+  // Le lien complet (sans « # ») est envoyé à VirusTotal
   reputationLienEnvoye: function (lien) {
-    return "Le lien complet « " + String(lien).replace(/^https:\/\//, "") + " » est comparé avec VirusTotal, parce que le nom du site seul ne dit pas où il mène. VirusTotal peut garder cette adresse et la partager avec la communauté de sécurité.";
+    return "Le lien complet « " + String(lien).replace(/^https:\/\//, "") + " » est comparé avec VirusTotal, qui peut le garder et le partager avec la communauté de sécurité.";
   },
   reputationLienResultat: function (m, total, date) {
     const quand = date ? " (analyse du " + date + ")" : "";

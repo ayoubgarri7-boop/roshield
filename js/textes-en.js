@@ -46,11 +46,11 @@ window.TEXTES_VERIF = {
     reputationUnRouge: "Danger: one security engine flags this domain name",
     reputationPlusieursJaune: "Warning: several security engines flag this domain name",
     reputationPlusieursRouge: "Several security engines flag this domain name",
-    // Same for a SHORTENED link (the full link is compared, not just the domain name)
-    reputationLienUnJaune: "Warning: one security engine flags this shortened link",
-    reputationLienUnRouge: "Danger: one security engine flags this shortened link",
-    reputationLienPlusieursJaune: "Warning: several security engines flag this shortened link",
-    reputationLienPlusieursRouge: "Several security engines flag this shortened link",
+    // Same when the FULL LINK is compared (the normal case for a yellow result)
+    reputationLienUnJaune: "Warning: one security engine flags this link",
+    reputationLienUnRouge: "Danger: one security engine flags this link",
+    reputationLienPlusieursJaune: "Warning: several security engines flag this link",
+    reputationLienPlusieursRouge: "Several security engines flag this link",
     // Bait word (Robux, Nitro) in the path of a non-official domain: yellow, stronger warning
     alerteAppatChemin: "Warning: this link talks about Robux or Nitro",
     // Brand name + trap word in the path of a non-official domain: yellow, strong warning
@@ -157,9 +157,9 @@ window.TEXTES_VERIF = {
     return m + " security engines out of " + total + " flag this domain name as malicious" + quand + ".";
   },
   reputationInconnu: "VirusTotal doesn’t know this domain name.",
-  // SHORTENED link: the full link (without “#”) is sent, because the site name alone doesn’t say where it leads
+  // The full link (without “#”) is sent to VirusTotal
   reputationLienEnvoye: function (lien) {
-    return "The full link “" + String(lien).replace(/^https:\/\//, "") + "” is being compared with VirusTotal, because the site name alone doesn’t say where it leads. VirusTotal may keep this address and share it with the security community.";
+    return "The full link “" + String(lien).replace(/^https:\/\//, "") + "” is being compared with VirusTotal, which may keep it and share it with the security community.";
   },
   reputationLienResultat: function (m, total, date) {
     const quand = date ? " (analysis of " + date + ")" : "";

@@ -27,8 +27,9 @@ window.CONFIG_SITE = {
   // (un Worker Cloudflare). DÉSACTIVÉE PAR DÉFAUT : tant que "urlWorker" est vide, RIEN n'est envoyé, jamais.
   //   - urlWorker : l'adresse du Worker, par exemple "https://roshield-sante.ton-sous-domaine.workers.dev"
   //     (seules les adresses https://....workers.dev sont acceptées, et http://localhost pour les essais en local).
-  //   - Quand elle est activée : seulement pour un résultat JAUNE. Pour un lien RACCOURCI (liste RACCOURCISSEURS), le lien
-  //     complet sans « # » est envoyé (/reputation-lien) ; pour tout autre lien, seulement le NOM DE DOMAINE (/reputation).
+  //   - Quand elle est activée : seulement pour un résultat JAUNE (jamais rouge ni vert). Le LIEN COMPLET (https, 200 caractères
+  //     au plus, sans « # » ni paramètres de requête) est envoyé (/reputation-lien) ; s'il ne peut pas l'être (http, trop long),
+  //     seulement le NOM DE DOMAINE (/reputation).
   //   - seuilAlerte : à partir de ce nombre de moteurs « malicious » chez VirusTotal, le résultat reste jaune mais devient une
   //     alerte forte avec le nombre de moteurs.
   //   - seuilRouge : à partir de ce nombre de moteurs « malicious », le résultat devient ROUGE.

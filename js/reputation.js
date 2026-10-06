@@ -6,11 +6,11 @@
 
    QUAND ELLE EST ACTIVÉE
    - Seulement pour un résultat JAUNE (pas le rouge, pas le vert, pas « officiel mais vérifie le lien »).
-   - Jamais pour une adresse IP, ni pour un domaine officiel.
-   - Pour tout lien SAUF un raccourci : on envoie SEULEMENT le nom de domaine de l'adresse réelle (jamais le lien complet) :
-     POST <urlWorker>/reputation avec {"domaine":"exemple.com"}, sans cookie ni referer.
-   - Pour un lien RACCOURCI (hôte de la liste RACCOURCISSEURS, https, 200 caractères au plus) : on envoie le lien complet, SANS le
-     « # », à POST <urlWorker>/reputation-lien avec {"lien":"https://tinyurl.com/abc"}. Jamais pour un autre lien.
+   - Jamais pour une adresse IP, un nom local, ni un domaine officiel. Jamais pour un résultat rouge ou vert.
+   - On envoie le LIEN COMPLET (https, 200 caractères au plus, sans identifiant ni port, sans « # », sans paramètres de requête
+     sauf pour un raccourcisseur) : POST <urlWorker>/reputation-lien avec {"lien":"https://exemple.com/page"}, sans cookie ni referer.
+   - Si le lien ne peut pas être envoyé (http, trop long, identifiant, port) : repli sur le NOM DE DOMAINE seul,
+     POST <urlWorker>/reputation avec {"domaine":"exemple.com"} (jamais pour un raccourcisseur).
    - Le résultat peut être AGGRAVÉ, jamais allégé, jamais vert :
        0 moteur « malicious »              -> rien ne change
        au moins seuilAlerte (1)            -> jaune, alerte forte avec le nombre de moteurs
@@ -54,29 +54,41 @@
 
   function estOuSousDomaine(hote, base) { return hote === base || hote.endsWith("." + base); }
 
-  // ---------- Faut-il interroger ? Renvoie le nom de domaine à envoyer, ou null ----------
-  function doitInterroger(res, cfg) {
+  const SUFFIXES_LOCAUX = ["localhost", "local", "localdomain", "internal", "intranet", "lan", "home", "corp", "private", "home.arpa"];
+
+  // ---------- Le nom d'hôte d'un résultat qui peut être vérifié, ou null ----------
+  // Seulement le JAUNE (jamais le rouge ni le vert), jamais un domaine officiel, une adresse IP ou un nom local.
+  function hoteVerifiable(res, cfg) {
     if (!lireConfig(cfg === undefined ? configSite() : cfg).url) return null;                 // désactivée
     if (!res || res.erreur || res.niveau !== "jaune") return null;                           // seulement le jaune
     if (res.titreCle === "officielAttention" || !res.hote) return null;                      // domaine officiel : jamais
     const hote = String(res.hote).toLowerCase();
     if (/^\d{1,3}(\.\d{1,3}){3}$/.test(hote) || hote.indexOf(":") !== -1 || hote.charAt(0) === "[") return null;   // adresse IP
     if (!/^[a-z0-9.-]+$/.test(hote) || hote.indexOf(".") === -1) return null;
+    if (SUFFIXES_LOCAUX.some(function (x) { return estOuSousDomaine(hote, x); })) return null;               // nom local
     if ((window.DOMAINES_OFFICIELS || []).some(function (d) { return estOuSousDomaine(hote, d.domaine); })) return null;
-    if ((window.RACCOURCISSEURS || []).some(function (r) { return estOuSousDomaine(hote, r); })) return null;   // jamais un raccourcisseur
+    return hote;
+  }
+  function estRaccourcisseur(hote) {
+    return (window.RACCOURCISSEURS || []).some(function (r) { return estOuSousDomaine(hote, r); });
+  }
+
+  // ---------- Repli : faut-il envoyer SEULEMENT le nom de domaine ? (lien non envoyable en entier : http, trop long...) ----------
+  function doitInterroger(res, cfg) {
+    const hote = hoteVerifiable(res, cfg);
+    if (!hote || estRaccourcisseur(hote)) return null;                                       // jamais un raccourcisseur seul
     return hote;
   }
 
-  // ---------- Lien RACCOURCI : faut-il envoyer le lien complet ? Renvoie le lien (sans « # »), ou null ----------
-  // C'est la SEULE situation où un lien complet part : un résultat jaune, un hôte de la liste des raccourcisseurs, en https.
+  // ---------- Faut-il envoyer le LIEN COMPLET ? Renvoie le lien (sans « # »), ou null ----------
+  // Un résultat jaune seulement ; https, 200 caractères au plus ; pas de paramètres de requête sauf pour un raccourcisseur.
   function lienAEnvoyer(res, cfg) {
-    if (!lireConfig(cfg === undefined ? configSite() : cfg).url) return null;                 // désactivée
-    if (!res || res.erreur || res.niveau !== "jaune" || res.titreCle === "officielAttention" || !res.hote) return null;
-    const hote = String(res.hote).toLowerCase();
-    if (!(window.RACCOURCISSEURS || []).some(function (r) { return estOuSousDomaine(hote, r); })) return null;   // PAS un raccourcisseur
+    const hote = hoteVerifiable(res, cfg);
+    if (!hote) return null;
     const lien = res.lien;
     if (typeof lien !== "string" || lien.length > 200 || lien.indexOf("#") !== -1) return null;
     if (lien.indexOf("https://" + hote + "/") !== 0) return null;                            // https, et le bon hôte
+    if (lien.indexOf("?") !== -1 && !estRaccourcisseur(hote)) return null;                   // pas de requête (sauf raccourci)
     if (/[\s\u0000-\u001f\u007f]/.test(lien)) return null;
     return lien;
   }
@@ -102,7 +114,7 @@
   async function interroger(domaine, cfg, fetchFn) {
     return appeler("/reputation", { domaine: domaine }, domaine, cfg, fetchFn);
   }
-  // Lien RACCOURCI : le lien complet (sans « # ») part vers /reputation-lien
+  // Lien complet (sans « # ») : part vers /reputation-lien
   async function interrogerLien(lien, cfg, fetchFn) {
     return appeler("/reputation-lien", { lien: lien }, "lien|" + lien, cfg, fetchFn);
   }
@@ -138,7 +150,7 @@
   }
 
   // ---------- Appliquer la réponse au résultat : on peut AGGRAVER, jamais alléger ----------
-  // nature : "lien" pour un lien RACCOURCI (le lien complet a été comparé), sinon le nom de domaine
+  // nature : "lien" quand le lien complet a été comparé, sinon le nom de domaine (repli)
   function appliquer(res, donnees, cfg, nature) {
     const c = lireConfig(cfg === undefined ? configSite() : cfg);
     const T = textes();
@@ -173,7 +185,7 @@
   // ---------- Pour le vérificateur : affiche d'abord le résultat local (+ « en cours »), puis le résultat complété ----------
   // rendre(resultat) est appelée une ou deux fois ; l'appelant ignore les réponses devenues inutiles.
   function lancer(res, rendre) {
-    // Lien RACCOURCI : le lien complet (sans « # ») est comparé ; en cas de panne ou de limite, le jaune « destination cachée » reste
+    // Le lien complet (sans « # ») est comparé ; en cas de panne ou de limite, le résultat jaune reste tel quel
     const lien = lienAEnvoyer(res);
     if (lien) {
       const cle = "lien|" + lien;

@@ -778,11 +778,12 @@
     // Exception : domaine officiel avec un détail (http://, @) -> "inconnu" serait faux.
     const titreCle = titreForce || (alerte && niveau === "jaune" ? alerte : (officiel && niveau === "jaune" ? "officielAttention" : niveau));
 
-    // Lien RACCOURCI : le lien complet, SANS « # », que la vérification complémentaire pourra envoyer (https seulement, 200 caractères
-    // au plus, sans identifiant ni port). Pour tout autre lien : null (seul le nom de domaine pourra être envoyé).
+    // Le lien complet que la vérification complémentaire pourra envoyer pour un résultat JAUNE : https seulement, 200 caractères au
+    // plus, sans identifiant ni port, SANS « # » et SANS paramètres de requête (sauf pour un raccourcisseur, où ils peuvent faire
+    // partie de l'identifiant du lien). Sinon : null (seul le nom de domaine pourra être envoyé).
     let lien = null;
-    if (raccourci && url.protocol === "https:" && !url.username && !url.password && !url.port) {
-      const complet = "https://" + hote + url.pathname + url.search;
+    if (url.protocol === "https:" && !url.username && !url.password && !url.port) {
+      const complet = "https://" + hote + url.pathname + (raccourci ? url.search : "");
       if (complet.length <= 200) lien = complet;
     }
 
