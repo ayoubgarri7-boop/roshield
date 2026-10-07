@@ -906,21 +906,32 @@
       const verif = creer("div", "verification-externe");
       verif.setAttribute("aria-live", "polite");
       verif.appendChild(creer("h3", "verification-externe__titre", T2.reputationTitreBloc));
-      const lienEnvoye = r.nature === "lien";     // lien RACCOURCI : c'est le lien complet qui est comparé, pas le nom de domaine
-      const resultat = lienEnvoye ? T2.reputationLienResultat : T2.reputationResultat;
-      const avertissement = lienEnvoye ? T2.reputationLienAucun : T2.reputationAvertissement;
-      verif.appendChild(creer("p", "verification-externe__ligne", lienEnvoye ? T2.reputationLienEnvoye(r.lien) : T2.reputationEnvoye(r.domaine)));
-      if (r.etat === "encours") {
-        verif.appendChild(creer("p", "verification-externe__ligne", T2.reputationEnCours));
-      } else if (r.etat === "connu") {
-        verif.appendChild(creer("p", "verification-externe__ligne" + (r.malveillants > 0 ? " verification-externe__ligne--alerte" : ""), resultat(r.malveillants, r.total, r.date)));
-        // « Aucun signalement ne veut pas dire sûr » : quand rien n'est signalé
-        if (r.malveillants === 0) verif.appendChild(creer("p", "verification-externe__ligne", avertissement));
-      } else if (r.etat === "inconnu") {
-        verif.appendChild(creer("p", "verification-externe__ligne", lienEnvoye ? T2.reputationLienInconnu : T2.reputationInconnu));
-        verif.appendChild(creer("p", "verification-externe__ligne", avertissement));
-      } else {
-        verif.appendChild(creer("p", "verification-externe__ligne", T2.reputationIndisponible));
+      // Une ou deux vérifications : le lien complet, puis (si rien n'est signalé) le nom de domaine
+      const verifs = r.verifs || [Object.assign({}, r, { nature: r.nature === "lien" ? "lien" : "domaine" })];
+      let signale = false, quelqueChose = false, avecLien = false;
+      verifs.forEach(function (v, i) {
+        const estLien = v.nature === "lien";
+        if (estLien) avecLien = true;
+        verif.appendChild(creer("p", "verification-externe__ligne",
+          estLien ? T2.reputationLienEnvoye(v.lien) : (i === 0 ? T2.reputationEnvoye(v.domaine) : T2.reputationDomaineAussi(v.domaine))));
+        if (v.etat === "encours") {
+          verif.appendChild(creer("p", "verification-externe__ligne", T2.reputationEnCours));
+        } else if (v.etat === "connu") {
+          quelqueChose = true;
+          if (v.malveillants > 0) signale = true;
+          verif.appendChild(creer("p", "verification-externe__ligne" + (v.malveillants > 0 ? " verification-externe__ligne--alerte" : ""),
+            (estLien ? T2.reputationLienResultat : T2.reputationResultat)(v.malveillants, v.total, v.date)));
+        } else if (v.etat === "inconnu") {
+          quelqueChose = true;
+          verif.appendChild(creer("p", "verification-externe__ligne", estLien ? T2.reputationLienInconnu : T2.reputationInconnu));
+        } else {
+          verif.appendChild(creer("p", "verification-externe__ligne", T2.reputationIndisponible));
+        }
+      });
+      // « Aucun signalement ne veut pas dire sûr » : quand rien n'est signalé
+      if (quelqueChose && !signale) {
+        verif.appendChild(creer("p", "verification-externe__ligne", avecLien ? T2.reputationLienAucun : T2.reputationAvertissement));
+        if (r.premiereFois) verif.appendChild(creer("p", "verification-externe__ligne", T2.reputationPremiereFois));
       }
       boite.appendChild(verif);
     }

@@ -161,6 +161,12 @@ window.TEXTES_VERIF = {
     return m + " moteurs de sécurité sur " + total + " signalent ce lien comme malveillant" + quand + ".";
   },
   reputationLienInconnu: "VirusTotal n'a pas encore de résultat pour ce lien.",
+  // Deuxième vérification (rien trouvé pour le lien complet) : le nom de domaine seul
+  reputationDomaineAussi: function (domaine) {
+    return "Le nom de domaine « " + domaine + " » est aussi comparé avec VirusTotal.";
+  },
+  // L'analyse du lien n'était pas finie après la relecture, et rien n'est signalé
+  reputationPremiereFois: "VirusTotal analyse ce lien pour la première fois. Réessaie dans une minute avant de l'ouvrir.",
   reputationLienAucun: "Aucun antivirus ne le signale pour l'instant. Ça ne veut pas dire sûr.",
   reputationAvertissement: "Aucun signalement ne veut pas dire sûr.",
   reputationConseil: "Ne tape jamais ton mot de passe ou un code sur cette page, et ne partage jamais ton écran.",

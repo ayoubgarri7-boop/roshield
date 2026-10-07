@@ -248,9 +248,10 @@ cas.forEach(function (c) {
 
   // jaune ORDINAIRE : le lien complet, sans « # » ni paramètres de requête, vers /reputation-lien (jamais /reputation)
   x = await executer(analyser("https://exemple.org/chemin/secret?jeton=12345#ancre", "inconnu"), repConnu(0));
-  verif(x.envoyes.length === 1 && x.envoyes[0].url === base2 + "/reputation-lien" && x.envoyes[0].corps === JSON.stringify({ lien: "https://exemple.org/chemin/secret" }), "jaune ordinaire : le lien complet sans « # » ni requête, vers /reputation-lien : " + JSON.stringify(x.envoyes));
+  verif(x.envoyes.length === 2 && x.envoyes[0].url === base2 + "/reputation-lien" && x.envoyes[0].corps === JSON.stringify({ lien: "https://exemple.org/chemin/secret" }), "jaune ordinaire (0 moteur) : d'abord le lien complet sans « # » ni requête : " + JSON.stringify(x.envoyes));
+  verif(x.envoyes[1].url === base2 + "/reputation" && x.envoyes[1].corps === JSON.stringify({ domaine: "exemple.org" }), "jaune ordinaire (0 moteur) : puis SEULEMENT le nom de domaine");
   verif(!JSON.stringify(x.envoyes).includes("jeton") && !JSON.stringify(x.envoyes).includes("12345") && !JSON.stringify(x.envoyes).includes("ancre"), "jaune ordinaire : ni la requête ni l'ancre ne partent");
-  verif(!x.envoyes.some(function (e) { return e.url === base2 + "/reputation"; }), "jaune ordinaire : plus d'appel à /reputation quand le lien peut être envoyé");
+  verif(x.envoyes[0].url === base2 + "/reputation-lien", "jaune ordinaire : le lien complet est toujours vérifié EN PREMIER");
   // un raccourci garde ses paramètres de requête (ils peuvent faire partie de l'identifiant)
   x = await executer(analyser("https://bit.ly/abc?x=1#f", "inconnu"), repConnu(0));
   verif(x.envoyes.length === 1 && x.envoyes[0].corps === JSON.stringify({ lien: "https://bit.ly/abc?x=1" }), "raccourci : la requête reste, le « # » part");
@@ -360,18 +361,6 @@ cas.forEach(function (c) {
   verif(suivi.length === 2 && suivi[0].x.attente === true && suivi[0].t < 50, "réponse rapide : l'attente s'affiche tout de suite");
   verif(suivi[1].x.niveau === "rouge" && suivi[1].t >= 90 && suivi[1].t < 1000, "réponse rapide : le résultat final arrive dès que le Worker répond (" + suivi[1].t + " ms)");
 
-  // réponse LENTE mais dans les temps (3 s) : on attend, puis le résultat final
-  R.viderCache();
-  suivi = await suivre(jauneOrd, async function () { await attendre(3000); return ok({ ok: true, etat: "connu", malveillants: 0, suspects: 0, inoffensifs: 80, nonDetectes: 4, total: 84, date: "2026-01-01" }); });
-  finSuivi();
-  verif(suivi.length === 2 && suivi[1].x.reputation.etat === "connu" && suivi[1].t >= 2950 && suivi[1].t < 3800, "réponse à 3 s : le résultat final est affiché (" + suivi[1].t + " ms)");
-
-  // réponse TROP LENTE (le Worker ne répond jamais) : au bout de 4 secondes, le jaune avec « indisponible »
-  R.viderCache();
-  suivi = await suivre(jauneOrd, function () { return new Promise(function () {}); });
-  finSuivi();
-  verif(suivi.length === 2 && suivi[1].t >= 3900 && suivi[1].t < 4700, "réponse trop lente : le jaune s'affiche au bout de 4 secondes (" + suivi[1].t + " ms)");
-  verif(suivi[1].x.niveau === "jaune" && suivi[1].x.titreCle === jauneOrd.titreCle && JSON.stringify(suivi[1].x.raisons) === JSON.stringify(jauneOrd.raisons) && suivi[1].x.reputation.etat === "indisponible", "réponse trop lente : jaune inchangé + ligne « indisponible »");
   verif(T.reputationIndisponible.indexOf("Vérification complémentaire indisponible") === 0, "texte de la ligne « Vérification complémentaire indisponible… »");
 
   // PANNE immédiate : pas d'attente de 4 secondes
@@ -417,7 +406,7 @@ cas.forEach(function (c) {
   compte = 0;
   await new Promise(function (resolve) { const fini = function (x) { if (!x.attente && ++compte === 2) resolve(); }; R.lancer(analyser("https://a.exemple.org/", "inconnu"), fini); R.lancer(analyser("https://b.exemple.org/", "inconnu"), fini); });
   finSuivi();
-  verif(cpt.n === 2, "deux liens différents : deux requêtes");
+  verif(cpt.n === 4, "deux liens différents : chacun sa vérification du lien et de son domaine (4 requêtes) : " + cpt.n);
 
   // Rouge, vert, officiel, IP, nom local, raccourci non envoyable : affichés TOUT DE SUITE (un seul rendu, synchrone), sans attente
   W.CONFIG_SITE = JSON.parse(JSON.stringify(ACTIVE));
@@ -441,6 +430,140 @@ cas.forEach(function (c) {
   verif(rapide.length === 1 && !rapide[0].attente && rapide[0].reputation && rapide[0].reputation.etat === "inconnu", "résultat déjà en cache : affiché tout de suite");
   R.viderCache();
 
+  // ---------- 5d. DOUBLE VÉRIFICATION : le lien d'abord, puis (seulement si rien n'est signalé) le nom de domaine ----------
+  // Un faux « Worker » qui répond selon la route : /reputation-lien et /reputation
+  const rep = function (m, extra) { return Object.assign({ ok: true, etat: "connu", malveillants: m, suspects: 0, inoffensifs: 60, nonDetectes: 20, total: 80 + m, date: "2026-01-01" }, extra || {}); };
+  const attenteVT = { ok: true, etat: "inconnu", analyseEnCours: true };
+  function routeur(l, d) {            // l : réponse pour le lien, d : réponse pour le nom de domaine (objets, ou fonctions renvoyant une promesse)
+    return function (url, init) {
+      const r = url.slice(-5) === "-lien" ? l : d;
+      const v = typeof r === "function" ? r(url, init) : ok(r);
+      return v;
+    };
+  }
+  async function double(res, l, d) {
+    const sortie = await executer(res, routeur(l, d));
+    return { rendus: sortie.rendus, finale: sortie.rendus[sortie.rendus.length - 1], envoyes: sortie.envoyes, chemins: sortie.envoyes.map(function (e) { return e.url.slice(base2.length); }) };
+  }
+  const exemple = analyser("https://exemple.org/page?a=1#f", "inconnu");
+
+  // 1. signalé au premier coup : AUCUNE deuxième vérification
+  let dbl = await double(exemple, rep(1), rep(9));
+  verif(dbl.chemins.join() === "/reputation-lien", "signalé au premier coup (1 moteur) : une seule requête, le lien : " + dbl.chemins.join());
+  verif(dbl.finale.niveau === "jaune" && dbl.finale.titreCle === "reputationLienUnJaune" && dbl.finale.reputation.verifs.length === 1, "signalé (1 moteur) : alerte forte jaune avec le nombre");
+  dbl = await double(exemple, rep(3), rep(0));
+  verif(dbl.chemins.join() === "/reputation-lien" && dbl.finale.niveau === "rouge" && dbl.finale.titreCle === "reputationLienPlusieursRouge", "signalé (3 moteurs) : rouge, une seule requête");
+
+  // 2. rien d'absent mais 0 moteur pour le lien -> le nom de domaine, avec le SEUL nom de domaine
+  dbl = await double(exemple, rep(0), rep(0));
+  verif(dbl.chemins.join() === "/reputation-lien,/reputation", "0 moteur : le lien PUIS le nom de domaine : " + dbl.chemins.join());
+  verif(dbl.envoyes[1].corps === JSON.stringify({ domaine: "exemple.org" }) && !dbl.envoyes[1].corps.includes("page"), "deuxième vérification : le seul nom de domaine");
+  verif(dbl.finale.niveau === "jaune" && dbl.finale.titreCle === exemple.titreCle && JSON.stringify(dbl.finale.raisons) === JSON.stringify(exemple.raisons), "tout à 0 : le jaune reste inchangé");
+  verif(dbl.finale.reputation.etat === "connu" && dbl.finale.reputation.verifs.length === 2 && dbl.finale.reputation.premiereFois === undefined, "tout à 0 : deux vérifications affichées, pas de « première fois »");
+
+  // 3. 0 moteur pour le lien, mais le nom de domaine est signalé : le PIRE gagne
+  dbl = await double(exemple, rep(0), rep(1));
+  verif(dbl.finale.niveau === "jaune" && dbl.finale.titreCle === "reputationUnJaune" && dbl.finale.raisons[0].indexOf("1 moteur") === 0 && dbl.finale.raisons[0].indexOf("nom de domaine") !== -1, "domaine à 1 moteur : alerte forte jaune (nom de domaine) : " + dbl.finale.raisons[0]);
+  dbl = await double(exemple, rep(0), rep(2));
+  verif(dbl.finale.niveau === "rouge" && dbl.finale.titreCle === "reputationPlusieursRouge" && dbl.finale.raisons[0].indexOf("2 moteurs") === 0, "domaine à 2 moteurs : ROUGE");
+  dbl = await double(exemple, attenteVT, rep(5));
+  verif(dbl.finale.niveau === "rouge" && dbl.finale.reputation.premiereFois !== true, "analyse pas finie + domaine signalé : rouge, pas de « première fois »");
+
+  // 4. analyse pas finie après la relecture (le Worker répond « inconnu » + analyseEnCours) + domaine à 0 : jaune, « première fois »
+  dbl = await double(exemple, attenteVT, rep(0));
+  verif(dbl.chemins.join() === "/reputation-lien,/reputation", "analyse pas finie : le nom de domaine est aussi vérifié");
+  verif(dbl.finale.niveau === "jaune" && dbl.finale.titreCle === exemple.titreCle && dbl.finale.reputation.premiereFois === true && dbl.finale.reputation.etat === "connu", "analyse pas finie + domaine à 0 : jaune + « première fois »");
+  dbl = await double(exemple, { ok: true, etat: "inconnu" }, { ok: true, etat: "inconnu" });
+  verif(dbl.finale.niveau === "jaune" && dbl.finale.reputation.etat === "inconnu" && dbl.finale.reputation.premiereFois === undefined, "inconnu partout (sans analyse en cours) : jaune, pas de « première fois »");
+  verif(T.reputationPremiereFois === "VirusTotal analyse ce lien pour la première fois. Réessaie dans une minute avant de l'ouvrir.", "texte exact « première fois » (FR)");
+
+  // 5. raccourcisseur : jamais de repli sur le nom de domaine
+  const bitly = analyser("https://bit.ly/abc?x=1#f", "inconnu");
+  dbl = await double(bitly, rep(0), rep(9));
+  verif(dbl.chemins.join() === "/reputation-lien" && dbl.finale.niveau === "jaune" && dbl.finale.reputation.verifs.length === 1, "raccourci à 0 moteur : UNE seule requête, aucun repli sur le domaine");
+  dbl = await double(bitly, attenteVT, rep(9));
+  verif(dbl.chemins.join() === "/reputation-lien" && dbl.finale.niveau === "jaune" && dbl.finale.reputation.premiereFois === true, "raccourci, analyse pas finie : une requête, jaune, « première fois »");
+  dbl = await double(bitly, rep(2), rep(0));
+  verif(dbl.chemins.join() === "/reputation-lien" && dbl.finale.niveau === "rouge", "raccourci signalé : rouge");
+
+  // 6. pannes : jamais de deuxième vérification si la première est en panne ou en limite
+  for (const cas2 of [["panne", function () { return new TypeError("Failed to fetch"); }], ["limite", function () { return ok({ ok: false, etat: "limite" }, 429); }], ["502", function () { return ok({ ok: false }, 502); }]]) {
+    dbl = await double(exemple, function () { const e = cas2[1](); if (e instanceof Error) return Promise.reject(e); return Promise.resolve(e); }, rep(0));
+    verif(dbl.chemins.join() === "/reputation-lien" && dbl.finale.niveau === "jaune" && dbl.finale.reputation.etat === "indisponible", cas2[0] + " pour le lien : pas de deuxième vérification, jaune + ligne « indisponible »");
+  }
+  // le lien à 0, mais le nom de domaine en panne : jaune, avec la ligne « indisponible » pour le domaine
+  dbl = await double(exemple, rep(0), function () { return Promise.reject(new TypeError("x")); });
+  verif(dbl.finale.niveau === "jaune" && dbl.finale.reputation.verifs.length === 2 && dbl.finale.reputation.verifs[1].etat === "indisponible" && dbl.finale.reputation.etat === "connu", "domaine en panne : le résultat du lien reste, ligne « indisponible » pour le domaine");
+
+  // 7. lien non envoyable (http) : seulement le nom de domaine, une seule requête
+  dbl = await double(analyser("http://exemple.org/page?a=1", "inconnu"), rep(0), rep(0));
+  verif(dbl.chemins.join() === "/reputation" && dbl.envoyes[0].corps === JSON.stringify({ domaine: "exemple.org" }), "lien http : seulement le nom de domaine, une requête");
+
+  // 8. deux clics rapides : toujours une seule requête par lien, et une seule pour le domaine
+  R.viderCache();
+  const cptD = { l: 0, d: 0 };
+  W.CONFIG_SITE = JSON.parse(JSON.stringify(ACTIVE));
+  W.fetch = function (url) { if (url.slice(-5) === "-lien") cptD.l++; else cptD.d++; return attendre(80).then(function () { return ok(rep(0)); }); };
+  let nFin = 0;
+  await new Promise(function (resolve) { const fini = function (x) { if (!x.attente && ++nFin === 2) resolve(); }; R.lancer(exemple, fini); R.lancer(exemple, fini); });
+  finSuivi();
+  verif(cptD.l === 1 && cptD.d === 1, "deux clics rapides : une requête pour le lien et UNE pour le domaine (" + cptD.l + "+" + cptD.d + ")");
+
+  // 9. Le cache de la visite : 5 minutes pour 0 moteur / sans résultat, 1 heure pour un lien signalé, 60 secondes si l'analyse n'est pas finie
+  verif(R.DUREES_CACHE.signale === 3600000 && R.DUREES_CACHE.zero === 300000 && R.DUREES_CACHE.attente === 60000, "durées du cache : 1 h, 5 min, 60 s");
+  let horlogeFaux = 1000000;
+  R.reglerHorloge(function () { return horlogeFaux; });
+  async function relancer(res, l, d) {          // renvoie le nombre de requêtes faites par cette demande, et si le résultat était immédiat
+    const sortie = await executer.sansVider(res, routeur(l, d));
+    return { n: sortie.envoyes.length, immediat: sortie.rendus.length === 1 };
+  }
+  executer.sansVider = async function (res, reponse) { executer.garder = true; try { return await executer(res, reponse); } finally { executer.garder = false; } };
+  R.viderCache();
+  let c1 = await relancer(exemple, rep(0), rep(0));
+  verif(c1.n === 2 && !c1.immediat, "cache : première demande, 2 requêtes");
+  horlogeFaux += 4 * 60000;
+  c1 = await relancer(exemple, rep(0), rep(0));
+  verif(c1.n === 0 && c1.immediat, "cache : 4 minutes plus tard, un résultat à 0 moteur est servi tout de suite, sans requête");
+  horlogeFaux += 2 * 60000;                                  // 6 minutes après la première demande
+  c1 = await relancer(exemple, rep(0), rep(0));
+  verif(c1.n === 2 && !c1.immediat, "cache : 6 minutes plus tard, un résultat à 0 moteur est redemandé (5 minutes seulement)");
+  R.viderCache(); horlogeFaux = 1000000;
+  c1 = await relancer(exemple, rep(2), rep(0));
+  horlogeFaux += 59 * 60000;
+  c1 = await relancer(exemple, rep(2), rep(0));
+  verif(c1.n === 0 && c1.immediat, "cache : un lien SIGNALÉ est gardé 1 heure (servi à 59 minutes)");
+  horlogeFaux += 2 * 60000;
+  c1 = await relancer(exemple, rep(2), rep(0));
+  verif(c1.n === 1, "cache : un lien signalé est redemandé après 1 heure");
+  R.viderCache(); horlogeFaux = 1000000;
+  c1 = await relancer(exemple, attenteVT, rep(0));
+  horlogeFaux += 30000;
+  c1 = await relancer(exemple, attenteVT, rep(0));
+  verif(c1.n === 0 && c1.immediat, "cache : analyse pas finie, servie à 30 secondes");
+  horlogeFaux += 31000;
+  c1 = await relancer(exemple, attenteVT, rep(0));
+  verif(c1.n >= 1 && !c1.immediat, "cache : analyse pas finie, redemandée au bout d'une minute (« réessaie dans une minute »)");
+  R.reglerHorloge(null);
+  R.viderCache();
+
+  // 10. Délais (réduits pour le test : lien 2,5 s, domaine 0,8 s, total 3 s ; en vrai 11 s, 4 s et 15 s)
+  const vrais = R.delais();
+  verif(vrais.lien === 11000 && vrais.domaine === 4000 && vrais.total === 15000, "délais réels : lien 11 s, domaine 4 s, total 15 s");
+  R.reglerDelais({ lien: 2500, domaine: 800, total: 3000 });
+  const jamais = function () { return new Promise(function () {}); };
+  const apres = function (ms, v) { return function () { return attendre(ms).then(function () { return ok(v); }); }; };
+  async function chrono(res, l, d) { R.viderCache(); const t = Date.now(); const x = await double(res, l, d); x.ms = Date.now() - t; return x; }
+  dbl = await chrono(exemple, apres(1000, rep(0)), apres(200, rep(0)));
+  verif(dbl.finale.reputation.verifs.length === 2 && dbl.ms >= 1150 && dbl.ms < 1800, "lien lent (1 s) mais dans les temps, puis domaine : résultat final complet (" + dbl.ms + " ms)");
+  dbl = await chrono(exemple, jamais, rep(0));
+  verif(dbl.chemins.join() === "/reputation-lien" && dbl.finale.niveau === "jaune" && dbl.finale.reputation.etat === "indisponible" && dbl.ms >= 2450 && dbl.ms < 3000, "lien qui ne répond jamais : jaune + « indisponible » à la fin du délai du lien, sans deuxième vérification (" + dbl.ms + " ms)");
+  dbl = await chrono(exemple, rep(0), jamais);
+  verif(dbl.finale.niveau === "jaune" && dbl.finale.reputation.verifs[1].etat === "indisponible" && dbl.ms >= 750 && dbl.ms < 1300, "domaine qui ne répond jamais : jaune après le délai du domaine (" + dbl.ms + " ms)");
+  dbl = await chrono(exemple, apres(2300, rep(0)), jamais);
+  verif(dbl.finale.niveau === "jaune" && dbl.ms >= 2900 && dbl.ms < 3400, "lien lent (2,3 s) puis domaine qui ne répond pas : jamais plus du délai total (" + dbl.ms + " ms)");
+  R.reglerDelais(vrais);
+  R.viderCache();
+
   // ---------- 6. Anglais : mêmes comportements, texte « sûr » ----------
   const WE = charger("en"), RE = WE.RoShieldReputation, TE = WE.TEXTES_VERIF;
   verif(TE.reputationAvertissement === "No reports doesn’t mean safe." && T.reputationAvertissement === "Aucun signalement ne veut pas dire sûr.", "phrase « Aucun signalement ne veut pas dire sûr » (FR) / « No reports doesn’t mean safe. » (EN)");
@@ -451,6 +574,8 @@ cas.forEach(function (c) {
   verif(!/(sûr|prouvé)/i.test(T.reputationResultat(0, 86, "2026-01-01") + T.reputationInconnu + T.reputationEnvoye("x.com")), "français : pareil");
   verif(!/^Aucun signalement/.test(T.reputationResultat(0, 86, null)), "le résultat seul ne prétend rien");
 
+  verif(TE.reputationPremiereFois === "VirusTotal is analysing this link for the first time. Try again in a minute before opening it." && TE.reputationDomaineAussi("exemple.org").indexOf("exemple.org") !== -1 && T.reputationDomaineAussi("exemple.org").indexOf("exemple.org") !== -1, "anglais et français : textes de la double vérification");
+  verif(!/(sûr|prouvé)/i.test(T.reputationPremiereFois + T.reputationDomaineAussi("x.org")) && !/(safe|proven)/i.test(TE.reputationPremiereFois + TE.reputationDomaineAussi("x.org")), "double vérification : aucun texte ne dit « sûr » ou « prouvé »");
   verif(TE.verificationEnCours === "Check in progress…", "anglais : texte de l'attente");
   verif(TE.reputationLienAucun === "No antivirus flags it for now. That doesn’t mean it’s safe." && TE.titres.reputationLienPlusieursRouge === "Several security engines flag this link", "anglais : textes du lien complet");
   verif(!/(sûr|prouvé)/i.test(T.reputationLienResultat(0, 86, "2026-01-01") + T.reputationLienInconnu + T.reputationLienEnvoye("https://bit.ly/x")), "français : les textes du raccourci ne disent pas « sûr »");

@@ -23,9 +23,12 @@
   "use strict";
 
   const GRAVITE = { vert: 0, jaune: 1, rouge: 2 };
-  const DELAI_MS = 4000;       // attente maximale de la réponse du Worker (le résultat jaune n'est affiché qu'après)
+  // Délais : le Worker peut attendre environ 5 s avant l'unique relecture d'une analyse neuve, donc la demande du lien complet a
+  // droit à 11 s ; la vérification du nom de domaine, qui suit, à 4 s ; le tout ne dépasse jamais 15 s.
+  const DELAIS = { lien: 11000, domaine: 4000, total: 15000 };      // (millisecondes) modifiables seulement par les tests
   const enVol = new Map();     // demandes en cours : un second clic sur le même lien ne lance PAS une seconde requête
-  const cache = new Map();     // nom de domaine -> réponse « connu » / « inconnu », seulement pendant la visite de la page
+  const cache = new Map();     // clé -> { donnees, fin } : réponse « connu » / « inconnu », gardée un temps limité (voir dureeCache)
+  let horloge = function () { return Date.now(); };
 
   function textes() { return window.TEXTES_VERIF; }
   function configSite() { return window.CONFIG_SITE; }
@@ -94,11 +97,27 @@
     return lien;
   }
 
+  // ---------- Le cache de la visite : un résultat SIGNALÉ (1 moteur ou plus) garde 1 heure ; 0 moteur ou « inconnu » 5 minutes ;
+  // une analyse pas finie 60 secondes (pour que « réessaie dans une minute » interroge de nouveau VirusTotal) ----------
+  const DUREES_CACHE = { signale: 3600 * 1000, zero: 5 * 60 * 1000, attente: 60 * 1000 };
+  function dureeCache(donnees) {
+    if (donnees.etat === "connu" && donnees.malveillants >= 1) return DUREES_CACHE.signale;
+    if (donnees.etat === "inconnu" && donnees.analyseEnCours) return DUREES_CACHE.attente;
+    return DUREES_CACHE.zero;
+  }
+  function lireCache(cle) {
+    const e = cache.get(cle);
+    if (!e) return null;
+    if (horloge() >= e.fin) { cache.delete(cle); return null; }
+    return e.donnees;
+  }
+  function garder(cle, donnees) { cache.set(cle, { donnees: donnees, fin: horloge() + dureeCache(donnees) }); }
+
   // ---------- La réponse du Worker : on la contrôle avant d'en croire un mot ----------
   function entier(v, max) { return Number.isInteger(v) && v >= 0 && v <= max; }
   function valider(corps) {
     if (!corps || corps.ok !== true) return { etat: "indisponible" };
-    if (corps.etat === "inconnu") return { etat: "inconnu" };
+    if (corps.etat === "inconnu") return corps.analyseEnCours === true ? { etat: "inconnu", analyseEnCours: true } : { etat: "inconnu" };
     if (corps.etat === "connu" && entier(corps.malveillants, 100000) && entier(corps.total, 100000) &&
         corps.total >= 1 && corps.total >= corps.malveillants) {
       return {
@@ -112,20 +131,21 @@
   }
 
   // ---------- L'appel au Worker (la seule requête de ce fichier) ----------
-  async function interroger(domaine, cfg, fetchFn) {
-    return appeler("/reputation", { domaine: domaine }, domaine, cfg, fetchFn);
+  async function interroger(domaine, cfg, fetchFn, delai) {
+    return appeler("/reputation", { domaine: domaine }, domaine, cfg, fetchFn, delai);
   }
   // Lien complet (sans « # ») : part vers /reputation-lien
-  async function interrogerLien(lien, cfg, fetchFn) {
-    return appeler("/reputation-lien", { lien: lien }, "lien|" + lien, cfg, fetchFn);
+  async function interrogerLien(lien, cfg, fetchFn, delai) {
+    return appeler("/reputation-lien", { lien: lien }, "lien|" + lien, cfg, fetchFn, delai || DELAIS.lien);
   }
-  // Une seule requête à la fois pour le même lien (ou nom de domaine), et jamais plus de DELAI_MS d'attente, même si le
+  // Une seule requête à la fois pour le même lien (ou nom de domaine), et jamais plus de « delai » d'attente, même si le
   // réseau ou fetch ne répondent plus : au-delà, « indisponible » (le résultat jaune s'affiche alors avec une ligne qui le dit).
-  function appeler(chemin, corps, cleCache, cfg, fetchFn) {
+  function appeler(chemin, corps, cleCache, cfg, fetchFn, delai) {
     if (enVol.has(cleCache)) return enVol.get(cleCache);
+    const duree = delai || DELAIS.domaine;
     let minuteur = null;
-    const delai = new Promise(function (resoudre) { minuteur = setTimeout(function () { resoudre({ etat: "indisponible" }); }, DELAI_MS); });
-    const demande = Promise.race([envoyer(chemin, corps, cleCache, cfg, fetchFn), delai]).then(function (donnees) {
+    const fin = new Promise(function (resoudre) { minuteur = setTimeout(function () { resoudre({ etat: "indisponible" }); }, duree); });
+    const demande = Promise.race([envoyer(chemin, corps, cleCache, cfg, fetchFn, duree), fin]).then(function (donnees) {
       clearTimeout(minuteur);
       enVol.delete(cleCache);
       return donnees;
@@ -133,19 +153,20 @@
     enVol.set(cleCache, demande);
     return demande;
   }
-  async function envoyer(chemin, corps, cleCache, cfg, fetchFn) {
+  async function envoyer(chemin, corps, cleCache, cfg, fetchFn, duree) {
     const c = lireConfig(cfg === undefined ? configSite() : cfg);
     if (!c.url) return { etat: "desactive" };
-    if (cache.has(cleCache)) return cache.get(cleCache);
+    const gardee = lireCache(cleCache);
+    if (gardee) return gardee;
     const f = fetchFn || (typeof fetch === "function" ? fetch : null);
     if (!f) return { etat: "indisponible" };
     const controleur = typeof AbortController === "function" ? new AbortController() : null;
-    const minuteur = controleur ? setTimeout(function () { controleur.abort(); }, DELAI_MS) : null;
+    const minuteur = controleur ? setTimeout(function () { controleur.abort(); }, duree) : null;
     try {
       const reponse = await f(c.url + chemin, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(corps),     // SEULEMENT le nom de domaine (ou, pour un raccourci, le lien complet sans « # »)
+        body: JSON.stringify(corps),     // SEULEMENT le nom de domaine, ou le lien complet sans « # » (sans requête sauf raccourci)
         credentials: "omit",
         referrerPolicy: "no-referrer",
         cache: "no-store",
@@ -155,7 +176,7 @@
       if (reponse.status === 429) return { etat: "limite" };
       if (!reponse.ok) return { etat: "indisponible" };
       const donnees = valider(await reponse.json());
-      if (donnees.etat === "connu" || donnees.etat === "inconnu") cache.set(cleCache, donnees);
+      if (donnees.etat === "connu" || donnees.etat === "inconnu") garder(cleCache, donnees);
       return donnees;
     } catch (e) {
       return { etat: "indisponible" };                   // réseau coupé, délai dépassé, réponse illisible...
@@ -164,8 +185,8 @@
     }
   }
 
-  // ---------- Appliquer la réponse au résultat : on peut AGGRAVER, jamais alléger ----------
-  // nature : "lien" quand le lien complet a été comparé, sinon le nom de domaine (repli)
+  // ---------- Appliquer UNE réponse au résultat : on peut AGGRAVER, jamais alléger ----------
+  // nature : "lien" quand le lien complet a été comparé, sinon le nom de domaine
   function appliquer(res, donnees, cfg, nature) {
     const c = lireConfig(cfg === undefined ? configSite() : cfg);
     const T = textes();
@@ -197,23 +218,80 @@
     return suite;
   }
 
-  // ---------- Pour le vérificateur : affiche d'abord le résultat local (+ « en cours »), puis le résultat complété ----------
-  // rendre(resultat) est appelée une ou deux fois ; l'appelant ignore les réponses devenues inutiles.
-  function lancer(res, rendre) {
-    // Le lien complet (sans « # ») est comparé ; en cas de panne ou de limite, le résultat jaune reste tel quel
-    const lien = lienAEnvoyer(res);
-    if (lien) {
-      const cle = "lien|" + lien;
-      if (cache.has(cle)) { rendre(appliquer(res, cache.get(cle), undefined, "lien")); return; }
-      rendre({ attente: true });     // pas de jaune tout de suite : seulement « Vérification en cours… »
-      interrogerLien(lien).then(function (donnees) { rendre(appliquer(res, donnees, undefined, "lien")); });
-      return;
+  // ---------- Appliquer la double vérification : le PIRE niveau des deux gagne ----------
+  // d1 : la réponse pour le lien complet (ou null), d2 : la réponse pour le nom de domaine (ou null).
+  function appliquerDouble(res, d1, d2, cfg) {
+    if (!res || res.erreur) return res;
+    const verifs = [];
+    function ajouter(nature, d) {
+      if (!d) return;
+      const v = { nature: nature, etat: d.etat === "connu" || d.etat === "inconnu" ? d.etat : "indisponible" };
+      if (nature === "lien") v.lien = res.lien; else v.domaine = res.hote;
+      if (d.etat === "connu") { v.malveillants = d.malveillants; v.total = d.total; v.date = d.date; }
+      if (d.etat === "inconnu" && d.analyseEnCours) v.analyseEnCours = true;
+      verifs.push({ v: v, d: d });
     }
-    const domaine = doitInterroger(res);
-    if (!domaine) { rendre(res); return; }
-    if (cache.has(domaine)) { rendre(appliquer(res, cache.get(domaine))); return; }
-    rendre({ attente: true });       // pas de jaune tout de suite : seulement « Vérification en cours… »
-    interroger(domaine).then(function (donnees) { rendre(appliquer(res, donnees)); });
+    ajouter("lien", d1);
+    ajouter("domaine", d2);
+    // la réponse qui signale le plus de moteurs (en cas d'égalité : celle du lien, la première)
+    let pire = null;
+    verifs.forEach(function (x) {
+      if (x.d.etat === "connu" && (pire === null || x.d.malveillants > pire.d.malveillants)) pire = x;
+    });
+    const choisi = pire || verifs[0] || null;
+    const suite = choisi ? appliquer(res, choisi.d, cfg, choisi.v.nature) : res;
+    const connus = verifs.filter(function (x) { return x.d.etat === "connu"; });
+    const agregee = { etat: connus.length ? "connu" : (verifs.some(function (x) { return x.d.etat === "inconnu"; }) ? "inconnu" : "indisponible"),
+                      domaine: res.hote, verifs: verifs.map(function (x) { return x.v; }) };
+    if (verifs.some(function (x) { return x.v.nature === "lien"; })) { agregee.nature = "lien"; agregee.lien = res.lien; }
+    if (pire) { agregee.malveillants = pire.d.malveillants; agregee.total = pire.d.total; agregee.date = pire.d.date; }
+    const signale = pire !== null && pire.d.malveillants >= 1;
+    // « VirusTotal analyse ce lien pour la première fois » : l'analyse du lien n'était pas finie, et rien n'est signalé
+    if (!signale && d1 && d1.etat === "inconnu" && d1.analyseEnCours === true) agregee.premiereFois = true;
+    return Object.assign({}, suite, { reputation: agregee });
+  }
+
+  // ---------- La vérification : le lien d'abord, puis (seulement si rien n'est signalé) le nom de domaine ----------
+  // Un lien signalé (1 moteur ou plus) arrête tout : aucune deuxième vérification. Un raccourcisseur n'a jamais de repli sur le
+  // domaine. Au total, 15 secondes au plus.
+  function lienSeSuffit(d1) { return !d1 || d1.etat === "limite" || d1.etat === "indisponible" || d1.etat === "desactive" || (d1.etat === "connu" && d1.malveillants >= 1); }
+
+  async function verifier(res, cfg, fetchFn) {
+    const debut = Date.now();
+    const lien = lienAEnvoyer(res, cfg);
+    const domaine = doitInterroger(res, cfg);
+    if (!lien) return { d1: null, d2: domaine ? await interroger(domaine, cfg, fetchFn, DELAIS.domaine) : null };
+    const d1 = await interrogerLien(lien, cfg, fetchFn, Math.min(DELAIS.lien, DELAIS.total));
+    if (lienSeSuffit(d1) || !domaine) return { d1: d1, d2: null };
+    const reste = DELAIS.total - (Date.now() - debut);
+    if (reste < 500) return { d1: d1, d2: { etat: "indisponible" } };
+    return { d1: d1, d2: await interroger(domaine, cfg, fetchFn, Math.min(DELAIS.domaine, reste)) };
+  }
+
+  // Tout est-il déjà en mémoire (cache de la visite) ? Alors le résultat est affiché tout de suite, sans attente.
+  function depuisCache(res) {
+    const lien = lienAEnvoyer(res), domaine = doitInterroger(res);
+    if (!lien) {
+      const d2 = domaine ? lireCache(domaine) : null;
+      return d2 ? { d1: null, d2: d2 } : null;
+    }
+    const d1 = lireCache("lien|" + lien);
+    if (!d1) return null;
+    if (lienSeSuffit(d1) || !domaine) return { d1: d1, d2: null };
+    const d2 = lireCache(domaine);
+    return d2 ? { d1: d1, d2: d2 } : null;
+  }
+
+  // ---------- Pour le vérificateur ----------
+  // rendre(resultat) est appelée une ou deux fois ; l'appelant ignore les réponses devenues inutiles.
+  // Un résultat jaune qui doit partir chez VirusTotal n'est PAS affiché tout de suite : rendre({ attente: true }) d'abord
+  // (« Vérification en cours… »), puis le résultat final. Tout le reste est affiché immédiatement.
+  function lancer(res, rendre) {
+    if (!lienAEnvoyer(res) && !doitInterroger(res)) { rendre(res); return; }
+    const gardees = depuisCache(res);
+    if (gardees) { rendre(appliquerDouble(res, gardees.d1, gardees.d2)); return; }
+    rendre({ attente: true });
+    verifier(res).then(function (r) { rendre(appliquerDouble(res, r.d1, r.d2)); });
   }
 
   function viderCache() { cache.clear(); enVol.clear(); }
@@ -221,6 +299,9 @@
   window.RoShieldReputation = {
     adresseWorker: adresseWorker, lireConfig: lireConfig, doitInterroger: doitInterroger, interroger: interroger,
     lienAEnvoyer: lienAEnvoyer, interrogerLien: interrogerLien,
-    appliquer: appliquer, lancer: lancer, viderCache: viderCache
+    appliquer: appliquer, appliquerDouble: appliquerDouble, verifier: verifier, lancer: lancer, viderCache: viderCache,
+    dureeCache: dureeCache, DUREES_CACHE: DUREES_CACHE, delais: function () { return Object.assign({}, DELAIS); },
+    reglerDelais: function (d) { Object.assign(DELAIS, d); },
+    reglerHorloge: function (f) { horloge = typeof f === "function" ? f : function () { return Date.now(); }; }
   };
 })();

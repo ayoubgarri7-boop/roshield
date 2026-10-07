@@ -87,8 +87,11 @@
         Ce petit service interroge VirusTotal, un site qui rassemble les avis de nombreux moteurs de sécurité.
       </p>
       <p>
-        Avec 0 moteur « malicious », le résultat reste jaune, avec une ligne qui dit qu'aucun antivirus ne le signale
-        pour l'instant, ce qui ne veut pas dire sûr.
+        Si VirusTotal signale le lien (1 moteur « malicious » ou plus), c'est tout. Sinon, le site fait une <strong>deuxième vérification</strong> :
+        s'il faut attendre l'analyse d'un lien neuf, le petit service relit une seule fois le résultat après environ 5 secondes, puis (sauf pour un
+        lien raccourci) le site envoie aussi le <strong>nom de domaine seul</strong>. Le pire des deux résultats gagne.
+        Si tout reste absent ou à 0 moteur, le résultat reste jaune, avec une ligne qui dit qu'aucun antivirus ne le signale
+        pour l'instant, ce qui ne veut pas dire sûr. Si l'analyse du lien n'était pas finie, la page te demande de réessayer dans une minute.
       </p>
       <p>
         Le résultat peut seulement <strong>aggraver</strong> ce que tu vois, jamais le rendre vert :
@@ -100,8 +103,8 @@
       </ul>
       <p>
         Seuls les moteurs « malicious » comptent (pas « suspicious », pas « undetected »). Les moteurs se trompent parfois.
-        Pour un résultat jaune, le site affiche « Vérification en cours… » et attend la réponse du petit service pendant 4 secondes au plus.
-        Si le petit service ne répond pas dans ce délai, s'il est en panne ou si une limite est atteinte, le vérificateur affiche
+        Pour un résultat jaune, le site affiche « Vérification en cours… » et attend la réponse du petit service pendant 15 secondes au plus.
+        Si le petit service ne répond pas dans ce délai (15 secondes en tout, deux vérifications comprises), s'il est en panne ou si une limite est atteinte, le vérificateur affiche
         son résultat local, avec une ligne qui le dit. Les résultats rouges, verts, officiels, les adresses IP et les noms locaux
         s'affichent tout de suite, sans attente.
       </p>
@@ -111,13 +114,13 @@
       <h2>Ce que garde le petit service</h2>
       <p>Pour respecter les limites de VirusTotal, il garde très peu de choses, et seulement le temps indiqué :</p>
       <ul>
-        <li><strong>Un résultat par nom de domaine</strong> : une empreinte secrète du nom (jamais le nom lui-même), quelques nombres et une date. <strong>6 heures</strong> si VirusTotal connaît le domaine, <strong>2 heures</strong> sinon.</li>
-        <li><strong>Un résultat par lien</strong> : une empreinte secrète du lien (jamais le lien lui-même), quelques nombres et une date. <strong>1 heure</strong> seulement, parce que la destination d'un lien peut changer.</li>
+        <li><strong>Un résultat par nom de domaine</strong> : une empreinte secrète du nom (jamais le nom lui-même), quelques nombres et une date. <strong>1 heure</strong> si le domaine est signalé, <strong>5 minutes</strong> s'il est à 0 moteur ou inconnu de VirusTotal.</li>
+        <li><strong>Un résultat par lien</strong> : une empreinte secrète du lien (jamais le lien lui-même), quelques nombres et une date. <strong>1 heure</strong> si le lien est signalé, <strong>5 minutes seulement</strong> s'il est à 0 moteur ou sans résultat (1 minute si l'analyse n'est pas finie), parce que la destination d'un lien peut changer.</li>
         <li><strong>Un compteur par visiteur</strong> : une empreinte secrète de ton adresse IP (jamais l'adresse elle-même), qui change chaque jour. <strong>1 minute</strong> pour le compteur de la minute, <strong>jusqu'à la fin de la journée (24 heures au plus)</strong> pour celui du jour.</li>
         <li><strong>Des compteurs généraux</strong> (nombre d'appels à VirusTotal), sans aucune donnée personnelle : 1 minute et 1 jour.</li>
       </ul>
       <p>
-        Limites : 4 appels par minute et 500 par jour pour tout le monde (c'est le quota gratuit de VirusTotal), 2 par minute et 30 par jour pour toi (la vérification d'un lien compte pour 2).
+        Limites : 4 appels par minute et 500 par jour pour tout le monde (c'est le quota gratuit de VirusTotal), 3 par minute et 45 par jour pour toi (la vérification d'un lien compte pour 2, celle d'un nom de domaine pour 1).
         Le petit service ne garde ni ton adresse IP, ni les liens, ni les chemins. En cas de panne, il écrit seulement une courte cause technique (par exemple « délai dépassé »), jamais de lien, de nom de domaine ni d'adresse IP.
         Une purge automatique efface chaque heure ce qui a expiré.
       </p>

@@ -170,6 +170,12 @@ window.TEXTES_VERIF = {
     return m + " security engines out of " + total + " flag this link as malicious" + quand + ".";
   },
   reputationLienInconnu: "VirusTotal has no result for this link yet.",
+  // Second check (nothing found for the full link): the domain name alone
+  reputationDomaineAussi: function (domaine) {
+    return "The domain name “" + domaine + "” is also compared with VirusTotal.";
+  },
+  // The link’s analysis wasn’t finished after the re-read, and nothing is flagged
+  reputationPremiereFois: "VirusTotal is analysing this link for the first time. Try again in a minute before opening it.",
   reputationLienAucun: "No antivirus flags it for now. That doesn’t mean it’s safe.",
   reputationAvertissement: "No reports doesn’t mean safe.",
   reputationConseil: "Never type your password or a code on this page, and never share your screen.",
